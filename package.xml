@@ -5,20 +5,8 @@
   <description>The as_can_interface package</description>
   <maintainer email="jwhitley@autonomoustuff.com">Joshua Whitley</maintainer>
   <license>BSD</license>
+  <url type="repository">https://bitbucket.org/autonomoustuff/as_can_interface</url>
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author> -->
-
-
-  <!-- The *_depend tags are used to specify dependencies -->
-  <!-- Dependencies can be catkin packages or system dependencies -->
-  <!-- Examples: -->
-  <!-- Use build_depend for packages you need at compile time: -->
-  <!--   <build_depend>message_generation</build_depend> -->
-  <!-- Use buildtool_depend for build tool packages: -->
-  <!--   <buildtool_depend>catkin</buildtool_depend> -->
-  <!-- Use run_depend for packages you need at runtime: -->
-  <!--   <run_depend>message_runtime</run_depend> -->
-  <!-- Use test_depend for packages you need only for testing: -->
-  <!--   <test_depend>gtest</test_depend> -->
   <build_depend>message_generation</build_depend>
   <build_depend>std_msgs</build_depend>
   <buildtool_depend>catkin</buildtool_depend>
