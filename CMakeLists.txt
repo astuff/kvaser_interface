@@ -59,8 +59,9 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
     INCLUDE_DIRS include/${PROJECT_NAME}
-    LIBRARIES as_can_interface
+    LIBRARIES as_linuxcan
     CATKIN_DEPENDS std_msgs message_runtime
+    DEPENDS canlib
 )
 
 ###########
@@ -82,7 +83,8 @@ add_library(as_linuxcan
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(as_linuxcan
-  ${catkin_LIBRARIES}
+    canlib
+    ${catkin_LIBRARIES}
 )
 
 #############
