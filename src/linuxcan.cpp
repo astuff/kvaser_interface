@@ -15,7 +15,7 @@
 * TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS, OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT  MAY DESCRIBE, IN WHOLE OR IN PART.
 */
 
-#include <AS_Can.hpp>
+#include <as_can_interface.hpp>
 #include <canlib.h>
 
 using namespace std;

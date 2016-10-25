@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>as_can_parser</name>
+  <name>as_can_interface</name>
   <version>0.1.0</version>
-  <description>The as_can_parser package</description>
+  <description>The as_can_interface package</description>
   <maintainer email="jwhitley@autonomoustuff.com">Joshua Whitley</maintainer>
   <license>BSD</license>
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author> -->

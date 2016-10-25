@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(as_can_parser)
+project(as_can_interface)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -58,9 +58,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include
- LIBRARIES as_can_parser
- CATKIN_DEPENDS std_msgs message_runtime
+    INCLUDE_DIRS include/${PROJECT_NAME}
+    LIBRARIES as_can_interface
+    CATKIN_DEPENDS std_msgs message_runtime
 )
 
 ###########
@@ -69,7 +69,7 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include
+include_directories(include/${PROJECT_NAME}
     ${catkin_INCLUDE_DIRS}
 )
 
