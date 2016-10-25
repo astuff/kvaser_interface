@@ -1,0 +1,7 @@
+build/
+bin/
+*.log
+*.swp
+*.user
+*~
+.idea/
