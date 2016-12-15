@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <package>
-  <name>as_can_interface</name>
-  <version>0.1.0</version>
-  <description>The as_can_interface package</description>
-  <maintainer email="jwhitley@autonomoustuff.com">Joshua Whitley</maintainer>
+  <name>can_interface</name>
+  <version>1.0.0</version>
+  <description>CAN interfaces and messages.</description>
+  <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
   <license>BSD</license>
-  <url type="repository">https://bitbucket.org/autonomoustuff/as_can_interface</url>
-  <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author> -->
+  <url type="repository">https://bitbucket.org/autonomoustuff/can_interface</url>
+  <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
   <build_depend>message_generation</build_depend>
   <build_depend>std_msgs</build_depend>
   <buildtool_depend>catkin</buildtool_depend>

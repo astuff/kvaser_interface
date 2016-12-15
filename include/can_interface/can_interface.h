@@ -18,8 +18,8 @@
 // Define a class that supports a basic CAN interface that's independent of the hardware and driver library used
 // Different libraries can be created to define all these functions for a specific driver library
 
-#ifndef AS_CAN_HPP
-#define AS_CAN_HPP
+#ifndef CAN_INTERFACE_HPP
+#define CAN_INTERFACE_HPP
 
 //C++ Includes
 #include <iostream>
