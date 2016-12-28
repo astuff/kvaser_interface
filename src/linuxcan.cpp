@@ -31,6 +31,12 @@ CanInterface::CanInterface() :
 //Default destructor.
 CanInterface::~CanInterface()
 {
+    if (handle != NULL)
+    {
+        canHandle *h = (canHandle*) handle;
+        canClose(*h);
+    }
+
     free(handle);
 }
 
