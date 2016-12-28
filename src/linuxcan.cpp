@@ -81,7 +81,7 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
     }
 
     // Open channel
-    *h = canOpenChannel(channel, canOPEN_REQUIRE_EXTENDED);
+    *h = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
     if (*h < 0)
     {
         return init_failed;
@@ -101,16 +101,13 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
         }
     }
 
-    if (canSetBusParams(*h, freq, 4, 3, 1, 1, 0) < 0)
+    if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
     {
         return bad_params;
     }
 
     // Set output control
     canSetBusOutputControl(*h, canDRIVER_NORMAL);
-
-    // Go bus on
-    canBusOn(*h);
 
     return ok;
 }
@@ -139,6 +136,9 @@ return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *s
 
     canHandle *h = (canHandle *) handle;
 
+    // Go bus on
+    canBusOn(*h);
+
     bool done = false;
     return_statuses ret_val = init_failed;
     unsigned int flag = 0;
@@ -150,19 +150,18 @@ return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *s
         if (ret == canERR_NOMSG)
         {
             ret_val = no_messages_received;
-            done = true;
         }
         else if (ret != canOK)
         {
             ret_val = read_failed;
-            done = true;
         }
         else if (!(flag & 0xFFF9))
         {
             // Was a received message with actual data
             ret_val = ok;
-            done = true;
         }
+
+        done = true;
     }
 
     if (ret_val == ok)
@@ -181,6 +180,9 @@ return_statuses CanInterface::send(long id, unsigned char *msg, unsigned int siz
     }
 
     canHandle *h = (canHandle *) handle;
+
+    // Go bus on
+    canBusOn(*h);
 
     unsigned int flag;
 
