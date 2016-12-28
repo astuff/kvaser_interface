@@ -109,6 +109,12 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
     // Set output control
     canSetBusOutputControl(*h, canDRIVER_NORMAL);
 
+    if (!onBus)
+    {
+        canBusOn(*h);
+        onBus = true;
+    }
+
     return ok;
 }
 
@@ -135,9 +141,6 @@ return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *s
     }
 
     canHandle *h = (canHandle *) handle;
-
-    // Go bus on
-    canBusOn(*h);
 
     bool done = false;
     return_statuses ret_val = init_failed;
@@ -180,9 +183,6 @@ return_statuses CanInterface::send(long id, unsigned char *msg, unsigned int siz
     }
 
     canHandle *h = (canHandle *) handle;
-
-    // Go bus on
-    canBusOn(*h);
 
     unsigned int flag;
 

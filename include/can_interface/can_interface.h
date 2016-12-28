@@ -62,6 +62,7 @@ namespace AS
 
         private:
             void *handle;
+            bool onBus;
         };
     }
 }
