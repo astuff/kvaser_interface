@@ -23,7 +23,7 @@ generate_messages(
 )
 
 catkin_package(
-    INCLUDE_DIRS include/${PROJECT_NAME}
+    INCLUDE_DIRS include
     LIBRARIES ros_linuxcan
     CATKIN_DEPENDS std_msgs message_runtime
     DEPENDS canlib
