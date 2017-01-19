@@ -47,70 +47,69 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
         return init_failed;
     }
 
-    canHandle *h = (canHandle *) handle;
-
-    int numChan;
-    if (canGetNumberOfChannels(&numChan) != canOK)
+    if (!onBus)
     {
-        return init_failed;
-    }
+        canHandle *h = (canHandle *) handle;
 
-    unsigned int serial[2];
-    unsigned int channel_number;
-    int channel = -1;
-    for (int idx = 0; idx < numChan; idx++)
-    {
-        if (canGetChannelData(idx, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial)) == canOK)
+        int numChan;
+        if (canGetNumberOfChannels(&numChan) != canOK)
         {
-            if (serial[0] == (unsigned int) hardware_id)
+            return init_failed;
+        }
+
+        unsigned int serial[2];
+        unsigned int channel_number;
+        int channel = -1;
+        for (int idx = 0; idx < numChan; idx++)
+        {
+            if (canGetChannelData(idx, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial)) == canOK)
             {
-                if (canGetChannelData(idx, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_number, sizeof(channel_number)) == canOK)
+                if (serial[0] == (unsigned int) hardware_id)
                 {
-                    if (channel_number == (unsigned int) circuit_id)
+                    if (canGetChannelData(idx, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_number, sizeof(channel_number)) == canOK)
                     {
-                        channel = idx;
+                        if (channel_number == (unsigned int) circuit_id)
+                        {
+                            channel = idx;
+                        }
                     }
                 }
             }
         }
-    }
 
-    if (channel == -1)
-    {
-        return bad_params;
-    }
-
-    // Open channel
-    *h = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
-    if (*h < 0)
-    {
-        return init_failed;
-    }
-
-    // Set bit rate and other parameters
-    long freq;
-    switch (bitrate)
-    {
-        case 125000: freq = canBITRATE_125K; break;
-        case 250000: freq = canBITRATE_250K; break;
-        case 500000: freq = canBITRATE_500K; break;
-        case 1000000: freq = canBITRATE_1M; break;
-        default:
+        if (channel == -1)
         {
-            return  bad_params;
+            return bad_params;
         }
-    }
 
-    if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
-    {
-        return bad_params;
-    }
+        // Open channel
+        *h = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
+        if (*h < 0)
+        {
+            return init_failed;
+        }
 
-    // Set output control
-    canSetBusOutputControl(*h, canDRIVER_NORMAL);
+        // Set bit rate and other parameters
+        long freq;
+        switch (bitrate)
+        {
+            case 125000: freq = canBITRATE_125K; break;
+            case 250000: freq = canBITRATE_250K; break;
+            case 500000: freq = canBITRATE_500K; break;
+            case 1000000: freq = canBITRATE_1M; break;
+            default:
+            {
+                return  bad_params;
+            }
+        }
 
-    if (!onBus)
-    {
+        if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
+        {
+            return bad_params;
+        }
+
+        // Set output control
+        canSetBusOutputControl(*h, canDRIVER_NORMAL);
         canBusOn(*h);
         onBus = true;
     }
@@ -129,6 +128,7 @@ return_statuses CanInterface::close()
 
     // Close the channel
     canClose(*h);
+    onBus = false;
 
     return ok;
 }
