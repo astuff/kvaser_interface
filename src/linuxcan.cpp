@@ -153,18 +153,21 @@ return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *s
         if (ret == canERR_NOMSG)
         {
             ret_val = no_messages_received;
+            done = true;
         }
         else if (ret != canOK)
         {
             ret_val = read_failed;
+            done = true;
         }
-        else if (!(flag & 0xFFF9))
+        else if (!(flag & 0xF9))
         {
             // Was a received message with actual data
             ret_val = ok;
+            done = true;
         }
-
-        done = true;
+        // Else a protocol message, such as a TX ACK, was received
+        // Keep looping until one of the other conditions above is met
     }
 
     if (ret_val == ok)
