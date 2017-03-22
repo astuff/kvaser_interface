@@ -1,4 +1,4 @@
 Header header
-uint16 id
+uint32 id
 uint8 dlc
 uint8[] data
