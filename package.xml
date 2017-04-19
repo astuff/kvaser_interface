@@ -1,11 +1,17 @@
 <?xml version="1.0"?>
 <package>
   <name>can_interface</name>
-  <version>1.5.0</version>
-  <description>CAN interfaces and messages.</description>
+  <version>1.6.0</version>
+  <description>CAN interfaces for Kvaser devices.</description>
+  <license>GPLv3</license>
+
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
-  <license>BSD</license>
+
+  <url type="bugtracker">https://bitbucket.org/autonomoustuff/can_interface/issues</url>
   <url type="repository">https://bitbucket.org/autonomoustuff/can_interface</url>
+
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
+  <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
+
   <buildtool_depend>catkin</buildtool_depend>
 </package>
