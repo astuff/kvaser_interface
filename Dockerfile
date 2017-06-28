@@ -8,7 +8,6 @@ ENV workspace /root/driver_ws
 RUN apt-get update && apt-get install -y \
     wget \
     ros-kinetic-can-msgs \
-    git \
     python-catkin-tools \
     linux-headers-generic-hwe-16.04 \
     && rm -rf /var/lib/apt/lists/
@@ -16,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 # Download, build, and install linuxcan
 RUN cd /usr/src \
     && wget http://www.kvaser.com/software/7330130980754/V5_20_0/linuxcan.tar.gz \
-    && tar xvf linuxcan.tar.gz \
+    && tar xf linuxcan.tar.gz \
     && cd linuxcan \
     && make canlib \
     && make linlib \
