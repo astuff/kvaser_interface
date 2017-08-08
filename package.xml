@@ -2,7 +2,7 @@
 <package>
   <name>can_interface</name>
   <version>1.6.0</version>
-  <description>CAN interfaces for Kvaser devices.</description>
+  <description>Generic CAN interface for ROS device drivers.</description>
   <license>GPLv3</license>
 
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
