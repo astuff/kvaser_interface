@@ -30,41 +30,41 @@
 
 namespace AS
 {
-    namespace CAN
-    {
-        enum return_statuses
-        {
-            ok = 0,
-            init_failed,
-            bad_params,
-            no_messages_received,
-            read_failed,
-            send_failed
-        };
+namespace CAN
+{
+  enum return_statuses
+  {
+    OK = 0,
+    INIT_FAILED,
+    BAD_PARAMS,
+    NO_MESSAGES_RECEIVED,
+    READ_FAILED,
+    SEND_FAILED
+  };
 
-        class CanInterface
-        {
-        public:
-            CanInterface();
+  class CanInterface
+  {
+  public:
+    CanInterface();
 
-            ~CanInterface();
+    ~CanInterface();
 
-            // Called to pass in parameters and open can link
-            return_statuses open(int hardware_id, int circuit_id, int bitrate);
+    // Called to pass in parameters and open can link
+    return_statuses open(int hardware_id, int circuit_id, int bitrate);
 
-            // Close the can link
-            return_statuses close();
+    // Close the can link
+    return_statuses close();
 
-            // Read a message
-            return_statuses read(long *id, unsigned char *msg, unsigned int *size, bool *extended, unsigned long *time);
+    // Read a message
+    return_statuses read(long *id, unsigned char *msg, unsigned int *size, bool *extended, unsigned long *time);
 
-            // Send a message
-            return_statuses send(long id, unsigned char *msg, unsigned int size, bool extended);
+    // Send a message
+    return_statuses send(long id, unsigned char *msg, unsigned int size, bool extended);
 
-        private:
-            void *handle;
-            bool onBus;
-        };
-    }
+  private:
+    void *handle;
+    bool onBus;
+  };
+}
 }
 #endif

@@ -26,180 +26,181 @@ using namespace AS::CAN;
 CanInterface::CanInterface() :
         handle(NULL)
 {
-    handle = malloc(sizeof(canHandle));
+  handle = malloc(sizeof(canHandle));
 }
 
 //Default destructor.
 CanInterface::~CanInterface()
 {
-    if (handle != NULL)
-    {
-        canHandle *h = (canHandle*) handle;
-        canClose(*h);
-    }
+  if (handle != NULL)
+  {
+    canHandle *h = (canHandle*) handle;
+    canClose(*h);
+  }
 
-    free(handle);
+  free(handle);
 }
 
 return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
 {
-    if (handle == NULL)
+  if (handle == NULL)
+  {
+    return INIT_FAILED;
+  }
+
+  if (!onBus)
+  {
+    canHandle *h = (canHandle *) handle;
+
+    int numChan;
+    if (canGetNumberOfChannels(&numChan) != canOK)
     {
-        return init_failed;
+      return INIT_FAILED;
     }
 
-    if (!onBus)
+    unsigned int serial[2];
+    unsigned int channel_number;
+    int channel = -1;
+
+    for (int idx = 0; idx < numChan; idx++)
     {
-        canHandle *h = (canHandle *) handle;
-
-        int numChan;
-        if (canGetNumberOfChannels(&numChan) != canOK)
+      if (canGetChannelData(idx, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial)) == canOK)
+      {
+        if (serial[0] == (unsigned int) hardware_id)
         {
-            return init_failed;
-        }
-
-        unsigned int serial[2];
-        unsigned int channel_number;
-        int channel = -1;
-        for (int idx = 0; idx < numChan; idx++)
-        {
-            if (canGetChannelData(idx, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial)) == canOK)
+          if (canGetChannelData(idx, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_number, sizeof(channel_number)) == canOK)
+          {
+            if (channel_number == (unsigned int) circuit_id)
             {
-                if (serial[0] == (unsigned int) hardware_id)
-                {
-                    if (canGetChannelData(idx, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_number, sizeof(channel_number)) == canOK)
-                    {
-                        if (channel_number == (unsigned int) circuit_id)
-                        {
-                            channel = idx;
-                        }
-                    }
-                }
+              channel = idx;
             }
+          }
         }
-
-        if (channel == -1)
-        {
-            return bad_params;
-        }
-
-        // Open channel
-        *h = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
-        if (*h < 0)
-        {
-            return init_failed;
-        }
-
-        // Set bit rate and other parameters
-        long freq;
-        switch (bitrate)
-        {
-            case 125000: freq = canBITRATE_125K; break;
-            case 250000: freq = canBITRATE_250K; break;
-            case 500000: freq = canBITRATE_500K; break;
-            case 1000000: freq = canBITRATE_1M; break;
-            default:
-            {
-                return  bad_params;
-            }
-        }
-
-        if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
-        {
-            return bad_params;
-        }
-
-        // Set output control
-        canSetBusOutputControl(*h, canDRIVER_NORMAL);
-        canBusOn(*h);
-        onBus = true;
+      }
     }
 
-    return ok;
+    if (channel == -1)
+    {
+      return BAD_PARAMS;
+    }
+
+    // Open channel
+    *h = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
+    if (*h < 0)
+    {
+      return INIT_FAILED;
+    }
+
+    // Set bit rate and other parameters
+    long freq;
+    switch (bitrate)
+    {
+      case 125000: freq = canBITRATE_125K; break;
+      case 250000: freq = canBITRATE_250K; break;
+      case 500000: freq = canBITRATE_500K; break;
+      case 1000000: freq = canBITRATE_1M; break;
+      default:
+      {
+        return  BAD_PARAMS;
+      }
+    }
+
+    if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
+    {
+      return BAD_PARAMS;
+    }
+
+    // Set output control
+    canSetBusOutputControl(*h, canDRIVER_NORMAL);
+    canBusOn(*h);
+    onBus = true;
+  }
+
+  return OK;
 }
 
 return_statuses CanInterface::close()
 {
-    if (handle == NULL)
-    {
-        return init_failed;
-    }
+  if (handle == NULL)
+  {
+    return INIT_FAILED;
+  }
 
-    canHandle *h = (canHandle *) handle;
+  canHandle *h = (canHandle *) handle;
 
-    // Close the channel
-    canClose(*h);
-    onBus = false;
+  // Close the channel
+  canClose(*h);
+  onBus = false;
 
-    return ok;
+  return OK;
 }
 
 return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *size, bool *extended, unsigned long *time)
 {
-    if (handle == NULL)
+  if (handle == NULL)
+  {
+    return INIT_FAILED;
+  }
+
+  canHandle *h = (canHandle *) handle;
+
+  bool done = false;
+  return_statuses ret_val = INIT_FAILED;
+  unsigned int flag = 0;
+
+  while (!done)
+  {
+    canStatus ret = canRead(*h, id, msg, size, &flag, time);
+
+    if (ret == canERR_NOMSG)
     {
-        return init_failed;
+      ret_val = NO_MESSAGES_RECEIVED;
+      done = true;
     }
-
-    canHandle *h = (canHandle *) handle;
-
-    bool done = false;
-    return_statuses ret_val = init_failed;
-    unsigned int flag = 0;
-
-    while (!done)
+    else if (ret != canOK)
     {
-        canStatus ret = canRead(*h, id, msg, size, &flag, time);
-
-        if (ret == canERR_NOMSG)
-        {
-            ret_val = no_messages_received;
-            done = true;
-        }
-        else if (ret != canOK)
-        {
-            ret_val = read_failed;
-            done = true;
-        }
-        else if (!(flag & 0xF9))
-        {
-            // Was a received message with actual data
-            ret_val = ok;
-            done = true;
-        }
-        // Else a protocol message, such as a TX ACK, was received
-        // Keep looping until one of the other conditions above is met
+      ret_val = READ_FAILED;
+      done = true;
     }
-
-    if (ret_val == ok)
+    else if (!(flag & 0xF9))
     {
-        *extended = ((flag & canMSG_EXT) > 0);
+      // Was a received message with actual data
+      ret_val = OK;
+      done = true;
     }
+    // Else a protocol message, such as a TX ACK, was received
+    // Keep looping until one of the other conditions above is met
+  }
 
-    return ret_val;
+  if (ret_val == OK)
+  {
+    *extended = ((flag & canMSG_EXT) > 0);
+  }
+
+  return ret_val;
 }
 
 return_statuses CanInterface::send(long id, unsigned char *msg, unsigned int size, bool extended)
 {
-    if (handle == NULL)
-    {
-        return init_failed;
-    }
+  if (handle == NULL)
+  {
+    return INIT_FAILED;
+  }
 
-    canHandle *h = (canHandle *) handle;
+  canHandle *h = (canHandle *) handle;
 
-    unsigned int flag;
+  unsigned int flag;
 
-    if (extended)
-    {
-        flag = canMSG_EXT;
-    }
-    else
-    {
-        flag = canMSG_STD;
-    }
+  if (extended)
+  {
+    flag = canMSG_EXT;
+  }
+  else
+  {
+    flag = canMSG_STD;
+  }
 
-    canStatus ret = canWrite(*h, id, msg, size, flag);
+  canStatus ret = canWrite(*h, id, msg, size, flag);
 
-    return (ret == canOK) ? ok : send_failed;
+  return (ret == canOK) ? OK : SEND_FAILED;
 }
