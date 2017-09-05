@@ -38,10 +38,11 @@ namespace CAN
     INIT_FAILED = -1,
     BAD_PARAMS = -2,
     NO_CHANNELS_FOUND = -3,
-    NO_MESSAGES_RECEIVED = -4,
-    READ_FAILED = -5,
-    WRITE_FAILED = -6,
-    CLOSE_FAILED = -7
+    CHANNEL_NOT_OPEN = -4,
+    NO_MESSAGES_RECEIVED = -5,
+    READ_FAILED = -6,
+    WRITE_FAILED = -7,
+    CLOSE_FAILED = -8
   };
 
   class CanInterface
@@ -68,7 +69,7 @@ namespace CAN
 
   private:
     void *handle;
-    bool onBus;
+    bool on_bus;
   };
 }
 }

@@ -47,7 +47,7 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
     return INIT_FAILED;
   }
 
-  if (!onBus)
+  if (!on_bus)
   {
     canHandle *h = (canHandle *) handle;
 
@@ -112,7 +112,7 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
     // Set output control
     canSetBusOutputControl(*h, canDRIVER_NORMAL);
     canBusOn(*h);
-    onBus = true;
+    on_bus = true;
   }
 
   return OK;
@@ -133,7 +133,7 @@ return_statuses CanInterface::close()
     return CLOSE_FAILED;
   }
 
-  onBus = false;
+  on_bus = false;
 
   return OK;
 }
@@ -155,7 +155,13 @@ return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *s
   {
     canStatus ret = canRead(*h, id, msg, size, &flag, time);
 
-    if (ret == canERR_NOMSG)
+    if (ret == canERR_NOTINITIALIZED)
+    {
+      ret_val = CHANNEL_NOT_OPEN;
+      on_bus = false;
+      done = true;
+    }
+    else if (ret == canERR_NOMSG)
     {
       ret_val = NO_MESSAGES_RECEIVED;
       done = true;
