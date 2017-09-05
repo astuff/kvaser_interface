@@ -64,13 +64,13 @@ namespace CAN
     // Send a message
     return_statuses write(long id, unsigned char *msg, unsigned int size, bool extended);
 
-    // Converts error messages to human-readable strings
-    std::string return_status_desc(return_statuses &ret);
-
   private:
     void *handle;
     bool on_bus;
   };
+
+  // Converts error messages to human-readable strings
+  std::string return_status_desc(return_statuses &ret);
 }
 }
 #endif
