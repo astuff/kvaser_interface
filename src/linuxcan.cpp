@@ -80,7 +80,7 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
 
     if (channel == -1)
     {
-      return BAD_PARAMS;
+      return BAD_PARAM;
     }
 
     // Open channel
@@ -100,13 +100,13 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
       case 1000000: freq = canBITRATE_1M; break;
       default:
       {
-        return  BAD_PARAMS;
+        return  BAD_PARAM;
       }
     }
 
     if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
     {
-      return BAD_PARAMS;
+      return BAD_PARAM;
     }
 
     // Set output control

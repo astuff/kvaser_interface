@@ -26,7 +26,7 @@ std::string AS::CAN::return_status_desc(return_statuses &ret)
   {
     status_string = "Initialization of the CAN interface failed.";
   }
-  else if (ret == BAD_PARAMS)
+  else if (ret == BAD_PARAM)
   {
     status_string = "A bad parameter was provided to the CAN interface during initalization.";
   }

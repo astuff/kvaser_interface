@@ -36,7 +36,7 @@ namespace CAN
   {
     OK = 0,
     INIT_FAILED = -1,
-    BAD_PARAMS = -2,
+    BAD_PARAM = -2,
     NO_CHANNELS_FOUND = -3,
     CHANNEL_CLOSED = -4,
     NO_MESSAGES_RECEIVED = -5,
