@@ -157,7 +157,7 @@ return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *s
 
     if (ret == canERR_NOTINITIALIZED)
     {
-      ret_val = CHANNEL_NOT_OPEN;
+      ret_val = CHANNEL_CLOSED;
       on_bus = false;
       done = true;
     }
@@ -229,6 +229,10 @@ std::string CanInterface::return_status_desc(return_statuses &ret)
   else if (ret == NO_CHANNELS_FOUND)
   {
     status_string = "No available CAN channels were found.";
+  }
+  else if (ret == CHANNEL_CLOSED)
+  {
+    status_string = "CAN channel is not currently open.";
   }
   else if (ret == NO_MESSAGES_RECEIVED)
   {

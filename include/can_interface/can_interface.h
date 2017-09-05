@@ -38,7 +38,7 @@ namespace CAN
     INIT_FAILED = -1,
     BAD_PARAMS = -2,
     NO_CHANNELS_FOUND = -3,
-    CHANNEL_NOT_OPEN = -4,
+    CHANNEL_CLOSED = -4,
     NO_MESSAGES_RECEIVED = -5,
     READ_FAILED = -6,
     WRITE_FAILED = -7,
