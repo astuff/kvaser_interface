@@ -204,3 +204,31 @@ return_statuses CanInterface::send(long id, unsigned char *msg, unsigned int siz
 
   return (ret == canOK) ? OK : SEND_FAILED;
 }
+
+std::string CanInterface::return_status_desc(return_statuses &ret)
+{
+  std::string status_string;
+
+  if (ret == INIT_FAILED)
+  {
+    status_string = "Initialization of the CAN interface failed.";
+  }
+  else if (ret == BAD_PARAMS)
+  {
+    status_string = "A bad parameter was provided to the CAN interface during initalization.";
+  }
+  else if (ret == NO_MESSAGES_RECEIVED)
+  {
+    status_string = "No messages were received on the interface.";
+  }
+  else if (ret == READ_FAILED)
+  {
+    status_string = "A read operation failed on the CAN interface.";
+  }
+  else if (ret == SEND_FAILED)
+  {
+    status_string = "A write operation failed on the CAN interface.";
+  }
+
+  return status_string;
+}
