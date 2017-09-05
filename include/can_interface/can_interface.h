@@ -35,11 +35,13 @@ namespace CAN
   enum return_statuses
   {
     OK = 0,
-    INIT_FAILED,
-    BAD_PARAMS,
-    NO_MESSAGES_RECEIVED,
-    READ_FAILED,
-    SEND_FAILED
+    INIT_FAILED = -1,
+    BAD_PARAMS = -2,
+    NO_CHANNELS_FOUND = -3,
+    NO_MESSAGES_RECEIVED = -4,
+    READ_FAILED = -5,
+    WRITE_FAILED = -6,
+    CLOSE_FAILED = -7
   };
 
   class CanInterface
@@ -59,7 +61,7 @@ namespace CAN
     return_statuses read(long *id, unsigned char *msg, unsigned int *size, bool *extended, unsigned long *time);
 
     // Send a message
-    return_statuses send(long id, unsigned char *msg, unsigned int size, bool extended);
+    return_statuses write(long id, unsigned char *msg, unsigned int size, bool extended);
 
     // Converts error messages to human-readable strings
     std::string return_status_desc(return_statuses &ret);

@@ -34,8 +34,7 @@ CanInterface::~CanInterface()
 {
   if (handle != NULL)
   {
-    canHandle *h = (canHandle*) handle;
-    canClose(*h);
+    close();
   }
 
   free(handle);
@@ -129,7 +128,11 @@ return_statuses CanInterface::close()
   canHandle *h = (canHandle *) handle;
 
   // Close the channel
-  canClose(*h);
+  if (canClose(*h) != canOK)
+  {
+    return CLOSE_FAILED;
+  }
+
   onBus = false;
 
   return OK;
@@ -180,7 +183,7 @@ return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *s
   return ret_val;
 }
 
-return_statuses CanInterface::send(long id, unsigned char *msg, unsigned int size, bool extended)
+return_statuses CanInterface::write(long id, unsigned char *msg, unsigned int size, bool extended)
 {
   if (handle == NULL)
   {
@@ -202,7 +205,7 @@ return_statuses CanInterface::send(long id, unsigned char *msg, unsigned int siz
 
   canStatus ret = canWrite(*h, id, msg, size, flag);
 
-  return (ret == canOK) ? OK : SEND_FAILED;
+  return (ret == canOK) ? OK : WRITE_FAILED;
 }
 
 std::string CanInterface::return_status_desc(return_statuses &ret)
@@ -217,6 +220,10 @@ std::string CanInterface::return_status_desc(return_statuses &ret)
   {
     status_string = "A bad parameter was provided to the CAN interface during initalization.";
   }
+  else if (ret == NO_CHANNELS_FOUND)
+  {
+    status_string = "No available CAN channels were found.";
+  }
   else if (ret == NO_MESSAGES_RECEIVED)
   {
     status_string = "No messages were received on the interface.";
@@ -225,9 +232,13 @@ std::string CanInterface::return_status_desc(return_statuses &ret)
   {
     status_string = "A read operation failed on the CAN interface.";
   }
-  else if (ret == SEND_FAILED)
+  else if (ret == WRITE_FAILED)
   {
     status_string = "A write operation failed on the CAN interface.";
+  }
+  else if (ret == CLOSE_FAILED)
+  {
+    status_string = "Closing the CAN interface failed.";
   }
 
   return status_string;
