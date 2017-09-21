@@ -53,7 +53,10 @@ namespace CAN
     ~CanInterface();
 
     // Called to pass in parameters and open can link
-    return_statuses open(int hardware_id, int circuit_id, int bitrate);
+    return_statuses open(int hardware_id,
+                         int circuit_id,
+                         int bitrate,
+                         bool echo_on = true);
 
     // Close the can link
     return_statuses close();

@@ -40,7 +40,10 @@ CanInterface::~CanInterface()
   free(handle);
 }
 
-return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
+return_statuses CanInterface::open(int hardware_id,
+                                   int circuit_id,
+                                   int bitrate,
+                                   bool echo_on)
 {
   if (handle == NULL)
   {
@@ -107,6 +110,15 @@ return_statuses CanInterface::open(int hardware_id, int circuit_id, int bitrate)
     if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
     {
       return BAD_PARAM;
+    }
+
+    // Linuxcan defaults to echo on, so if you've opened the same can channel
+    // from multiple interfaces they will receive the messages that each other
+    // send.  Turn it off here if desired.
+    if (!echo_on)
+    {
+      unsigned char off = 0;
+      canIoCtl(*h, canIOCTL_SET_LOCAL_TXECHO, &off, 1);
     }
 
     // Set output control
