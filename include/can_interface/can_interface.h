@@ -61,6 +61,9 @@ namespace CAN
     // Close the can link
     return_statuses close();
 
+    // Check to see if the CAN link is open
+    bool is_open();
+
     // Read a message
     return_statuses read(long *id, unsigned char *msg, unsigned int *size, bool *extended, unsigned long *time);
 

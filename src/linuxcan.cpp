@@ -130,6 +130,38 @@ return_statuses CanInterface::open(int hardware_id,
   return OK;
 }
 
+bool CanInterface::is_open()
+{
+  if (handle == NULL)
+  {
+    return false;
+  }
+  else
+  {
+    canHandle *h = (canHandle*) handle;
+
+    if (on_bus)
+    {
+      unsigned long int flags;
+
+      canStatus ret = canReadStatus(*h, &flags);
+
+      if (ret != canOK)
+        return false;
+
+      if ((flags & canSTAT_BUS_OFF) > 1)
+      {
+        close();
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
+  }
+}
+
 return_statuses CanInterface::close()
 {
   if (handle == NULL)
