@@ -159,6 +159,10 @@ bool CanInterface::is_open()
         return true;
       }
     }
+    else
+    {
+      return false;
+    }
   }
 }
 
