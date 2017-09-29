@@ -13,7 +13,8 @@ before_script:
   - tar xvf linuxcan.tar.gz
   - cd linuxcan
   - make canlib linlib
-  - make install canlib linlib
+  - make -C canlib install
+  - make -C linlib install
 
 env:
   matrix:
