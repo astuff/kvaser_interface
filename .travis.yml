@@ -8,13 +8,7 @@ notifications:
     on_failure: always
 
 before_script:
-  - cd /tmp
-  - wget http://www.kvaser.com/software/7330130980754/V5_20_0/linuxcan.tar.gz
-  - tar xvf linuxcan.tar.gz
-  - cd linuxcan
-  - make canlib linlib
-  - make -C canlib install
-  - make -C linlib install
+  ./install_linuxcan.sh
 
 env:
   matrix:
