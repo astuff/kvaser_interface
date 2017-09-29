@@ -7,9 +7,6 @@ notifications:
   email:
     on_failure: always
 
-before_script:
-  sudo ./install_linuxcan.sh
-
 env:
   matrix:
     - ROS_DISTRO="indigo" ROS_REPO=ros-shadow-fixed
@@ -21,6 +18,11 @@ matrix:
   allow_failures:
     env: ROS_DISTRO="indigo" ROS_REPO=ros-shadow-fixed
     env: ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed
+
+before_install:
+  - sudo ./install_linuxcan.sh
+  - export C_INCLUDE_PATH=/usr/include:$C_INCLUDE_PATH
+  - export CPLUS_INCLUDE_PATH=/usr/include:$CPLUS_INCLUDE_PATH
 
 install:
   git clone https://github.com/ros-industrial/industrial_ci.git .ci_config

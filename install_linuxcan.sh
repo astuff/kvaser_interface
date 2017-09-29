@@ -30,6 +30,3 @@ ln -sf $LINLIB_LIBRARY /usr/lib/$LINLIB_LIBNAME
 ln -sf $LINLIB_LIBRARY /usr/lib/$LINLIB_SONAME
 /sbin/ldconfig -X
 install -m 644 ../include/linlib.h /usr/include
-
-CPATH=/usr/include:${CPATH}
-export CPATH
