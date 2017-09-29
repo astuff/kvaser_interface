@@ -8,10 +8,10 @@ notifications:
     on_failure: always
 
 before_script:
-  - wget http://www.kvaser.com/software/7330130980754/V5_20_0/linuxcan.tar.gz /tmp/linuxcan.tar.gz
-  - tar xvf /tmp/linuxcan.tar.gz
-  - mv /tmp/linuxcan /usr/src/linuxcan
-  - cd /usr/src/linuxcan
+  - cd /usr/src
+  - wget http://www.kvaser.com/software/7330130980754/V5_20_0/linuxcan.tar.gz
+  - tar xvf linuxcan.tar.gz
+  - cd linuxcan
   - make
   - make install
 
