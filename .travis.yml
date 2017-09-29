@@ -8,7 +8,7 @@ notifications:
     on_failure: always
 
 before_script:
-  ./install_linuxcan.sh
+  sudo ./install_linuxcan.sh
 
 env:
   matrix:

@@ -16,9 +16,6 @@ cd /tmp/linuxcan
 make canlib linlib
 
 cd /tmp/linuxcan/canlib
-make -C examples install
-rm -f /usr/lib/$CANLIB_LIBNAME
-rm -f /usr/lib/$CANLIB_SONAME
 install  -m 644 $CANLIB_LIBRARY /usr/lib/
 ln -sf $CANLIB_LIBRARY /usr/lib/$CANLIB_LIBNAME
 ln -sf $CANLIB_LIBRARY /usr/lib/$CANLIB_SONAME
@@ -28,8 +25,6 @@ install -m 644 ../include/canstat.h /usr/include
 install -m 644 ../include/obsolete.h /usr/include
 
 cd /tmp/linuxcan/linlib
-rm -f /usr/lib/$(LINLIB_LIBNAME)
-rm -f /usr/lib/$(LINLIB_SONAME)
 install  -m 644 $(LINLIB_LIBRARY) /usr/lib/
 ln -sf $(LINLIB_LIBRARY) /usr/lib/$(LINLIB_LIBNAME)
 ln -sf $(LINLIB_LIBRARY) /usr/lib/$(LINLIB_SONAME)
