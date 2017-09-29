@@ -9,15 +9,15 @@ notifications:
 
 env:
   matrix:
-    - ROS_DISTRO="indigo" ROS_REPO=ros-shadow-fixed CATKIN_CONFIG='-DCMAKE_CXX_FLAGS=-isystem\ /usr/include'
-    - ROS_DISTRO="indigo" ROS_REPO=ros CATKIN_CONFIG='-DCMAKE_CXX_FLAGS=-isystem\ /usr/include'
-    - ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed CATKIN_CONFIG='-DCMAKE_CXX_FLAGS=-isystem\ /usr/include'
-    - ROS_DISTRO="kinetic" ROS_REPO=ros CATKIN_CONFIG='-DCMAKE_CXX_FLAGS=-isystem\ /usr/include'
+    - ROS_DISTRO="indigo" ROS_REPO=ros-shadow-fixed CATKIN_CONFIG='-DCMAKE_CXX_FLAGS="-isystem\ /usr/include"'
+    - ROS_DISTRO="indigo" ROS_REPO=ros CATKIN_CONFIG='-DCMAKE_CXX_FLAGS="-isystem\ /usr/include"'
+    - ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed CATKIN_CONFIG='-DCMAKE_CXX_FLAGS="-isystem\ /usr/include"'
+    - ROS_DISTRO="kinetic" ROS_REPO=ros CATKIN_CONFIG='-DCMAKE_CXX_FLAGS="-isystem\ /usr/include"'
 
 matrix:
   allow_failures:
-    env: ROS_DISTRO="indigo" ROS_REPO=ros-shadow-fixed CATKIN_CONFIG='-DCMAKE_CXX_FLAGS=-isystem\ /usr/include'
-    env: ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed CATKIN_CONFIG='-DCMAKE_CXX_FLAGS=-isystem\ /usr/include'
+    env: ROS_DISTRO="indigo" ROS_REPO=ros-shadow-fixed CATKIN_CONFIG='--install -DCMAKE_CXX_FLAGS="-isystem\ /usr/include"'
+    env: ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed CATKIN_CONFIG='--install -DCMAKE_CXX_FLAGS="-isystem\ /usr/include"'
 
 before_install:
   - sudo ./install_linuxcan.sh
