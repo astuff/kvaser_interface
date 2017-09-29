@@ -8,3 +8,5 @@ The following are required prerequisites:
     * For Ubuntu 14.04 - Version 5.14.0 or older
     * For Ubuntu 16.04 - Latest version
 * can_msgs
+
+[![Build Status](https://travis-ci.org/astuff/can_interface.svg?branch=master)](https://travis-ci.org/astuff/can_interface)
