@@ -8,7 +8,7 @@ notifications:
     on_failure: always
 
 before_script:
-  - cd /usr/src
+  - cd /tmp
   - wget http://www.kvaser.com/software/7330130980754/V5_20_0/linuxcan.tar.gz
   - tar xvf linuxcan.tar.gz
   - cd linuxcan
