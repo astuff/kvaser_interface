@@ -25,8 +25,8 @@ install -m 644 ../include/canstat.h /usr/include
 install -m 644 ../include/obsolete.h /usr/include
 
 cd /tmp/linuxcan/linlib
-install  -m 644 $(LINLIB_LIBRARY) /usr/lib/
-ln -sf $(LINLIB_LIBRARY) /usr/lib/$(LINLIB_LIBNAME)
-ln -sf $(LINLIB_LIBRARY) /usr/lib/$(LINLIB_SONAME)
+install  -m 644 $LINLIB_LIBRARY /usr/lib/
+ln -sf $LINLIB_LIBRARY /usr/lib/$LINLIB_LIBNAME
+ln -sf $LINLIB_LIBRARY /usr/lib/$LINLIB_SONAME
 /sbin/ldconfig -X
 install -m 644 ../include/linlib.h /usr/include
