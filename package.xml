@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <package>
   <name>can_interface</name>
-  <version>1.6.0</version>
+  <version>2.0.0</version>
   <description>Generic CAN interface for ROS device drivers.</description>
-  <license>GPLv3</license>
+  <license>GNU GPLv3</license>
 
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
 
-  <url type="bugtracker">https://bitbucket.org/autonomoustuff/can_interface/issues</url>
-  <url type="repository">https://bitbucket.org/autonomoustuff/can_interface</url>
+  <url type="bugtracker">https://github.com/astuff/can_interface/issues</url>
+  <url type="repository">https://github.com/astuff/can_interface</url>
 
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
