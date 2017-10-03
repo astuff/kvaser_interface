@@ -53,10 +53,10 @@ namespace CAN
     ~CanInterface();
 
     // Called to pass in parameters and open can link
-    return_statuses open(int hardware_id,
-                         int circuit_id,
-                         int bitrate,
-                         bool echo_on = true);
+    return_statuses open(const int& hardware_id,
+                         const int& circuit_id,
+                         const int& bitrate,
+                         const bool& echo_on = true);
 
     // Close the can link
     return_statuses close();
@@ -65,10 +65,17 @@ namespace CAN
     bool is_open();
 
     // Read a message
-    return_statuses read(long *id, unsigned char *msg, unsigned int *size, bool *extended, unsigned long *time);
+    return_statuses read(long *id,
+                         unsigned char *msg,
+                         unsigned int *size,
+                         bool *extended,
+                         unsigned long *time);
 
     // Send a message
-    return_statuses write(long id, unsigned char *msg, unsigned int size, bool extended);
+    return_statuses write(const long& id,
+                          unsigned char *msg,
+                          const unsigned int& size,
+                          const bool& extended);
 
   private:
     void *handle;
@@ -76,7 +83,7 @@ namespace CAN
   };
 
   // Converts error messages to human-readable strings
-  std::string return_status_desc(return_statuses &ret);
+  std::string return_status_desc(const return_statuses& ret);
 }
 }
 #endif

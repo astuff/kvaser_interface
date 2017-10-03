@@ -40,10 +40,10 @@ CanInterface::~CanInterface()
   free(handle);
 }
 
-return_statuses CanInterface::open(int hardware_id,
-                                   int circuit_id,
-                                   int bitrate,
-                                   bool echo_on)
+return_statuses CanInterface::open(const int& hardware_id,
+                                   const int& circuit_id,
+                                   const int& bitrate,
+                                   const bool& echo_on)
 {
   if (handle == NULL)
   {
@@ -186,7 +186,11 @@ return_statuses CanInterface::close()
   return OK;
 }
 
-return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *size, bool *extended, unsigned long *time)
+return_statuses CanInterface::read(long *id,
+                                   unsigned char *msg,
+                                   unsigned int *size,
+                                   bool *extended,
+                                   unsigned long *time)
 {
   if (handle == NULL)
   {
@@ -237,7 +241,10 @@ return_statuses CanInterface::read(long *id, unsigned char *msg, unsigned int *s
   return ret_val;
 }
 
-return_statuses CanInterface::write(long id, unsigned char *msg, unsigned int size, bool extended)
+return_statuses CanInterface::write(const long& id,
+                                    unsigned char *msg,
+                                    const unsigned int& size,
+                                    const bool& extended)
 {
   if (handle == NULL)
   {

@@ -18,7 +18,7 @@
 
 #include <can_interface.h>
 
-std::string AS::CAN::return_status_desc(return_statuses &ret)
+std::string AS::CAN::return_status_desc(const return_statuses& ret)
 {
   std::string status_string;
 
