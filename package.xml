@@ -14,4 +14,10 @@
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>can_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>can_msgs</run_depend>
 </package>
