@@ -156,7 +156,7 @@ int main(int argc, char** argv)
 
     if (hardware_id <= 0)
     {
-      ROS_ERROR("Kvaser CAN Interface - CAN hardware ID is invalid");
+      ROS_ERROR("Kvaser CAN Interface - CAN hardware ID is invalid.");
       exit = true;
     }
   }
@@ -167,7 +167,18 @@ int main(int argc, char** argv)
 
     if (circuit_id < 0)
     {
-      ROS_ERROR("Kvaser CAN Interface - Circuit ID is invalid");
+      ROS_ERROR("Kvaser CAN Interface - Circuit ID is invalid.");
+      exit = true;
+    }
+  }
+
+  if (priv.getParam("can_bit_rate", bit_rate))
+  {
+    ROS_INFO("Kvaser CAN Interface - Got bit_rate: %d", bit_rate);
+    
+    if (bit_rate < 0)
+    {
+      ROS_ERROR("Kvaser CAN Interface - Bit Rate is invalid.");
       exit = true;
     }
   }
