@@ -89,10 +89,13 @@ void can_read()
     keep_going_mut.unlock();
   }
 
-  ret = can_reader.close();
+  if (can_reader.is_open())
+  {
+    ret = can_reader.close();
 
-  if (ret != OK)
-    ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing CAN link: %d - %s", ret, return_status_desc(ret).c_str());
+    if (ret != OK)
+      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing reader: %d - %s", ret, return_status_desc(ret).c_str());
+  }
 }
 
 void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
@@ -106,31 +109,25 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
 
     if (ret != OK)
     {
-      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening CAN writer: %d - %s", ret, return_status_desc(ret).c_str());
-    }
-    else
-    {
-      ret = can_writer.write(msg->id, const_cast<unsigned char*>(&(msg->data[0])), msg->dlc, true);
-
-      if (ret != OK)
-        ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s", ret, return_status_desc(ret).c_str());
+      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening writer: %d - %s", ret, return_status_desc(ret).c_str());
     }
   }
-  else
+
+  if (can_writer.is_open())
   {
     ret = can_writer.write(msg->id, const_cast<unsigned char*>(&(msg->data[0])), msg->dlc, true);
 
     if (ret != OK)
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s", ret, return_status_desc(ret).c_str());
+
+    ret = can_writer.close();
+
+    if (ret != OK)
+    {
+      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing writer: %d - %s", ret, return_status_desc(ret).c_str());
+      return;
+    }
   }
-
-	ret = can_writer.close();
-
-	if (ret != OK)
-	{
-		ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing CAN writer: %d - %s", ret, return_status_desc(ret).c_str());
-		return;
-	}
 }
 
 int main(int argc, char** argv)
