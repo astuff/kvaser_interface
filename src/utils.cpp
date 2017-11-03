@@ -16,7 +16,7 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <can_interface.h>
+#include <kvaser_interface.h>
 
 std::string AS::CAN::return_status_desc(const return_statuses& ret)
 {

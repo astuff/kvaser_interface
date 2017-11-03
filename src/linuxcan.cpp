@@ -16,21 +16,21 @@
 *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <can_interface.h>
+#include <kvaser_interface.h>
 #include <canlib.h>
 
 using namespace std;
 using namespace AS::CAN;
 
 //Default constructor.
-CanInterface::CanInterface() :
+KvaserCan::KvaserCan() :
         handle(NULL)
 {
   handle = malloc(sizeof(canHandle));
 }
 
 //Default destructor.
-CanInterface::~CanInterface()
+KvaserCan::~KvaserCan()
 {
   if (handle != NULL)
   {
@@ -40,7 +40,7 @@ CanInterface::~CanInterface()
   free(handle);
 }
 
-return_statuses CanInterface::open(const int& hardware_id,
+return_statuses KvaserCan::open(const int& hardware_id,
                                    const int& circuit_id,
                                    const int& bitrate,
                                    const bool& echo_on)
@@ -130,7 +130,7 @@ return_statuses CanInterface::open(const int& hardware_id,
   return OK;
 }
 
-bool CanInterface::is_open()
+bool KvaserCan::is_open()
 {
   if (handle == NULL)
   {
@@ -166,7 +166,7 @@ bool CanInterface::is_open()
   }
 }
 
-return_statuses CanInterface::close()
+return_statuses KvaserCan::close()
 {
   if (handle == NULL)
   {
@@ -186,7 +186,7 @@ return_statuses CanInterface::close()
   return OK;
 }
 
-return_statuses CanInterface::read(long *id,
+return_statuses KvaserCan::read(long *id,
                                    unsigned char *msg,
                                    unsigned int *size,
                                    bool *extended,
@@ -241,7 +241,7 @@ return_statuses CanInterface::read(long *id,
   return ret_val;
 }
 
-return_statuses CanInterface::write(const long& id,
+return_statuses KvaserCan::write(const long& id,
                                     unsigned char *msg,
                                     const unsigned int& size,
                                     const bool& extended)

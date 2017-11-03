@@ -1,5 +1,5 @@
 /*
-*   can_interface.h - Header file for AutonomouStuff generic CAN interface.
+*   kvaser_interface.h - Header file for AutonomouStuff Kvaser CAN interface.
 *   Copyright (C) 2017 AutonomouStuff, Co.
 *
 *   This program is free software: you can redistribute it and/or modify
@@ -19,8 +19,8 @@
 // Define a class that supports a basic CAN interface that's independent of the hardware and driver library used
 // Different libraries can be created to define all these functions for a specific driver library
 
-#ifndef CAN_INTERFACE_HPP
-#define CAN_INTERFACE_HPP
+#ifndef KVASER_INTERFACE_HPP
+#define KVASER_INTERFACE_HPP
 
 //C++ Includes
 #include <iostream>
@@ -45,12 +45,12 @@ namespace CAN
     CLOSE_FAILED = -8
   };
 
-  class CanInterface
+  class KvaserCan
   {
   public:
-    CanInterface();
+    KvaserCan();
 
-    ~CanInterface();
+    ~KvaserCan();
 
     // Called to pass in parameters and open can link
     return_statuses open(const int& hardware_id,

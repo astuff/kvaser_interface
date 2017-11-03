@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(can_interface)
+project(kvaser_interface)
 
 add_definitions(-std=c++11)
 
@@ -29,11 +29,11 @@ target_link_libraries(ros_linuxcan
   ${catkin_LIBRARIES}
 )
 
-add_executable(${PROJECT_NAME}
-  src/can_interface_node.cpp
+add_executable(kvaser_can_bridge
+  src/kvaser_can_bridge.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(kvaser_can_bridge
   ros_linuxcan
   ${catkin_LIBRARIES}
 )
@@ -48,9 +48,8 @@ install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS kvaser_can_bridge
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
-

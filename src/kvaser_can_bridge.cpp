@@ -20,7 +20,7 @@
 #include <chrono>
 
 #include <ros/ros.h>
-#include <can_interface.h>
+#include <kvaser_interface.h>
 #include <can_msgs/Frame.h>
 
 using namespace AS::CAN;
@@ -30,7 +30,7 @@ int hardware_id = 0;
 int circuit_id = 0;
 bool global_keep_going = true;
 std::mutex keep_going_mut;
-CanInterface can_reader, can_writer;
+KvaserCan can_reader, can_writer;
 ros::Publisher can_tx_pub;
 
 void can_read()
@@ -138,7 +138,7 @@ int main(int argc, char** argv)
   bool exit = false;
 
   // ROS initialization
-  ros::init(argc, argv, "can_interface");
+  ros::init(argc, argv, "kvaser_can_bridge");
   ros::AsyncSpinner spinner(0);
   ros::NodeHandle n;
   ros::NodeHandle priv("~");
