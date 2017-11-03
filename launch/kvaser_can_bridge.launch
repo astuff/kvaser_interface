@@ -4,7 +4,7 @@
   <arg name="can_circuit_id" default="0" />
   <arg name="can_bit_rate" default="500000" />
 
-  <node pkg="can_interface" type="can_interface" name="can_interface">
+  <node pkg="kvaser_interface" type="kvaser_can_bridge" name="kvaser_can_bridge">
     <param name="can_hardware_id" value="$(arg can_hardware_id)" />
     <param name="can_circuit_id" value="$(arg can_circuit_id)" />
     <param name="can_bit_rate" value="$(arg can_bit_rate)" />
