@@ -41,7 +41,7 @@ void can_read()
   bool extended;
   unsigned long t;
 
-  const std::chrono::milliseconds loop_pause = std::chrono::milliseconds(25);
+  const std::chrono::milliseconds loop_pause = std::chrono::milliseconds(5);
   bool keep_going = true;
 
   std::chrono::system_clock::time_point next_time = std::chrono::system_clock::now();
