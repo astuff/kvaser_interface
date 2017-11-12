@@ -136,9 +136,9 @@ int main(int argc, char** argv)
 
   // ROS initialization
   ros::init(argc, argv, "kvaser_can_bridge");
-  ros::AsyncSpinner spinner(1);
   ros::NodeHandle n;
   ros::NodeHandle priv("~");
+  ros::Rate loop_rate(50);
 
   can_tx_pub = n.advertise<can_msgs::Frame>("can_tx", 500);
 
@@ -185,10 +185,12 @@ int main(int argc, char** argv)
 
   // Start CAN receiving thread.
   std::thread can_read_thread(can_read);
-  // Start callback spinner.
-  spinner.start();
 
-  ros::waitForShutdown();
+  while (ros::ok())
+  {
+    ros::spin();
+    loop_rate.sleep();
+  }
 
   keep_going_mut.lock();
   global_keep_going = false;
