@@ -58,7 +58,7 @@ void can_read()
   {
     if (!can_reader.is_open())
     {
-      ret = can_reader.open(hardware_id, circuit_id, bit_rate);
+      ret = can_reader.open(hardware_id, circuit_id, bit_rate, false);
 
       if (ret != OK)
         ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening reader: %d - %s", ret, return_status_desc(ret).c_str());
@@ -105,7 +105,7 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
   if (!can_writer.is_open())
   {
     // Open the channel.
-    ret = can_writer.open(hardware_id, circuit_id, bit_rate);
+    ret = can_writer.open(hardware_id, circuit_id, bit_rate, false);
 
     if (ret != OK)
     {
