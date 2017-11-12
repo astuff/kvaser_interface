@@ -41,7 +41,7 @@ void can_read()
   bool extended;
   unsigned long t;
 
-  const std::chrono::milliseconds loop_pause = std::chrono::milliseconds(5);
+  const std::chrono::milliseconds loop_pause = std::chrono::milliseconds(10);
   bool keep_going = true;
 
   std::chrono::system_clock::time_point next_time = std::chrono::system_clock::now();
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 
   // ROS initialization
   ros::init(argc, argv, "kvaser_can_bridge");
-  ros::AsyncSpinner spinner(0);
+  ros::AsyncSpinner spinner(1);
   ros::NodeHandle n;
   ros::NodeHandle priv("~");
 
