@@ -115,13 +115,7 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
 
   if (can_writer.is_open())
   {
-    if (msg->id == 107)
-      ROS_INFO("Got brake command.");
-
     ret = can_writer.write(msg->id, const_cast<unsigned char*>(&(msg->data[0])), msg->dlc, true);
-
-    if (msg->id == 107)
-      ROS_INFO("Finished writing brake command.");
 
     if (ret != OK)
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s", ret, return_status_desc(ret).c_str());
