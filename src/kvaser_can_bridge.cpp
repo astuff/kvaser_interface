@@ -125,14 +125,6 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
 
     if (ret != OK)
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s", ret, return_status_desc(ret).c_str());
-
-    ret = can_writer.close();
-
-    if (ret != OK)
-    {
-      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing writer: %d - %s", ret, return_status_desc(ret).c_str());
-      return;
-    }
   }
 }
 
@@ -197,6 +189,11 @@ int main(int argc, char** argv)
     ros::spin();
     loop_rate.sleep();
   }
+
+  return_statuses ret = can_writer.close();
+
+  if (ret != OK)
+    ROS_ERROR("Kvaser CAN Interface - Error closing writer: %d - %s", ret, return_status_desc(ret).c_str());
 
   keep_going_mut.lock();
   global_keep_going = false;
