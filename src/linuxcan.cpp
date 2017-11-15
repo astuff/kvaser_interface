@@ -17,44 +17,40 @@
 */
 
 #include <kvaser_interface.h>
-#include <canlib.h>
 
-using namespace std;
 using namespace AS::CAN;
 
 //Default constructor.
 KvaserCan::KvaserCan() :
-        handle(NULL)
+  handle(new int)
 {
-  handle = malloc(sizeof(canHandle));
+  *handle = -1;
+  canInitializeLibrary();
 }
 
 //Default destructor.
 KvaserCan::~KvaserCan()
 {
-  if (handle != NULL)
+  if (*handle > -1)
   {
-    close();
+    canClose(*handle);
   }
-
-  free(handle);
 }
 
 return_statuses KvaserCan::open(const int& hardware_id,
-                                   const int& circuit_id,
-                                   const int& bitrate,
-                                   const bool& echo_on)
+                                const int& circuit_id,
+                                const int& bitrate,
+                                const bool& echo_on)
 {
-  if (handle == NULL)
+  if (*handle < 0)
   {
     return INIT_FAILED;
   }
 
   if (!on_bus)
   {
-    canHandle *h = (canHandle *) handle;
-
     int numChan;
+
     if (canGetNumberOfChannels(&numChan) != canOK)
     {
       return INIT_FAILED;
@@ -87,27 +83,37 @@ return_statuses KvaserCan::open(const int& hardware_id,
     }
 
     // Open channel
-    *h = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
-    if (*h < 0)
+    *handle = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
+
+    if (*handle < 0)
     {
       return INIT_FAILED;
     }
 
     // Set bit rate and other parameters
     long freq;
+
     switch (bitrate)
     {
-      case 125000: freq = canBITRATE_125K; break;
-      case 250000: freq = canBITRATE_250K; break;
-      case 500000: freq = canBITRATE_500K; break;
-      case 1000000: freq = canBITRATE_1M; break;
+      case 125000:
+        freq = canBITRATE_125K;
+        break;
+      case 250000:
+        freq = canBITRATE_250K;
+        break;
+      case 500000:
+        freq = canBITRATE_500K;
+        break;
+      case 1000000:
+        freq = canBITRATE_1M;
+        break;
       default:
       {
         return  BAD_PARAM;
       }
     }
 
-    if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
+    if (canSetBusParams(*handle, freq, 0, 0, 0, 0, 0) < 0)
     {
       return BAD_PARAM;
     }
@@ -118,12 +124,15 @@ return_statuses KvaserCan::open(const int& hardware_id,
     if (!echo_on)
     {
       unsigned char off = 0;
-      canIoCtl(*h, canIOCTL_SET_LOCAL_TXECHO, &off, 1);
+      canIoCtl(*handle, canIOCTL_SET_LOCAL_TXECHO, &off, 1);
     }
 
     // Set output control
-    canSetBusOutputControl(*h, canDRIVER_NORMAL);
-    canBusOn(*h);
+    canSetBusOutputControl(*handle, canDRIVER_NORMAL);
+
+    if (canBusOn(*handle) < 0)
+      return INIT_FAILED;
+
     on_bus = true;
   }
 
@@ -132,19 +141,17 @@ return_statuses KvaserCan::open(const int& hardware_id,
 
 bool KvaserCan::is_open()
 {
-  if (handle == NULL)
+  if (*handle < 0)
   {
     return false;
   }
   else
   {
-    canHandle *h = (canHandle*) handle;
-
     if (on_bus)
     {
       unsigned long int flags;
 
-      canStatus ret = canReadStatus(*h, &flags);
+      canStatus ret = canReadStatus(*handle, &flags);
 
       if (ret != canOK)
         return false;
@@ -168,15 +175,13 @@ bool KvaserCan::is_open()
 
 return_statuses KvaserCan::close()
 {
-  if (handle == NULL)
+  if (*handle < 0)
   {
-    return INIT_FAILED;
+    return CHANNEL_CLOSED;
   }
 
-  canHandle *h = (canHandle *) handle;
-
   // Close the channel
-  if (canClose(*h) != canOK)
+  if (canClose(*handle) != canOK)
   {
     return CLOSE_FAILED;
   }
@@ -187,17 +192,15 @@ return_statuses KvaserCan::close()
 }
 
 return_statuses KvaserCan::read(long *id,
-                                   unsigned char *msg,
-                                   unsigned int *size,
-                                   bool *extended,
-                                   unsigned long *time)
+                                unsigned char *msg,
+                                unsigned int *size,
+                                bool *extended,
+                                unsigned long *time)
 {
-  if (handle == NULL)
+  if (*handle < 0)
   {
-    return INIT_FAILED;
+    return CHANNEL_CLOSED;
   }
-
-  canHandle *h = (canHandle *) handle;
 
   bool done = false;
   return_statuses ret_val = INIT_FAILED;
@@ -205,7 +208,7 @@ return_statuses KvaserCan::read(long *id,
 
   while (!done)
   {
-    canStatus ret = canRead(*h, id, msg, size, &flag, time);
+    canStatus ret = canRead(*handle, id, msg, size, &flag, time);
 
     if (ret == canERR_NOTINITIALIZED)
     {
@@ -242,16 +245,14 @@ return_statuses KvaserCan::read(long *id,
 }
 
 return_statuses KvaserCan::write(const long& id,
-                                    unsigned char *msg,
-                                    const unsigned int& size,
-                                    const bool& extended)
+                                 unsigned char *msg,
+                                 const unsigned int& size,
+                                 const bool& extended)
 {
-  if (handle == NULL)
+  if (*handle < 0)
   {
-    return INIT_FAILED;
+    return CHANNEL_CLOSED;
   }
-
-  canHandle *h = (canHandle *) handle;
 
   unsigned int flag;
 
@@ -264,7 +265,7 @@ return_statuses KvaserCan::write(const long& id,
     flag = canMSG_STD;
   }
 
-  canStatus ret = canWrite(*h, id, msg, size, flag);
+  canStatus ret = canWrite(*handle, id, msg, size, flag);
 
   return (ret == canOK) ? OK : WRITE_FAILED;
 }

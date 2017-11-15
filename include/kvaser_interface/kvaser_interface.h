@@ -24,9 +24,11 @@
 
 //C++ Includes
 #include <iostream>
+#include <memory>
 
-//OS Includes
-#include <unistd.h>
+extern "C" {
+#include <canlib.h>
+}
 
 namespace AS
 {
@@ -78,7 +80,7 @@ namespace CAN
                           const bool& extended);
 
   private:
-    void *handle;
+    std::unique_ptr<CanHandle> handle;
     bool on_bus;
   };
 
