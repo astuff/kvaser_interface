@@ -127,26 +127,9 @@ bool KvaserCan::is_open()
   }
   else
   {
-    canHandle *h = (canHandle*) handle;
-
     if (on_bus)
     {
-      unsigned long int flags;
-
-      canStatus ret = canReadStatus(*h, &flags);
-
-      if (ret != canOK)
-        return false;
-
-      if ((flags & canSTAT_BUS_OFF) > 1)
-      {
-        close();
-        return false;
-      }
-      else
-      {
-        return true;
-      }
+      return true;
     }
     else
     {

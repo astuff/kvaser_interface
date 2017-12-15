@@ -168,11 +168,7 @@ int main(int argc, char** argv)
   // Start CAN receiving thread.
   std::thread can_read_thread(can_read);
 
-  while (ros::ok())
-  {
-    ros::spin();
-    loop_rate.sleep();
-  }
+  ros::spin();
 
   return_statuses ret = can_writer.close();
 
