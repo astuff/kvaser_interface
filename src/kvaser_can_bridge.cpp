@@ -105,7 +105,7 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
 
   if (can_writer.is_open())
   {
-    ret = can_writer.write(msg->id, const_cast<unsigned char*>(&(msg->data[0])), msg->dlc, true);
+    ret = can_writer.write(msg->id, const_cast<unsigned char*>(&(msg->data[0])), msg->dlc, msg->is_extended);
 
     if (ret != OK)
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s", ret, return_status_desc(ret).c_str());
@@ -168,11 +168,7 @@ int main(int argc, char** argv)
   // Start CAN receiving thread.
   std::thread can_read_thread(can_read);
 
-  while (ros::ok())
-  {
-    ros::spin();
-    loop_rate.sleep();
-  }
+  ros::spin();
 
   return_statuses ret = can_writer.close();
 
