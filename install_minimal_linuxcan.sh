@@ -16,17 +16,17 @@ cd /tmp/linuxcan
 make canlib linlib
 
 cd /tmp/linuxcan/canlib
-install  -m 644 $CANLIB_LIBRARY /usr/lib/
-ln -sf $CANLIB_LIBRARY /usr/lib/$CANLIB_LIBNAME
-ln -sf $CANLIB_LIBRARY /usr/lib/$CANLIB_SONAME
-/sbin/ldconfig
-install -m 644 ../include/canlib.h /usr/include
-install -m 644 ../include/canstat.h /usr/include
-install -m 644 ../include/obsolete.h /usr/include
+sudo install  -m 644 $CANLIB_LIBRARY /usr/lib/
+sudo ln -sf $CANLIB_LIBRARY /usr/lib/$CANLIB_LIBNAME
+sudo ln -sf $CANLIB_LIBRARY /usr/lib/$CANLIB_SONAME
+sudo /sbin/ldconfig
+sudo install -m 644 ../include/canlib.h /usr/include
+sudo install -m 644 ../include/canstat.h /usr/include
+sudo install -m 644 ../include/obsolete.h /usr/include
 
 cd /tmp/linuxcan/linlib
-install  -m 644 $LINLIB_LIBRARY /usr/lib/
-ln -sf $LINLIB_LIBRARY /usr/lib/$LINLIB_LIBNAME
-ln -sf $LINLIB_LIBRARY /usr/lib/$LINLIB_SONAME
-/sbin/ldconfig -X
-install -m 644 ../include/linlib.h /usr/include
+sudo install  -m 644 $LINLIB_LIBRARY /usr/lib/
+sudo ln -sf $LINLIB_LIBRARY /usr/lib/$LINLIB_LIBNAME
+sudo ln -sf $LINLIB_LIBRARY /usr/lib/$LINLIB_SONAME
+sudo /sbin/ldconfig -X
+sudo install -m 644 ../include/linlib.h /usr/include
