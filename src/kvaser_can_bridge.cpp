@@ -34,9 +34,6 @@ void can_read()
   const std::chrono::milliseconds loop_pause = std::chrono::milliseconds(10);
   bool keep_going = true;
 
-  std::chrono::system_clock::time_point next_time = std::chrono::system_clock::now();
-  next_time += loop_pause;
-
   //Set local to global value before looping.
   keep_going_mut.lock();
   keep_going = global_keep_going;
@@ -46,6 +43,9 @@ void can_read()
 
   while (keep_going)
   {
+    std::chrono::system_clock::time_point next_time = std::chrono::system_clock::now();
+    next_time += loop_pause;
+
     if (!can_reader.is_open())
     {
       ret = can_reader.open(hardware_id, circuit_id, bit_rate, false);
@@ -58,7 +58,6 @@ void can_read()
       while ((ret = can_reader.read(&id, msg, &size, &extended, &t)) == OK)
       {
         can_msgs::Frame can_pub_msg;
-        can_pub_msg.header.stamp = ros::Time::now();
         can_pub_msg.header.frame_id = "0";
         can_pub_msg.id = id;
         can_pub_msg.dlc = size;
@@ -120,7 +119,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "kvaser_can_bridge");
   ros::NodeHandle n;
   ros::NodeHandle priv("~");
-  ros::Rate loop_rate(50);
+  ros::AsyncSpinner spinner(1);
 
   can_tx_pub = n.advertise<can_msgs::Frame>("can_tx", 500);
 
@@ -168,7 +167,9 @@ int main(int argc, char** argv)
   // Start CAN receiving thread.
   std::thread can_read_thread(can_read);
 
-  ros::spin();
+  spinner.start();
+
+  ros::waitForShutdown();
 
   return_statuses ret = can_writer.close();
 
