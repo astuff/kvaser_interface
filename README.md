@@ -10,6 +10,7 @@ The following are required prerequisites:
 
 * The Kvaser CANLIB API (https://www.kvaser.com/downloads/)
     * For Ubuntu 14.04/16.04 - Latest version (tested with at least v5.20.814)
+    * For Linux kernel 4.13 or higher, version 5.21 of CANLIB is required (click the Tux on the right of the downloads page)
 * `can_msgs`
 
 ## The `kvaser_can_bridge` Node
