@@ -10,7 +10,7 @@ LINLIB_SONAME=liblinlib.so.1
 LINLIB_LIBRARY=liblinlib.so.1.4.0
 
 cd /tmp
-wget https://www.kvaser.com/downloads-kvaser/?d_version_id=1193
+wget https://www.kvaser.com/downloads-kvaser/?d_version_id=1193 -O linuxcan.tar.gz
 tar xvf linuxcan.tar.gz
 cd /tmp/linuxcan
 make canlib linlib
