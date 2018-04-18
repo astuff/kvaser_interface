@@ -3,14 +3,14 @@ set -ex
 
 CANLIB_LIBNAME=libcanlib.so
 CANLIB_SONAME=libcanlib.so.1
-CANLIB_LIBRARY=libcanlib.so.1.2.0
+CANLIB_LIBRARY=libcanlib.so.1.4.0
 
 LINLIB_LIBNAME=liblinlib.so
 LINLIB_SONAME=liblinlib.so.1
-LINLIB_LIBRARY=liblinlib.so.1.2.0
+LINLIB_LIBRARY=liblinlib.so.1.4.0
 
 cd /tmp
-wget http://www.kvaser.com/software/7330130980754/V5_20_0/linuxcan.tar.gz
+wget https://www.kvaser.com/downloads-kvaser/?d_version_id=1193 -O linuxcan.tar.gz
 tar xvf linuxcan.tar.gz
 cd /tmp/linuxcan
 make canlib linlib
