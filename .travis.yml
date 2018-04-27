@@ -1,6 +1,10 @@
 sudo: required
 dist: trusty
 language: generic
+services:
+  - docker
+compiler:
+  - gcc
 
 notifications:
   email:
@@ -8,18 +12,18 @@ notifications:
 
 env:
   matrix:
-    - USE_DEB=true ROS_DISTRO="indigo" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
-    - USE_DEB=true ROS_DISTRO="indigo" ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
-    - USE_DEB=true ROS_DISTRO="kinetic" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
-    - USE_DEB=true ROS_DISTRO="kinetic" ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
-    - USE_DEB=true ROS_DISTRO="lunar" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
-    - USE_DEB=true ROS_DISTRO="lunar" ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
+    - ROS_DISTRO="indigo" ROS_REPO=ros BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:indigo-ros-core
+    - ROS_DISTRO="indigo" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:indigo-ros-core
+    - ROS_DISTRO="kinetic" ROS_REPO=ros BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
+    - ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
+    - ROS_DISTRO="lunar" ROS_REPO=ros BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
+    - ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
 
 matrix:
   allow_failures:
-    env: USE_DEB=true ROS_DISTRO="indigo" ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
-    env: USE_DEB=true ROS_DISTRO="kinetic" ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
-    env: USE_DEB=true ROS_DISTRO="lunar" ROS_REPOSITORY_PATH=http://packages.ros.org/ros-shadow-fixed/ubuntu BEFORE_SCRIPT='./install_minimal_linuxcan.sh'
+    env: ROS_DISTRO="indigo" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:indigo-ros-core
+    env: ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
+    env: ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
 
 install:
   git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
