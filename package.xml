@@ -3,7 +3,7 @@
   <name>kvaser_interface</name>
   <version>2.0.0</version>
   <description>Kvaser CAN interface for ROS device drivers.</description>
-  <license>GNU GPLv3</license>
+  <license>MIT</license>
 
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
 
