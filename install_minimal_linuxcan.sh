@@ -32,6 +32,6 @@ set -ex
 #install -m 644 ../include/linlib.h /usr/include
 
 apt-get install -y software-properties-common
-apt-add-repository ppa:jwhitleyastuff/kvaser-linuxcan-dkms
+apt-add-repository -y ppa:jwhitleyastuff/kvaser-linuxcan-dkms
 apt-get update
 apt-get install -y linuxcan-dkms
