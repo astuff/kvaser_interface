@@ -31,7 +31,7 @@ set -ex
 #/sbin/ldconfig -X
 #install -m 644 ../include/linlib.h /usr/include
 
-apt-get install software-properties-common
+apt-get install -y software-properties-common
 apt-add-repository ppa:jwhitleyastuff/kvaser-linuxcan-dkms
 apt-get update
-apt-get install linuxcan-dkms
+apt-get install -y linuxcan-dkms
