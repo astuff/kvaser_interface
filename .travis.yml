@@ -12,16 +12,16 @@ notifications:
 
 env:
   matrix:
-    - ROS_DISTRO="indigo" ROS_REPO=ros BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:indigo-ros-core
-    - ROS_DISTRO="kinetic" ROS_REPO=ros BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
-    - ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
-    - ROS_DISTRO="lunar" ROS_REPO=ros BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
-    - ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
+    - ROS_DISTRO="indigo" ROS_REPO=ros BEFORE_SCRIPT='./install_linuxcan.sh' DOCKER_BASE_IMAGE=ros:indigo-ros-core
+    - ROS_DISTRO="kinetic" ROS_REPO=ros BEFORE_SCRIPT='./install_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
+    - ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
+    - ROS_DISTRO="lunar" ROS_REPO=ros BEFORE_SCRIPT='./install_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
+    - ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
 
 matrix:
   allow_failures:
-    - env: ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
-    - env: ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_minimal_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
+    - env: ROS_DISTRO="kinetic" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_linuxcan.sh' DOCKER_BASE_IMAGE=ros:kinetic-ros-core
+    - env: ROS_DISTRO="lunar" ROS_REPO=ros-shadow-fixed BEFORE_SCRIPT='./install_linuxcan.sh' DOCKER_BASE_IMAGE=ros:lunar-ros-core
 
 install:
   git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
