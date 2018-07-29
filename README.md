@@ -10,7 +10,9 @@ The following are required prerequisites:
 
 * The Kvaser CANLIB API (https://www.kvaser.com/downloads/)
     * Can be [downloaded directly](https://www.kvaser.com/kvaser-downloads) or installed through PPA:
+
         `sudo apt-add-repository ppa:jwhitleyastuff/kvaser-linuxcan-dkms`
+
         `sudo apt update && sudo apt install -y linuxcan-dkms`
     * For Linux kernel 4.13 or higher, version 5.21 or higher of CANLIB is required
 * `can_msgs`
