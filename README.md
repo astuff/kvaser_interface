@@ -9,8 +9,12 @@ by including the header <kvaser_interface/kvaser_interface.h> and linking agains
 The following are required prerequisites:
 
 * The Kvaser CANLIB API (https://www.kvaser.com/downloads/)
-    * For Ubuntu 14.04/16.04 - Latest version (tested with at least v5.20.814)
-    * For Linux kernel 4.13 or higher, version 5.21 of CANLIB is required (click the Tux on the right of the downloads page)
+    * Can be [downloaded directly](https://www.kvaser.com/kvaser-downloads) or installed through PPA:
+
+        `sudo apt-add-repository ppa:jwhitleyastuff/kvaser-linuxcan-dkms`
+
+        `sudo apt update && sudo apt install -y linuxcan-dkms`
+    * For Linux kernel 4.13 or higher, version 5.21 or higher of CANLIB is required
 * `can_msgs`
 
 ## The `kvaser_can_bridge` Node
@@ -37,4 +41,4 @@ This is the 0-based index of the channel number *on the specific hardware device
 
 *~can_bit_rate*
 
-This is the communication rate to be used on the CAN channel in bits per second.
+This is the communication rate to be used on the CAN channel in bits per second (default: 500000).
