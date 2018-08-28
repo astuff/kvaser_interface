@@ -1,0 +1,122 @@
+version: 2
+jobs:
+  indigo:
+    docker:
+      - image: ros:indigo-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential software-properties-common -y
+            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            apt-get update && apt-get install -y linux-headers-generic linuxcan-dkms
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+            cd ..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+      - run:
+          name: Build
+          command: |
+            cd ..
+            catkin build
+      - run:
+          name: Run Tests
+          command: |
+            cd ..
+            catkin run_tests
+    working_directory: ~/src
+
+  kinetic:
+    docker:
+      - image: ros:kinetic-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential software-properties-common -y
+            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            apt-get update && apt-get install -y linux-headers-generic linuxcan-dkms
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+            cd ..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+      - run:
+          name: Build
+          command: |
+            cd ..
+            catkin build
+      - run:
+          name: Run Tests
+          command: |
+            cd ..
+            catkin run_tests
+    working_directory: ~/src
+
+  lunar:
+    docker:
+      - image: ros:lunar-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential software-properties-common -y
+            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            apt-get update && apt-get install -y linux-headers-generic linuxcan-dkms
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+            cd ..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+      - run:
+          name: Build
+          command: |
+            cd ..
+            catkin build
+      - run:
+          name: Run Tests
+          command: |
+            cd ..
+            catkin run_tests
+    working_directory: ~/src
+
+  melodic:
+    docker:
+      - image: ros:melodic-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update && apt-get install openssh-client python-catkin-tools build-essential software-properties-common -y
+            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            apt-get update && apt-get install -y linux-headers-generic linuxcan-dkms
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+            cd ..
+            catkin init
+            catkin config --extend /opt/ros/$ROS_DISTRO
+      - run:
+          name: Build
+          command: |
+            cd ..
+            catkin build
+      - run:
+          name: Run Tests
+          command: |
+            cd ..
+            catkin run_tests
+    working_directory: ~/src
+
+workflows:
+  version: 2
+  ros_build:
+    jobs:
+      - indigo
+      - kinetic
+      - lunar
+      - melodic
