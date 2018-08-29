@@ -1,6 +1,6 @@
 # Kvaser ROS Interface API
 
-[![Build Status](https://travis-ci.org/astuff/kvaser_interface.svg?branch=master)](https://travis-ci.org/astuff/kvaser_interface)
+[![CircleCI](https://circleci.com/gh/astuff/kvaser_interface/tree/master.svg?style=svg)](https://circleci.com/gh/astuff/kvaser_interface/tree/master)
 
 This package was developed as a standardized way to access Kvaser CAN devices from ROS. It can either be used as a development API
 by including the header <kvaser_interface/kvaser_interface.h> and linking against `libros_linuxcan.so` or the stand-alone node
