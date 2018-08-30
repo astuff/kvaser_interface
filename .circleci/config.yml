@@ -119,4 +119,4 @@ workflows:
       - indigo
       - kinetic
       - lunar
-#      - melodic
+      - melodic
