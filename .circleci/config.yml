@@ -243,18 +243,22 @@ workflows:
   ros_release:
     jobs:
       - indigo_release:
+          context: ubuntu-pkg-build
           filters:
             branches:
               only: release
       - kinetic_release:
+          context: ubuntu-pkg-build
           filters:
             branches:
               only: release
       - lunar_release:
+          context: ubuntu-pkg-build
           filters:
             branches:
               only: release
       - melodic_release:
+          context: ubuntu-pkg-build
           filters:
             branches:
               only: release
