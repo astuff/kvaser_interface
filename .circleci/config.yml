@@ -132,11 +132,11 @@ jobs:
             bloom-generate rosdebian --os-name ubuntu --os-version trusty --ros-distro indigo
             sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
             fakeroot debian/rules binary
-      # run:
-      #   name: Upload
-      #   command: |
-      #     cd ..
-      #     deb-s3 upload -b autonomoustuff-repo -c trusty --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+      - run:
+          name: Upload
+          command: |
+            cd ..
+            deb-s3 upload -b autonomoustuff-repo -c trusty --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
     working_directory: ~/src
 
   kinetic_release:
@@ -159,11 +159,11 @@ jobs:
             bloom-generate rosdebian --os-name ubuntu --os-version xenial --ros-distro kinetic
             sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
             fakeroot debian/rules binary
-      # run:
-      #   name: Upload
-      #   command: |
-      #     cd ..
-      #     deb-s3 upload -b autonomoustuff-repo -c xenial --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+      - run:
+          name: Upload
+          command: |
+            cd ..
+            deb-s3 upload -b autonomoustuff-repo -c xenial --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
     working_directory: ~/src
 
   lunar_release:
@@ -186,11 +186,11 @@ jobs:
             bloom-generate rosdebian --os-name ubuntu --os-version xenial --ros-distro lunar
             sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
             fakeroot debian/rules binary
-      # run:
-      #   name: Upload
-      #   command: |
-      #     cd ..
-      #     deb-s3 upload -b autonomoustuff-repo -c xenial --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+      - run:
+          name: Upload
+          command: |
+            cd ..
+            deb-s3 upload -b autonomoustuff-repo -c xenial --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
     working_directory: ~/src
 
   melodic_release:
@@ -213,11 +213,11 @@ jobs:
             bloom-generate rosdebian --os-name ubuntu --os-version bionic --ros-distro melodic
             sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
             fakeroot debian/rules binary
-      # run:
-      #   name: Upload
-      #   command: |
-      #     cd ..
-      #     deb-s3 upload -b autonomoustuff-repo -c bionic --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+      - run:
+          name: Upload
+          command: |
+            cd ..
+            deb-s3 upload -b autonomoustuff-repo -c bionic --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
     working_directory: ~/src
 
 workflows:
@@ -227,34 +227,34 @@ workflows:
       - indigo:
           filters:
             branches:
-              ignore: maint/auto-release
+              ignore: release
       - kinetic:
           filters:
             branches:
-              ignore: maint/auto-release
+              ignore: release
       - lunar:
           filters:
             branches:
-              ignore: maint/auto-release
+              ignore: release
       - melodic:
           filters:
             branches:
-              ignore: maint/auto-release
+              ignore: release
   ros_release:
     jobs:
       - indigo_release:
           filters:
             branches:
-              only: maint/auto-release
+              only: release
       - kinetic_release:
           filters:
             branches:
-              only: maint/auto-release
+              only: release
       - lunar_release:
           filters:
             branches:
-              only: maint/auto-release
+              only: release
       - melodic_release:
           filters:
             branches:
-              only: maint/auto-release
+              only: release
