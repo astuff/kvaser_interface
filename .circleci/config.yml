@@ -112,6 +112,30 @@ jobs:
             catkin run_tests
     working_directory: ~/src
 
+  indigo_release:
+    docker:
+      - image: ros:indigo-ros-core
+    steps:
+      - checkout
+      - run:
+          name: Set Up Container
+          command: |
+            apt-get update && apt-get install build-essential software-properties-common dh-make python-bloom ruby -y
+            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            apt-get update && apt-get install -y linux-headers-generic linuxcan-dkms
+            gem install deb-s3
+            source `find /opt/ros -name setup.bash | sort | head -1`
+            rosdep install --from-paths . --ignore-src -y
+      - run:
+          name: Build
+          command: |
+            bloom-generate rosdebian --os-name ubuntu --os-version trusty --ros-distro indigo && fakeroot debian/rules binary && cd ..
+      # run:
+      #   name: Upload
+      #   command: |
+      #     deb-s3 upload -b autonomoustuff-repo -c trusty --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+    working_directory: ~/src
+
 workflows:
   version: 2
   ros_build:
@@ -120,3 +144,21 @@ workflows:
       - kinetic
       - lunar
       - melodic
+  ros_release:
+    jobs:
+      - indigo_release:
+          filters:
+            branches:
+              only: maint/auto-release
+      # kinetic_release:
+      #   filters:
+      #     branches:
+      #       only: release
+      # lunar_release:
+      #   filters:
+      #     branches:
+      #       only: release
+      # melodic_release:
+      #   filters:
+      #     branches:
+      #       only: release
