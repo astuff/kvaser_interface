@@ -249,12 +249,12 @@ workflows:
       - kinetic_release:
           filters:
             branches:
-              only: release
+              only: maint/auto-release
       - lunar_release:
           filters:
             branches:
-              only: release
+              only: maint/auto-release
       - melodic_release:
           filters:
             branches:
-              only: release
+              only: maint/auto-release
