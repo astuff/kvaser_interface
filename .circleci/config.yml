@@ -140,19 +140,19 @@ workflows:
   version: 2
   ros_build:
     jobs:
-      - indigo
+      - indigo:
           filters:
             branches:
               ignore: maint/auto-release
-      - kinetic
+      - kinetic:
           filters:
             branches:
               ignore: maint/auto-release
-      - lunar
+      - lunar:
           filters:
             branches:
               ignore: maint/auto-release
-      - melodic
+      - melodic:
           filters:
             branches:
               ignore: maint/auto-release
