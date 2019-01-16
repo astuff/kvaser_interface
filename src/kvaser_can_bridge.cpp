@@ -61,6 +61,7 @@ void can_read()
         can_pub_msg.header.frame_id = "0";
         can_pub_msg.id = id;
         can_pub_msg.dlc = size;
+        can_pub_msg.is_extended = extended;
         std::copy(msg, msg + 8, can_pub_msg.data.begin());
         can_pub_msg.header.stamp = ros::Time::now();
         can_tx_pub.publish(can_pub_msg);
