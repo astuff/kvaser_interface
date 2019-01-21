@@ -1,32 +1,5 @@
 version: 2
 jobs:
-  indigo:
-    docker:
-      - image: autonomoustuff/docker-builds:indigo-ros-base
-    steps:
-      - checkout
-      - run:
-          name: Set Up Container
-          command: |
-            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
-            apt-get update -qq && apt-get install -y linux-headers-generic linuxcan-dkms
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-            cd ..
-            catkin init
-            catkin config --extend /opt/ros/$ROS_DISTRO
-      - run:
-          name: Build
-          command: |
-            cd ..
-            catkin build
-      - run:
-          name: Run Tests
-          command: |
-            cd ..
-            catkin run_tests
-    working_directory: ~/src
-
   kinetic:
     docker:
       - image: autonomoustuff/docker-builds:kinetic-ros-base
@@ -106,32 +79,6 @@ jobs:
           command: |
             cd ..
             catkin run_tests
-    working_directory: ~/src
-
-  indigo_release:
-    docker:
-      - image: autonomoustuff/docker-builds:indigo-ros-base
-    steps:
-      - checkout
-      - run:
-          name: Set Up Container
-          command: |
-            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
-            apt-get update -qq && apt-get install -y linux-headers-generic linuxcan-dkms dh-make python-bloom ruby
-            gem install --no-rdoc --no-ri deb-s3
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-      - run:
-          name: Build
-          command: |
-            bloom-generate rosdebian --os-name ubuntu --os-version trusty --ros-distro indigo
-            sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
-            fakeroot debian/rules binary
-      - run:
-          name: Upload
-          command: |
-            cd ..
-            deb-s3 upload -b autonomoustuff-repo -c trusty --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
     working_directory: ~/src
 
   kinetic_release:
@@ -216,10 +163,6 @@ workflows:
   version: 2
   ros_build:
     jobs:
-      - indigo:
-          filters:
-            branches:
-              ignore: release
       - kinetic:
           filters:
             branches:
@@ -234,11 +177,6 @@ workflows:
               ignore: release
   ros_release:
     jobs:
-      - indigo_release:
-          context: ubuntu-pkg-build
-          filters:
-            branches:
-              only: release
       - kinetic_release:
           context: ubuntu-pkg-build
           filters:
