@@ -26,7 +26,7 @@ ros::Publisher can_tx_pub;
 void can_read()
 {
   long id;
-  uint8_t msg[8];
+  uint8_t msg[8] = {}; //zero-initialize array
   unsigned int size;
   bool extended;
   unsigned long t;
@@ -62,7 +62,7 @@ void can_read()
         can_pub_msg.id = id;
         can_pub_msg.dlc = size;
         can_pub_msg.is_extended = extended;
-        std::copy(msg, msg + 8, can_pub_msg.data.begin());
+        std::copy(msg, msg + size, can_pub_msg.data.begin());
         can_pub_msg.header.stamp = ros::Time::now();
         can_tx_pub.publish(can_pub_msg);
       }
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
   if (priv.getParam("can_bit_rate", bit_rate))
   {
     ROS_INFO("Kvaser CAN Interface - Got bit_rate: %d", bit_rate);
-    
+
     if (bit_rate < 0)
     {
       ROS_ERROR("Kvaser CAN Interface - Bit Rate is invalid.");
