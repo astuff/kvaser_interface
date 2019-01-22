@@ -26,16 +26,13 @@ ros::Publisher can_tx_pub;
 void can_read()
 {
   long id;
-  uint8_t msg[8];
+  uint8_t msg[8] = {}; //zero-initialize array
   unsigned int size;
   bool extended;
   unsigned long t;
 
   const std::chrono::milliseconds loop_pause = std::chrono::milliseconds(10);
   bool keep_going = true;
-
-  std::chrono::system_clock::time_point next_time = std::chrono::system_clock::now();
-  next_time += loop_pause;
 
   //Set local to global value before looping.
   keep_going_mut.lock();
@@ -46,6 +43,9 @@ void can_read()
 
   while (keep_going)
   {
+    std::chrono::system_clock::time_point next_time = std::chrono::system_clock::now();
+    next_time += loop_pause;
+
     if (!can_reader.is_open())
     {
       ret = can_reader.open(hardware_id, circuit_id, bit_rate, false);
@@ -58,11 +58,11 @@ void can_read()
       while ((ret = can_reader.read(&id, msg, &size, &extended, &t)) == OK)
       {
         can_msgs::Frame can_pub_msg;
-        can_pub_msg.header.stamp = ros::Time::now();
         can_pub_msg.header.frame_id = "0";
         can_pub_msg.id = id;
         can_pub_msg.dlc = size;
-        std::copy(msg, msg + 8, can_pub_msg.data.begin());
+        can_pub_msg.is_extended = extended;
+        std::copy(msg, msg + size, can_pub_msg.data.begin());
         can_pub_msg.header.stamp = ros::Time::now();
         can_tx_pub.publish(can_pub_msg);
       }
@@ -105,7 +105,7 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
 
   if (can_writer.is_open())
   {
-    ret = can_writer.write(msg->id, const_cast<unsigned char*>(&(msg->data[0])), msg->dlc, true);
+    ret = can_writer.write(msg->id, const_cast<unsigned char*>(&(msg->data[0])), msg->dlc, msg->is_extended);
 
     if (ret != OK)
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s", ret, return_status_desc(ret).c_str());
@@ -120,7 +120,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "kvaser_can_bridge");
   ros::NodeHandle n;
   ros::NodeHandle priv("~");
-  ros::Rate loop_rate(50);
+  ros::AsyncSpinner spinner(1);
 
   can_tx_pub = n.advertise<can_msgs::Frame>("can_tx", 500);
 
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
   if (priv.getParam("can_bit_rate", bit_rate))
   {
     ROS_INFO("Kvaser CAN Interface - Got bit_rate: %d", bit_rate);
-    
+
     if (bit_rate < 0)
     {
       ROS_ERROR("Kvaser CAN Interface - Bit Rate is invalid.");
@@ -168,11 +168,9 @@ int main(int argc, char** argv)
   // Start CAN receiving thread.
   std::thread can_read_thread(can_read);
 
-  while (ros::ok())
-  {
-    ros::spin();
-    loop_rate.sleep();
-  }
+  spinner.start();
+
+  ros::waitForShutdown();
 
   return_statuses ret = can_writer.close();
 

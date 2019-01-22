@@ -1,6 +1,6 @@
 # Kvaser ROS Interface API
 
-[![Build Status](https://travis-ci.org/astuff/kvaser_interface.svg?branch=master)](https://travis-ci.org/astuff/kvaser_interface)
+[![CircleCI](https://circleci.com/gh/astuff/kvaser_interface/tree/master.svg?style=svg)](https://circleci.com/gh/astuff/kvaser_interface/tree/master)
 
 This package was developed as a standardized way to access Kvaser CAN devices from ROS. It can either be used as a development API
 by including the header <kvaser_interface/kvaser_interface.h> and linking against `libros_linuxcan.so` or the stand-alone node
@@ -9,7 +9,12 @@ by including the header <kvaser_interface/kvaser_interface.h> and linking agains
 The following are required prerequisites:
 
 * The Kvaser CANLIB API (https://www.kvaser.com/downloads/)
-    * For Ubuntu 14.04/16.04 - Latest version (tested with at least v5.20.814)
+    * Can be [downloaded directly](https://www.kvaser.com/kvaser-downloads) or installed through PPA:
+
+        `sudo apt-add-repository ppa:jwhitleyastuff/linuxcan-dkms`
+
+        `sudo apt update && sudo apt install -y linuxcan-dkms`
+    * For Linux kernel 4.13 or higher, version 5.21 or higher of CANLIB is required
 * `can_msgs`
 
 ## The `kvaser_can_bridge` Node
@@ -36,4 +41,4 @@ This is the 0-based index of the channel number *on the specific hardware device
 
 *~can_bit_rate*
 
-This is the communication rate to be used on the CAN channel in bits per second.
+This is the communication rate to be used on the CAN channel in bits per second (default: 500000).
