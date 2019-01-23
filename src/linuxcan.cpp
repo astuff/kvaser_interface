@@ -1,55 +1,67 @@
 /*
-* Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
+* Unpublished Copyright (c) 2009-2017 AutonomouStuff, LLC, All Rights Reserved.
 *
 * This file is part of the Kvaser ROS 1.0 driver which is released under the MIT license.
 * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
 */
 
-#include <kvaser_interface/kvaser_interface.h>
+#include <kvaser_interface.h>
+#include <canlib.h>
 
+using namespace std;
 using namespace AS::CAN;
 
+//Default constructor.
 KvaserCan::KvaserCan() :
-  handle(new int32_t)
+        handle(NULL)
 {
-  *handle = -1;
-  canInitializeLibrary();
+  handle = malloc(sizeof(canHandle));
 }
 
+//Default destructor.
 KvaserCan::~KvaserCan()
 {
-  if (*handle > -1)
-    canClose(*handle);
+  if (handle != NULL)
+  {
+    close();
+  }
+
+  free(handle);
 }
 
-ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
-                               const int32_t& circuit_id,
-                               const int32_t& bitrate,
-                               const bool& echo_on)
+return_statuses KvaserCan::open(const int& hardware_id,
+                                   const int& circuit_id,
+                                   const int& bitrate,
+                                   const bool& echo_on)
 {
-  if (*handle < 0)
+  if (handle == NULL)
+  {
     return INIT_FAILED;
+  }
 
   if (!on_bus)
   {
+    canHandle *h = (canHandle *) handle;
+
     int numChan;
-
     if (canGetNumberOfChannels(&numChan) != canOK)
+    {
       return INIT_FAILED;
+    }
 
-    uint32_t serial[2];
-    uint32_t channel_number;
-    int32_t channel = -1;
+    unsigned int serial[2];
+    unsigned int channel_number;
+    int channel = -1;
 
-    for (int32_t idx = 0; idx < numChan; idx++)
+    for (int idx = 0; idx < numChan; idx++)
     {
       if (canGetChannelData(idx, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial)) == canOK)
       {
-        if (serial[0] == (uint32_t) hardware_id)
+        if (serial[0] == (unsigned int) hardware_id)
         {
           if (canGetChannelData(idx, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_number, sizeof(channel_number)) == canOK)
           {
-            if (channel_number == (uint32_t) circuit_id)
+            if (channel_number == (unsigned int) circuit_id)
             {
               channel = idx;
             }
@@ -64,50 +76,52 @@ ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
     }
 
     // Open channel
-    *handle = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
-
-    if (*handle < 0)
+    *h = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
+    if (*h < 0)
+    {
       return INIT_FAILED;
+    }
 
     // Set bit rate and other parameters
-    int64_t freq;
-
+    long freq;
     switch (bitrate)
     {
       case 125000: freq = canBITRATE_125K; break;
       case 250000: freq = canBITRATE_250K; break;
       case 500000: freq = canBITRATE_500K; break;
       case 1000000: freq = canBITRATE_1M; break;
-      default: return  BAD_PARAM;
+      default:
+      {
+        return  BAD_PARAM;
+      }
     }
 
-    if (canSetBusParams(*handle, freq, 0, 0, 0, 0, 0) < 0)
+    if (canSetBusParams(*h, freq, 0, 0, 0, 0, 0) < 0)
+    {
       return BAD_PARAM;
+    }
 
     // Linuxcan defaults to echo on, so if you've opened the same can channel
     // from multiple interfaces they will receive the messages that each other
     // send.  Turn it off here if desired.
     if (!echo_on)
     {
-      uint8_t off = 0;
-      canIoCtl(*handle, canIOCTL_SET_LOCAL_TXECHO, &off, 1);
+      unsigned char off = 0;
+      canIoCtl(*h, canIOCTL_SET_LOCAL_TXECHO, &off, 1);
     }
 
     // Set output control
-    canSetBusOutputControl(*handle, canDRIVER_NORMAL);
-
-    if (canBusOn(*handle) < 0)
-      return INIT_FAILED;
-
+    canSetBusOutputControl(*h, canDRIVER_NORMAL);
+    canBusOn(*h);
     on_bus = true;
   }
 
   return OK;
 }
 
-bool KvaserCan::isOpen()
+bool KvaserCan::is_open()
 {
-  if (*handle < 0)
+  if (handle == NULL)
   {
     return false;
   }
@@ -115,22 +129,7 @@ bool KvaserCan::isOpen()
   {
     if (on_bus)
     {
-      uint64_t flags;
-
-      canStatus ret = canReadStatus(*handle, &flags);
-
-      if (ret != canOK)
-        return false;
-
-      if ((flags & canSTAT_BUS_OFF) > 1)
-      {
-        close();
-        return false;
-      }
-      else
-      {
-        return true;
-      }
+      return true;
     }
     else
     {
@@ -139,38 +138,46 @@ bool KvaserCan::isOpen()
   }
 }
 
-ReturnStatuses KvaserCan::close()
+return_statuses KvaserCan::close()
 {
-  if (*handle < 0)
-    return CHANNEL_CLOSED;
+  if (handle == NULL)
+  {
+    return INIT_FAILED;
+  }
+
+  canHandle *h = (canHandle *) handle;
 
   // Close the channel
-  if (canClose(*handle) != canOK)
+  if (canClose(*h) != canOK)
+  {
     return CLOSE_FAILED;
+  }
 
   on_bus = false;
 
   return OK;
 }
 
-ReturnStatuses KvaserCan::read(int64_t *id,
-                               uint8_t *msg,
-                               uint32_t *size,
-                               bool *extended,
-                               uint64_t *time)
+return_statuses KvaserCan::read(long *id,
+                                   unsigned char *msg,
+                                   unsigned int *size,
+                                   bool *extended,
+                                   unsigned long *time)
 {
-  if (*handle < 0)
+  if (handle == NULL)
   {
-    return CHANNEL_CLOSED;
+    return INIT_FAILED;
   }
 
+  canHandle *h = (canHandle *) handle;
+
   bool done = false;
-  ReturnStatuses ret_val = INIT_FAILED;
+  return_statuses ret_val = INIT_FAILED;
   unsigned int flag = 0;
 
   while (!done)
   {
-    canStatus ret = canRead(*handle, id, msg, size, &flag, time);
+    canStatus ret = canRead(*h, id, msg, size, &flag, time);
 
     if (ret == canERR_NOTINITIALIZED)
     {
@@ -199,27 +206,37 @@ ReturnStatuses KvaserCan::read(int64_t *id,
   }
 
   if (ret_val == OK)
+  {
     *extended = ((flag & canMSG_EXT) > 0);
+  }
 
   return ret_val;
 }
 
-ReturnStatuses KvaserCan::write(const int64_t& id,
-                                uint8_t *msg,
-                                const uint32_t& size,
-                                const bool& extended)
+return_statuses KvaserCan::write(const long& id,
+                                    unsigned char *msg,
+                                    const unsigned int& size,
+                                    const bool& extended)
 {
-  if (*handle < 0)
-    return CHANNEL_CLOSED;
+  if (handle == NULL)
+  {
+    return INIT_FAILED;
+  }
 
-  uint32_t flag;
+  canHandle *h = (canHandle *) handle;
+
+  unsigned int flag;
 
   if (extended)
+  {
     flag = canMSG_EXT;
+  }
   else
+  {
     flag = canMSG_STD;
+  }
 
-  canStatus ret = canWrite(*handle, id, msg, size, flag);
+  canStatus ret = canWrite(*h, id, msg, size, flag);
 
   return (ret == canOK) ? OK : WRITE_FAILED;
 }

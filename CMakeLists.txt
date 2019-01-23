@@ -6,7 +6,6 @@ add_definitions(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   can_msgs
-  roslint
 )
 
 catkin_package(
@@ -16,7 +15,7 @@ catkin_package(
 )
 
 include_directories(
-  include
+  include/${PROJECT_NAME}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -39,16 +38,13 @@ target_link_libraries(kvaser_can_bridge
   ${catkin_LIBRARIES}
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/include_what_you_use,-build/c++11")
-roslint_cpp()
-
 install(TARGETS ros_linuxcan
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY include
+install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
