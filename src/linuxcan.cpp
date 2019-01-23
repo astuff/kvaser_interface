@@ -27,9 +27,6 @@ ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
                                const int32_t& bitrate,
                                const bool& echo_on)
 {
-  if (*handle < 0)
-    return INIT_FAILED;
-
   if (!on_bus)
   {
     int numChan;
