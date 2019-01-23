@@ -2,8 +2,8 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3.0.0 (2019-01-23)
-------------------
+Forthcoming
+-----------
 * Merge pull request `#14 <https://github.com/astuff/kvaser_interface/issues/14>`_ from astuff/memory-management
 * Adding roslint and formatting clean up.
   Testing better memory management with smart pointers.
