@@ -2,6 +2,24 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#14 <https://github.com/astuff/kvaser_interface/issues/14>`_ from astuff/memory-management
+* Adding roslint and formatting clean up.
+  Testing better memory management with smart pointers.
+  Contains significant API changes (function names and include header location)
+  to conform to ROS C++ guidelines.
+* Merge pull request `#13 <https://github.com/astuff/kvaser_interface/issues/13>`_ from astuff/fix/short_messages
+* Fixes issues seen when receiving short messages
+  Before: Short messages (<8 bytes) would correctly report
+  DLC and any bytes sent, but published topic would contain
+  garbage extra data in unused bytes.
+  After: Short messages are published with zeros for any unused
+  bytes instead of line noise.
+* Merge pull request `#11 <https://github.com/astuff/kvaser_interface/issues/11>`_ from giuspen/is_extended
+* set value of can_pub_msg.is_extended from read
+* Contributors: Daniel-Stanek, Giuseppe Penone, Joe Driscoll, Joshua Whitley, Sam Rustan, Zach Oakes
+
 2.0.2 (2018-09-13)
 ------------------
 * Bumping version.
