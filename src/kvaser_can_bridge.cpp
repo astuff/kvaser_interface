@@ -1,7 +1,7 @@
 /*
-* Unpublished Copyright (c) 2009-2017 AutonomouStuff, LLC, All Rights Reserved.
+* Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
 *
-* This file is part of the Kvaser ROS 1.0 driver which is released under the MIT license.
+* This file is part of the Kvaser ROS driver which is released under the MIT license.
 * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
 */
 
@@ -10,7 +10,7 @@
 #include <chrono>
 
 #include <ros/ros.h>
-#include <kvaser_interface.h>
+#include <kvaser_interface/kvaser_interface.h>
 #include <can_msgs/Frame.h>
 
 using namespace AS::CAN;
@@ -25,33 +25,34 @@ ros::Publisher can_tx_pub;
 
 void can_read()
 {
-  long id;
-  uint8_t msg[8] = {}; //zero-initialize array
-  unsigned int size;
+  int64_t id;
+  uint8_t msg[8] = {};  // zero-initialize array
+  uint32_t size;
   bool extended;
-  unsigned long t;
+  uint64_t t;
 
   const std::chrono::milliseconds loop_pause = std::chrono::milliseconds(10);
   bool keep_going = true;
 
-  //Set local to global value before looping.
+  // Set local to global value before looping.
   keep_going_mut.lock();
   keep_going = global_keep_going;
   keep_going_mut.unlock();
 
-  return_statuses ret;
+  ReturnStatuses ret;
 
   while (keep_going)
   {
     std::chrono::system_clock::time_point next_time = std::chrono::system_clock::now();
     next_time += loop_pause;
 
-    if (!can_reader.is_open())
+    if (!can_reader.isOpen())
     {
       ret = can_reader.open(hardware_id, circuit_id, bit_rate, false);
 
       if (ret != OK)
-        ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening reader: %d - %s", ret, return_status_desc(ret).c_str());
+        ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening reader: %d - %s",
+          ret, returnStatusDesc(ret).c_str());
     }
     else
     {
@@ -68,47 +69,54 @@ void can_read()
       }
 
       if (ret != NO_MESSAGES_RECEIVED)
-        ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - Error reading CAN message: %d - %s", ret, return_status_desc(ret).c_str());
+        ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - Error reading CAN message: %d - %s",
+          ret, returnStatusDesc(ret).c_str());
     }
 
     std::this_thread::sleep_until(next_time);
 
-    //Set local to global immediately before next loop.
+    // Set local to global immediately before next loop.
     keep_going_mut.lock();
     keep_going = global_keep_going;
     keep_going_mut.unlock();
   }
 
-  if (can_reader.is_open())
+  if (can_reader.isOpen())
   {
     ret = can_reader.close();
 
     if (ret != OK)
-      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing reader: %d - %s", ret, return_status_desc(ret).c_str());
+      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing reader: %d - %s",
+        ret, returnStatusDesc(ret).c_str());
   }
 }
 
 void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
 {
-  return_statuses ret;
+  ReturnStatuses ret;
 
-  if (!can_writer.is_open())
+  if (!can_writer.isOpen())
   {
     // Open the channel.
     ret = can_writer.open(hardware_id, circuit_id, bit_rate, false);
 
     if (ret != OK)
     {
-      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening writer: %d - %s", ret, return_status_desc(ret).c_str());
+      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening writer: %d - %s",
+        ret, returnStatusDesc(ret).c_str());
     }
   }
 
-  if (can_writer.is_open())
+  if (can_writer.isOpen())
   {
-    ret = can_writer.write(msg->id, const_cast<unsigned char*>(&(msg->data[0])), msg->dlc, msg->is_extended);
+    ret = can_writer.write(msg->id,
+                           const_cast<unsigned char*>(&(msg->data[0])),
+                           msg->dlc,
+                           msg->is_extended);
 
     if (ret != OK)
-      ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s", ret, return_status_desc(ret).c_str());
+      ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s",
+        ret, returnStatusDesc(ret).c_str());
   }
 }
 
@@ -127,7 +135,7 @@ int main(int argc, char** argv)
   ros::Subscriber can_rx_sub = n.subscribe("can_rx", 500, can_rx_callback);
 
   // Wait for time to be valid
-  while (ros::Time::now().nsec == 0);
+  ros::Time::waitForValid();
 
   if (priv.getParam("can_hardware_id", hardware_id))
   {
@@ -172,10 +180,11 @@ int main(int argc, char** argv)
 
   ros::waitForShutdown();
 
-  return_statuses ret = can_writer.close();
+  ReturnStatuses ret = can_writer.close();
 
   if (ret != OK)
-    ROS_ERROR("Kvaser CAN Interface - Error closing writer: %d - %s", ret, return_status_desc(ret).c_str());
+    ROS_ERROR("Kvaser CAN Interface - Error closing writer: %d - %s",
+      ret, returnStatusDesc(ret).c_str());
 
   keep_going_mut.lock();
   global_keep_going = false;
