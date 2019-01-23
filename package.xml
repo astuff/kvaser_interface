@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>kvaser_interface</name>
-  <version>3.0.0</version>
+  <version>2.0.2</version>
   <description>Kvaser CAN interface for ROS device drivers.</description>
   <license>MIT</license>
 
@@ -14,6 +14,8 @@
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roslint</build_depend>
 
   <depend>roscpp</depend>
   <depend>can_msgs</depend>
