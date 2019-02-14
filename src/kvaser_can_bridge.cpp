@@ -8,6 +8,7 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <algorithm>
 
 #include <ros/ros.h>
 #include <kvaser_interface/kvaser_interface.h>
