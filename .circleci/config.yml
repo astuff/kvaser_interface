@@ -27,8 +27,10 @@ jobs:
       - run:
           name: Run Tests
           command: |
+            source /opt/ros/kinetic/setup.bash
             cd ..
             catkin run_tests
+            catkin_test_results
     working_directory: ~/src
 
   lunar:
@@ -58,8 +60,10 @@ jobs:
       - run:
           name: Run Tests
           command: |
+            source /opt/ros/lunar/setup.bash
             cd ..
             catkin run_tests
+            catkin_test_results
     working_directory: ~/src
 
   melodic:
@@ -89,8 +93,10 @@ jobs:
       - run:
           name: Run Tests
           command: |
+            source /opt/ros/melodic/setup.bash
             cd ..
             catkin run_tests
+            catkin_test_results
     working_directory: ~/src
 
   kinetic_release:
