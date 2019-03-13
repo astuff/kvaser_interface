@@ -8,14 +8,15 @@
 #ifndef KVASER_INTERFACE_KVASER_INTERFACE_H
 #define KVASER_INTERFACE_KVASER_INTERFACE_H
 
-// C++ Includes
-#include <iostream>
-#include <memory>
-
 extern "C"
 {
 #include <canlib.h>
 }
+
+// C++ Includes
+#include <iostream>
+#include <memory>
+#include <string>
 
 namespace AS
 {

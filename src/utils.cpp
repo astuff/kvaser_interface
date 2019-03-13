@@ -7,6 +7,8 @@
 
 #include <kvaser_interface/kvaser_interface.h>
 
+#include <string>
+
 std::string AS::CAN::returnStatusDesc(const ReturnStatuses& ret)
 {
   std::string status_string;

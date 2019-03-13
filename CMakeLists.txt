@@ -39,7 +39,7 @@ target_link_libraries(kvaser_can_bridge
   ${catkin_LIBRARIES}
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/include_what_you_use,-build/c++11")
+set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/c++11")
 roslint_cpp()
 
 install(TARGETS ros_linuxcan
