@@ -32,7 +32,7 @@ ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
     int numChan;
 
     if (canGetNumberOfChannels(&numChan) != canOK)
-      return INIT_FAILED;
+      return ReturnStatuses::INIT_FAILED;
 
     uint32_t serial[2];
     uint32_t channel_number;
@@ -57,14 +57,14 @@ ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
 
     if (channel == -1)
     {
-      return BAD_PARAM;
+      return ReturnStatuses::BAD_PARAM;
     }
 
     // Open channel
     *handle = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
 
     if (*handle < 0)
-      return INIT_FAILED;
+      return ReturnStatuses::INIT_FAILED;
 
     // Set bit rate and other parameters
     int64_t freq;
@@ -75,11 +75,11 @@ ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
       case 250000: freq = canBITRATE_250K; break;
       case 500000: freq = canBITRATE_500K; break;
       case 1000000: freq = canBITRATE_1M; break;
-      default: return  BAD_PARAM;
+      default: return  ReturnStatuses::BAD_PARAM;
     }
 
     if (canSetBusParams(*handle, freq, 0, 0, 0, 0, 0) < 0)
-      return BAD_PARAM;
+      return ReturnStatuses::BAD_PARAM;
 
     // Linuxcan defaults to echo on, so if you've opened the same can channel
     // from multiple interfaces they will receive the messages that each other
@@ -94,12 +94,12 @@ ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
     canSetBusOutputControl(*handle, canDRIVER_NORMAL);
 
     if (canBusOn(*handle) < 0)
-      return INIT_FAILED;
+      return ReturnStatuses::INIT_FAILED;
 
     on_bus = true;
   }
 
-  return OK;
+  return ReturnStatuses::OK;
 }
 
 bool KvaserCan::isOpen()
@@ -139,15 +139,15 @@ bool KvaserCan::isOpen()
 ReturnStatuses KvaserCan::close()
 {
   if (*handle < 0)
-    return CHANNEL_CLOSED;
+    return ReturnStatuses::CHANNEL_CLOSED;
 
   // Close the channel
   if (canClose(*handle) != canOK)
-    return CLOSE_FAILED;
+    return ReturnStatuses::CLOSE_FAILED;
 
   on_bus = false;
 
-  return OK;
+  return ReturnStatuses::OK;
 }
 
 ReturnStatuses KvaserCan::read(int64_t *id,
@@ -158,11 +158,11 @@ ReturnStatuses KvaserCan::read(int64_t *id,
 {
   if (*handle < 0)
   {
-    return CHANNEL_CLOSED;
+    return ReturnStatuses::CHANNEL_CLOSED;
   }
 
   bool done = false;
-  ReturnStatuses ret_val = INIT_FAILED;
+  ReturnStatuses ret_val = ReturnStatuses::INIT_FAILED;
   unsigned int flag = 0;
 
   while (!done)
@@ -171,31 +171,31 @@ ReturnStatuses KvaserCan::read(int64_t *id,
 
     if (ret == canERR_NOTINITIALIZED)
     {
-      ret_val = CHANNEL_CLOSED;
+      ret_val = ReturnStatuses::CHANNEL_CLOSED;
       on_bus = false;
       done = true;
     }
     else if (ret == canERR_NOMSG)
     {
-      ret_val = NO_MESSAGES_RECEIVED;
+      ret_val = ReturnStatuses::NO_MESSAGES_RECEIVED;
       done = true;
     }
     else if (ret != canOK)
     {
-      ret_val = READ_FAILED;
+      ret_val = ReturnStatuses::READ_FAILED;
       done = true;
     }
     else if (!(flag & 0xF9))
     {
       // Was a received message with actual data
-      ret_val = OK;
+      ret_val = ReturnStatuses::OK;
       done = true;
     }
     // Else a protocol message, such as a TX ACK, was received
     // Keep looping until one of the other conditions above is met
   }
 
-  if (ret_val == OK)
+  if (ret_val == ReturnStatuses::OK)
     *extended = ((flag & canMSG_EXT) > 0);
 
   return ret_val;
@@ -207,7 +207,7 @@ ReturnStatuses KvaserCan::write(const int64_t& id,
                                 const bool& extended)
 {
   if (*handle < 0)
-    return CHANNEL_CLOSED;
+    return ReturnStatuses::CHANNEL_CLOSED;
 
   uint32_t flag;
 
@@ -218,5 +218,5 @@ ReturnStatuses KvaserCan::write(const int64_t& id,
 
   canStatus ret = canWrite(*handle, id, msg, size, flag);
 
-  return (ret == canOK) ? OK : WRITE_FAILED;
+  return (ret == canOK) ? ReturnStatuses::OK : ReturnStatuses::WRITE_FAILED;
 }
