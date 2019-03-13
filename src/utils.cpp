@@ -13,21 +13,21 @@ std::string AS::CAN::returnStatusDesc(const ReturnStatuses& ret)
 {
   std::string status_string;
 
-  if (ret == INIT_FAILED)
+  if (ret == ReturnStatuses::INIT_FAILED)
     status_string = "Initialization of the CAN interface failed.";
-  else if (ret == BAD_PARAM)
+  else if (ret == ReturnStatuses::BAD_PARAM)
     status_string = "A bad parameter was provided to the CAN interface during initalization.";
-  else if (ret == NO_CHANNELS_FOUND)
+  else if (ret == ReturnStatuses::NO_CHANNELS_FOUND)
     status_string = "No available CAN channels were found.";
-  else if (ret == CHANNEL_CLOSED)
+  else if (ret == ReturnStatuses::CHANNEL_CLOSED)
     status_string = "CAN channel is not currently open.";
-  else if (ret == NO_MESSAGES_RECEIVED)
+  else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED)
     status_string = "No messages were received on the interface.";
-  else if (ret == READ_FAILED)
+  else if (ret == ReturnStatuses::READ_FAILED)
     status_string = "A read operation failed on the CAN interface.";
-  else if (ret == WRITE_FAILED)
+  else if (ret == ReturnStatuses::WRITE_FAILED)
     status_string = "A write operation failed on the CAN interface.";
-  else if (ret == CLOSE_FAILED)
+  else if (ret == ReturnStatuses::CLOSE_FAILED)
     status_string = "Closing the CAN interface failed.";
 
   return status_string;

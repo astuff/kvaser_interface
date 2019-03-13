@@ -23,7 +23,7 @@ namespace AS
 namespace CAN
 {
 
-enum ReturnStatuses
+enum class ReturnStatuses
 {
   OK = 0,
   INIT_FAILED = -1,
