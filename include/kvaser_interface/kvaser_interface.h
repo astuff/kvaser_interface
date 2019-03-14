@@ -87,6 +87,12 @@ struct KvaserChannel
   uint16_t firmware_rev_bld = 0;
   HardwareType hw_type = HardwareType::NONE;
   uint32_t max_bitrate = 0;
+  std::string dev_name;
+  std::string upc_no;
+  std::string driver_name;
+  uint16_t driver_ver_maj = 0;
+  uint16_t driver_ver_min = 0;
+  uint16_t driver_ver_bld = 0;
   bool all_data_valid = true;
 };
 

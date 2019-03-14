@@ -9,6 +9,8 @@
 
 #include <string>
 #include <vector>
+#include <cstring>
+#include <sstream>
 
 using namespace AS::CAN;
 
@@ -277,6 +279,11 @@ std::vector<KvaserChannel> KvaserCanUtils::getChannels()
       uint32_t card_type = 0;
       uint16_t firmware_rev[4];
       uint32_t max_bitrate = 0;
+      char dev_name[256];
+      uint32_t upc_no[2];
+      uint16_t driver_ver[4];
+
+      memset(dev_name, 0, sizeof(dev_name));
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial));
 
@@ -326,6 +333,42 @@ std::vector<KvaserChannel> KvaserCanUtils::getChannels()
         chan.max_bitrate = max_bitrate;
       else
         chan.all_data_valid = false;
+
+      stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII, &dev_name, sizeof(dev_name));
+
+      if (stat == canOK)
+        chan.dev_name = std::string(dev_name);
+      else
+        chan.all_data_valid = false;
+
+      stat = canGetChannelData(i, canCHANNELDATA_CARD_UPC_NO, &upc_no, sizeof(upc_no));
+
+      if (stat == canOK)
+      {
+        std::ostringstream oss;
+        oss << (upc_no[1] >> 12) << "-";
+        oss << (((upc_no[1] & 0xfff) << 8) | ((upc_no[0] >> 24) & 0xff)) << "-";
+        oss << ((upc_no[0] >> 4) & 0xfffff) << "-";
+        oss << (upc_no[0] & 0x0f);
+        chan.upc_no = oss.str();
+      }
+      else
+      {
+        chan.all_data_valid = false;
+      }
+
+      stat = canGetChannelData(i, canCHANNELDATA_DLL_FILE_VERSION, &driver_ver, sizeof(driver_ver));
+
+      if (stat == canOK)
+      {
+        chan.driver_ver_maj = driver_ver[3];
+        chan.driver_ver_min = driver_ver[2];
+        chan.driver_ver_bld = driver_ver[1];
+      }
+      else
+      {
+        chan.all_data_valid = false;
+      }
 
       channels.push_back(chan);
     }
