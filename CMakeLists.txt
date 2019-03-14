@@ -38,6 +38,14 @@ target_link_libraries(kvaser_can_bridge
   ${catkin_LIBRARIES}
 )
 
+add_executable(list_channels
+  tools/list_channels.cpp
+)
+
+target_link_libraries(list_channels
+  ros_linuxcan
+)
+
 set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/c++11")
 roslint_cpp()
 
@@ -46,7 +54,8 @@ if(CATKIN_ENABLE_TESTING)
   roslint_add_test()
 endif()
 
-install(TARGETS ros_linuxcan
+install(
+  TARGETS ros_linuxcan kvaser_can_bridge list_channels
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -54,12 +63,6 @@ install(TARGETS ros_linuxcan
 
 install(DIRECTORY include
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
-
-install(TARGETS kvaser_can_bridge
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 install(DIRECTORY launch

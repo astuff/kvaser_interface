@@ -11,6 +11,7 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
+#include <algorithm>
 
 using namespace AS::CAN;
 
@@ -252,9 +253,32 @@ ReturnStatuses KvaserCanUtils::getChannelCount(int32_t * numChan)
   return canlibStatToReturnStatus(stat);
 }
 
-std::vector<KvaserChannel> KvaserCanUtils::getChannels()
+std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
 {
-  std::vector<KvaserChannel> channels;
+  auto channels = getChannels();
+
+  std::vector<std::shared_ptr<KvaserCard>> cards;
+
+  for (const auto & channel : channels)
+  {
+    bool found = false;
+    
+    for (const auto & card : cards)
+    {
+      if (card->serial_no == channel->serial_no)
+        found = true;
+    }
+    
+    if (!found)
+      cards.emplace_back(std::dynamic_pointer_cast<KvaserCard>(std::move(channel)));
+  }
+
+  return cards;
+}
+
+std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
+{
+  std::vector<std::shared_ptr<KvaserChannel>> channels;
 
   int32_t numChan = -1;
   ReturnStatuses retStat = ReturnStatuses::OK;
@@ -271,10 +295,9 @@ std::vector<KvaserChannel> KvaserCanUtils::getChannels()
       KvaserChannel chan;
       int stat = 0;
 
-      chan.channel_no = i;
+      chan.channel_idx = i;
 
       uint64_t serial = 0;
-      uint32_t card_no = 0;
       uint32_t channel_no = 0;
       uint32_t card_type = 0;
       uint16_t firmware_rev[4];
@@ -289,13 +312,6 @@ std::vector<KvaserChannel> KvaserCanUtils::getChannels()
 
       if (stat == canOK)
         chan.serial_no = serial;
-      else
-        chan.all_data_valid = false;
-
-      stat = canGetChannelData(i, canCHANNELDATA_CARD_NUMBER, &card_no, sizeof(card_no));
-
-      if (stat == canOK)
-        chan.card_no = card_no;
       else
         chan.all_data_valid = false;
 
@@ -370,11 +386,26 @@ std::vector<KvaserChannel> KvaserCanUtils::getChannels()
         chan.all_data_valid = false;
       }
 
-      channels.push_back(chan);
+      channels.push_back(std::make_shared<KvaserChannel>(chan));
     }
   }
 
   return channels;
+}
+
+std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannelsOnCard(const uint64_t & serialNo)
+{
+  std::vector<std::shared_ptr<KvaserChannel>> channelsOnCard;
+
+  auto channels = getChannels();
+
+  for (const auto & channel : channels)
+  {
+    if (channel->serial_no == serialNo)
+      channelsOnCard.emplace_back(std::move(channel));
+  }
+
+  return channelsOnCard;
 }
 
 std::string KvaserCanUtils::returnStatusDesc(const ReturnStatuses& ret)
