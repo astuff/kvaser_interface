@@ -53,7 +53,7 @@ void can_read()
 
       if (ret != ReturnStatuses::OK)
         ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening reader: %d - %s",
-          static_cast<int>(ret), returnStatusDesc(ret).c_str());
+          static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     }
     else
     {
@@ -71,7 +71,7 @@ void can_read()
 
       if (ret != ReturnStatuses::NO_MESSAGES_RECEIVED)
         ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - Error reading CAN message: %d - %s",
-          static_cast<int>(ret), returnStatusDesc(ret).c_str());
+          static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     }
 
     std::this_thread::sleep_until(next_time);
@@ -88,7 +88,7 @@ void can_read()
 
     if (ret != ReturnStatuses::OK)
       ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing reader: %d - %s",
-        static_cast<int>(ret), returnStatusDesc(ret).c_str());
+        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
   }
 }
 
@@ -104,7 +104,7 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
     if (ret != ReturnStatuses::OK)
     {
       ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening writer: %d - %s",
-        static_cast<int>(ret), returnStatusDesc(ret).c_str());
+        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     }
   }
 
@@ -117,7 +117,7 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
 
     if (ret != ReturnStatuses::OK)
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s",
-        static_cast<int>(ret), returnStatusDesc(ret).c_str());
+        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
   }
 }
 
@@ -185,7 +185,7 @@ int main(int argc, char** argv)
 
   if (ret != ReturnStatuses::OK)
     ROS_ERROR("Kvaser CAN Interface - Error closing writer: %d - %s",
-      static_cast<int>(ret), returnStatusDesc(ret).c_str());
+      static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
 
   keep_going_mut.lock();
   global_keep_going = false;

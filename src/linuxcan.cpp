@@ -7,6 +7,9 @@
 
 #include <kvaser_interface/kvaser_interface.h>
 
+#include <string>
+#include <vector>
+
 using namespace AS::CAN;
 
 KvaserCan::KvaserCan() :
@@ -29,10 +32,13 @@ ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
 {
   if (!on_bus)
   {
-    int numChan;
+    int32_t numChan;
+    ReturnStatuses stat;
 
-    if (canGetNumberOfChannels(&numChan) != canOK)
-      return ReturnStatuses::INIT_FAILED;
+    stat = KvaserCanUtils::getChannelCount(&numChan);
+
+    if (stat != ReturnStatuses::OK)
+      return stat;
 
     uint32_t serial[2];
     uint32_t channel_number;
@@ -145,6 +151,7 @@ ReturnStatuses KvaserCan::close()
   if (canClose(*handle) != canOK)
     return ReturnStatuses::CLOSE_FAILED;
 
+  *handle = -1;
   on_bus = false;
 
   return ReturnStatuses::OK;
@@ -219,4 +226,126 @@ ReturnStatuses KvaserCan::write(const int64_t& id,
   canStatus ret = canWrite(*handle, id, msg, size, flag);
 
   return (ret == canOK) ? ReturnStatuses::OK : ReturnStatuses::WRITE_FAILED;
+}
+
+ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t & canlibStat)
+{
+  switch (canlibStat)
+  {
+    case canOK:
+      return ReturnStatuses::OK;
+    case canERR_PARAM:
+      return ReturnStatuses::BAD_PARAM;
+    case canERR_NOTFOUND:
+      return ReturnStatuses::NO_CHANNELS_FOUND;
+    default:
+      return ReturnStatuses::INIT_FAILED;
+  }
+}
+
+ReturnStatuses KvaserCanUtils::getChannelCount(int32_t * numChan)
+{
+  auto stat = canGetNumberOfChannels(numChan);
+
+  return canlibStatToReturnStatus(stat);
+}
+
+std::vector<KvaserChannel> KvaserCanUtils::getChannels()
+{
+  std::vector<KvaserChannel> channels;
+
+  int32_t numChan = -1;
+  ReturnStatuses retStat = ReturnStatuses::OK;
+
+  retStat = KvaserCanUtils::getChannelCount(&numChan);
+
+  // Sanity checks before continuing
+  if (retStat == ReturnStatuses::OK &&
+    numChan > -1 &&
+    numChan < 300)
+  {
+    for (auto i = 0; i < numChan; ++i)
+    {
+      KvaserChannel chan;
+      int stat = 0;
+
+      chan.channel_no = i;
+
+      uint64_t serial;
+      uint32_t card_no;
+      uint32_t channel_no;
+      uint32_t card_type;
+      uint16_t firmware_rev[4];
+
+      stat = canGetChannelData(i, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial));
+
+      if (stat == canOK)
+        chan.serial_no = serial;
+      else
+        continue;
+
+      stat = canGetChannelData(i, canCHANNELDATA_CARD_NUMBER, &card_no, sizeof(card_no));
+
+      if (stat == canOK)
+        chan.card_no = card_no;
+      else
+        continue;
+
+      stat = canGetChannelData(i, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_no, sizeof(channel_no));
+
+      if (stat == canOK)
+        chan.channel_no_on_card = channel_no;
+      else
+        continue;
+
+      stat = canGetChannelData(i, canCHANNELDATA_CARD_TYPE, &card_type, sizeof(card_type));
+
+      if (stat == canOK)
+        chan.hw_type = static_cast<HardwareType>(card_type);
+      else
+        continue;
+
+      stat = canGetChannelData(i, canCHANNELDATA_CARD_FIRMWARE_REV, &firmware_rev, sizeof(firmware_rev));
+
+      if (stat == canOK)
+      {
+        chan.firmware_rev_maj = firmware_rev[0];
+        chan.firmware_rev_min = firmware_rev[1];
+        chan.firmware_rev_rel = firmware_rev[2];
+        chan.firmware_rev_bld = firmware_rev[3];
+      }
+      else
+      {
+        continue;
+      }
+
+      channels.push_back(chan);
+    }
+  }
+
+  return channels;
+}
+
+std::string KvaserCanUtils::returnStatusDesc(const ReturnStatuses& ret)
+{
+  std::string status_string;
+
+  if (ret == ReturnStatuses::INIT_FAILED)
+    status_string = "Initialization of the CAN interface failed.";
+  else if (ret == ReturnStatuses::BAD_PARAM)
+    status_string = "A bad parameter was provided to the CAN interface during initalization.";
+  else if (ret == ReturnStatuses::NO_CHANNELS_FOUND)
+    status_string = "No available CAN channels were found.";
+  else if (ret == ReturnStatuses::CHANNEL_CLOSED)
+    status_string = "CAN channel is not currently open.";
+  else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED)
+    status_string = "No messages were received on the interface.";
+  else if (ret == ReturnStatuses::READ_FAILED)
+    status_string = "A read operation failed on the CAN interface.";
+  else if (ret == ReturnStatuses::WRITE_FAILED)
+    status_string = "A write operation failed on the CAN interface.";
+  else if (ret == ReturnStatuses::CLOSE_FAILED)
+    status_string = "Closing the CAN interface failed.";
+
+  return status_string;
 }

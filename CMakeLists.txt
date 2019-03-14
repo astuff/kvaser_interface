@@ -22,7 +22,6 @@ include_directories(
 
 add_library(ros_linuxcan
   src/linuxcan.cpp
-  src/utils.cpp
 )
 
 target_link_libraries(ros_linuxcan
