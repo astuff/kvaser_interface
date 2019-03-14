@@ -21,10 +21,6 @@ jobs:
             cd ..
             catkin build
       - run:
-          name: Lint
-          command: |
-            catkin bt --no-deps --make-args roslint
-      - run:
           name: Run Tests
           command: |
             source /opt/ros/kinetic/setup.bash
@@ -54,10 +50,6 @@ jobs:
             cd ..
             catkin build
       - run:
-          name: Lint
-          command: |
-            catkin bt --no-deps --make-args roslint
-      - run:
           name: Run Tests
           command: |
             source /opt/ros/lunar/setup.bash
@@ -86,10 +78,6 @@ jobs:
           command: |
             cd ..
             catkin build
-      - run:
-          name: Lint
-          command: |
-            catkin bt --no-deps --make-args roslint
       - run:
           name: Run Tests
           command: |
