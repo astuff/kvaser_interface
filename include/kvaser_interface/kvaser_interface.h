@@ -77,15 +77,17 @@ enum class HardwareType
 
 struct KvaserChannel
 {
-  uint64_t serial_no;
-  uint32_t channel_no;
-  uint32_t card_no;
-  uint32_t channel_no_on_card;
-  uint16_t firmware_rev_maj;
-  uint16_t firmware_rev_min;
-  uint16_t firmware_rev_rel;
-  uint16_t firmware_rev_bld;
-  HardwareType hw_type;
+  uint64_t serial_no = 0;
+  uint32_t channel_no = 0;
+  uint32_t card_no = 0;
+  uint32_t channel_no_on_card = 0;
+  uint16_t firmware_rev_maj = 0;
+  uint16_t firmware_rev_min = 0;
+  uint16_t firmware_rev_rel = 0;
+  uint16_t firmware_rev_bld = 0;
+  HardwareType hw_type = HardwareType::NONE;
+  uint32_t max_bitrate = 0;
+  bool all_data_valid = true;
 };
 
 class KvaserCan

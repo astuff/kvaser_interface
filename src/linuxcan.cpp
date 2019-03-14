@@ -271,39 +271,40 @@ std::vector<KvaserChannel> KvaserCanUtils::getChannels()
 
       chan.channel_no = i;
 
-      uint64_t serial;
-      uint32_t card_no;
-      uint32_t channel_no;
-      uint32_t card_type;
+      uint64_t serial = 0;
+      uint32_t card_no = 0;
+      uint32_t channel_no = 0;
+      uint32_t card_type = 0;
       uint16_t firmware_rev[4];
+      uint32_t max_bitrate = 0;
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial));
 
       if (stat == canOK)
         chan.serial_no = serial;
       else
-        continue;
+        chan.all_data_valid = false;
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_NUMBER, &card_no, sizeof(card_no));
 
       if (stat == canOK)
         chan.card_no = card_no;
       else
-        continue;
+        chan.all_data_valid = false;
 
       stat = canGetChannelData(i, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_no, sizeof(channel_no));
 
       if (stat == canOK)
         chan.channel_no_on_card = channel_no;
       else
-        continue;
+        chan.all_data_valid = false;
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_TYPE, &card_type, sizeof(card_type));
 
       if (stat == canOK)
         chan.hw_type = static_cast<HardwareType>(card_type);
       else
-        continue;
+        chan.all_data_valid = false;
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_FIRMWARE_REV, &firmware_rev, sizeof(firmware_rev));
 
@@ -316,8 +317,15 @@ std::vector<KvaserChannel> KvaserCanUtils::getChannels()
       }
       else
       {
-        continue;
+        chan.all_data_valid = false;
       }
+
+      stat = canGetChannelData(i, canCHANNELDATA_MAX_BITRATE, &max_bitrate, sizeof(max_bitrate));
+
+      if (stat == canOK)
+        chan.max_bitrate = max_bitrate;
+      else
+        chan.all_data_valid = false;
 
       channels.push_back(chan);
     }
