@@ -10,6 +10,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <thread>
+#include <chrono>
 #include <unistd.h>
 #include <signal.h>
 
@@ -83,6 +85,9 @@ int main(int argc, char ** argv)
       while ((ret = kv_can.read(&id, msg, &size, &extended, &t)) == ReturnStatuses::OK)
       {
         // Write the message to stdout
+        auto unix_timestamp_ms = std::chrono::milliseconds(std::time(NULL)).count();
+
+        std::cout << "[" << unix_timestamp_ms << "] ";
         std::cout << "ID: 0x" << std::hex << id;
         std::cout << ":";
 
@@ -104,7 +109,7 @@ int main(int argc, char ** argv)
           no_msg_count = 0;
         }
 
-        usleep(10000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
       }
       else
       {
