@@ -15,18 +15,38 @@ using AS::CAN::KvaserChannel;
 
 int main(int argc, char ** argv)
 {
-  auto channels = KvaserCanUtils::getChannels();
+  auto cards = KvaserCanUtils::getCards();
 
-  if (channels.size() > 0)
+  if (cards.size() > 0)
   {
-    auto cards = KvaserCanUtils::getCards();
+    std::cout << std::endl;
 
-    for (const auto & channel : channels)
+    for (const auto & card : cards)
     {
-      std::cout << "Channel Index: " << channel->channel_idx << ", ";
-      std::cout << "Circuit No: " << channel->channel_no_on_card << ", ";
-      std::cout << "Card S/N: " << channel->serial_no << ", ";
-      std::cout << "Card UPC: " << channel->upc_no << std::endl;
+      std::cout << "Card " << (&card - &cards[0]) << ":" << std::endl;
+      std::cout << "  S/N: " << card->serial_no << std::endl;
+      std::cout << "  UPC: " << card->upc_no << std::endl;
+      std::cout << "  Name: " << card->dev_name << std::endl;
+      std::cout << "  Firmware rev: v";
+        std::cout << card->firmware_rev_maj << ".";
+        std::cout << card->firmware_rev_min << ".";
+        std::cout << card->firmware_rev_bld << std::endl;
+      std::cout << "  Driver: " << card->driver_name << " v";
+        std::cout << card->driver_ver_maj << ".";
+        std::cout << card->driver_ver_min << ".";
+        std::cout << card->driver_ver_bld << std::endl;
+      std::cout << std::endl;
+
+      auto channels = KvaserCanUtils::getChannelsOnCard(card->serial_no);
+
+      for (const auto & channel : channels)
+      {
+        std::cout << "  Channel " << channel->channel_no_on_card << ":" << std::endl;
+        std::cout << "    Index: " << channel->channel_idx << std::endl;
+        std::cout << "    Max Bitrate: " << channel->max_bitrate << std::endl;
+      }
+
+      std::cout << std::endl;
     }
   }
   else

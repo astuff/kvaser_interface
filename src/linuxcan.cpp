@@ -262,13 +262,13 @@ std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
   for (const auto & channel : channels)
   {
     bool found = false;
-    
+
     for (const auto & card : cards)
     {
       if (card->serial_no == channel->serial_no)
         found = true;
     }
-    
+
     if (!found)
       cards.emplace_back(std::dynamic_pointer_cast<KvaserCard>(std::move(channel)));
   }
@@ -304,9 +304,11 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
       uint32_t max_bitrate = 0;
       char dev_name[256];
       uint32_t upc_no[2];
+      char driver_name[256];
       uint16_t driver_ver[4];
 
       memset(dev_name, 0, sizeof(dev_name));
+      memset(driver_name, 0, sizeof(driver_name));
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial));
 
@@ -333,10 +335,10 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
 
       if (stat == canOK)
       {
-        chan.firmware_rev_maj = firmware_rev[0];
-        chan.firmware_rev_min = firmware_rev[1];
-        chan.firmware_rev_rel = firmware_rev[2];
-        chan.firmware_rev_bld = firmware_rev[3];
+        chan.firmware_rev_maj = firmware_rev[3];
+        chan.firmware_rev_min = firmware_rev[2];
+        chan.firmware_rev_rel = firmware_rev[1];
+        chan.firmware_rev_bld = firmware_rev[0];
       }
       else
       {
@@ -373,6 +375,13 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
         chan.all_data_valid = false;
       }
 
+      stat = canGetChannelData(i, canCHANNELDATA_DRIVER_NAME, &driver_name, sizeof(driver_name));
+
+      if (stat == canOK)
+        chan.driver_name = std::string(driver_name);
+      else
+        chan.all_data_valid = false;
+
       stat = canGetChannelData(i, canCHANNELDATA_DLL_FILE_VERSION, &driver_ver, sizeof(driver_ver));
 
       if (stat == canOK)
@@ -386,7 +395,7 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
         chan.all_data_valid = false;
       }
 
-      channels.push_back(std::make_shared<KvaserChannel>(chan));
+      channels.push_back(std::make_shared<KvaserChannel>(std::move(chan)));
     }
   }
 
