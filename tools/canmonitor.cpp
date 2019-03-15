@@ -47,13 +47,13 @@ int main(int argc, char ** argv)
   cxxopts::Options options("canmonitor", "A simple tool for reading data from a CAN channel.");
 
   options.add_options()
-    ("c, channel", "Channel index", cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))
+    ("i, index", "Channel index", cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))
     ("b, bitrate", "Bitrate", cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))
     ("h, help", "Print help", cxxopts::value<bool>()->implicit_value("true")->default_value("false"));
 
   auto result = options.parse(argc, argv);
 
-  uint32_t channel_idx = result["channel"].as<unsigned int>();
+  uint32_t channel_idx = result["index"].as<unsigned int>();
   uint32_t bitrate = result["bitrate"].as<unsigned int>();
 
   if (channel_idx > 300 ||
