@@ -86,17 +86,18 @@ int main(int argc, char ** argv)
       while ((ret = kv_can.read(&id, msg, &size, &extended, &t)) == ReturnStatuses::OK)
       {
         // Write the message to stdout
-        auto unix_timestamp = std::chrono::seconds(std::time(NULL));
-        auto unix_timestamp_ms = std::chrono::milliseconds(unix_timestamp).count();
+        auto unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
+          (std::chrono::system_clock::now().time_since_epoch()).count();
 
         std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
-        std::cout << "ID: 0x" << std::hex << id;
+        std::cout << "ID: 0x" << std::hex << std::uppercase << id;
         std::cout << ":";
         std::cout << std::internal << std::setfill('0');
 
         for (uint8_t i = 0; i < size; ++i)
         {
-          std::cout << " " << std::hex << std::setw(2) << static_cast<unsigned int>(msg[i]);
+          std::cout << " " << std::hex << std::setw(2);
+          std::cout << std::uppercase << static_cast<unsigned int>(msg[i]);
         }
 
         std::cout << std::endl;
