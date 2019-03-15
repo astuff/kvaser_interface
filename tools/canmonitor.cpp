@@ -9,6 +9,7 @@
 #include "kvaser_interface/cxxopts.h"
 
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <thread>
 #include <chrono>
@@ -88,13 +89,14 @@ int main(int argc, char ** argv)
         auto unix_timestamp = std::chrono::seconds(std::time(NULL));
         auto unix_timestamp_ms = std::chrono::milliseconds(unix_timestamp).count();
 
-        std::cout << "[" << unix_timestamp_ms << "] ";
+        std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
         std::cout << "ID: 0x" << std::hex << id;
         std::cout << ":";
+        std::cout << std::internal << std::setfill('0');
 
         for (uint8_t i = 0; i < size; ++i)
         {
-          std::cout << " " << std::hex << static_cast<unsigned int>(msg[i]);
+          std::cout << " " << std::hex << std::setw(2) << static_cast<unsigned int>(msg[i]);
         }
 
         std::cout << std::endl;
