@@ -26,7 +26,7 @@ ros::Publisher can_tx_pub;
 
 void can_read()
 {
-  int64_t id;
+  uint32_t id;
   uint8_t msg[8] = {};  // zero-initialize array
   uint32_t size;
   bool extended;

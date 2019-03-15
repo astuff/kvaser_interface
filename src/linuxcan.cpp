@@ -28,49 +28,46 @@ KvaserCan::~KvaserCan()
     canClose(*handle);
 }
 
-ReturnStatuses KvaserCan::open(const int32_t& hardware_id,
-                               const int32_t& circuit_id,
-                               const int32_t& bitrate,
+ReturnStatuses KvaserCan::open(const uint64_t& hardware_id,
+                               const uint32_t& circuit_id,
+                               const uint32_t& bitrate,
+                               const bool& echo_on)
+{
+  auto channels = KvaserCanUtils::getChannels();
+  uint32_t channel_index = 0;
+  bool channel_found = false;
+
+  for (const auto & channel : channels)
+  {
+    if (hardware_id == channel->serial_no &&
+        circuit_id == channel->channel_no_on_card)
+    {
+      channel_index = channel->channel_idx;
+      channel_found = true;
+      break;
+    }
+  }
+
+  if (channel_found)
+    return open(channel_index, bitrate, echo_on);
+  else
+    return ReturnStatuses::BAD_PARAM;
+}
+
+ReturnStatuses KvaserCan::open(const uint32_t& channel_index,
+                               const uint32_t& bitrate,
                                const bool& echo_on)
 {
   if (!on_bus)
   {
-    int32_t numChan;
-    ReturnStatuses stat;
+    int32_t numChan = -1;
+    KvaserCanUtils::getChannelCount(&numChan);
 
-    stat = KvaserCanUtils::getChannelCount(&numChan);
-
-    if (stat != ReturnStatuses::OK)
-      return stat;
-
-    uint32_t serial[2];
-    uint32_t channel_number;
-    int32_t channel = -1;
-
-    for (int32_t idx = 0; idx < numChan; idx++)
-    {
-      if (canGetChannelData(idx, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial)) == canOK)
-      {
-        if (serial[0] == (uint32_t) hardware_id)
-        {
-          if (canGetChannelData(idx, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_number, sizeof(channel_number)) == canOK)
-          {
-            if (channel_number == (uint32_t) circuit_id)
-            {
-              channel = idx;
-            }
-          }
-        }
-      }
-    }
-
-    if (channel == -1)
-    {
-      return ReturnStatuses::BAD_PARAM;
-    }
+    if (numChan < 0)
+      return ReturnStatuses::NO_CHANNELS_FOUND;
 
     // Open channel
-    *handle = canOpenChannel(channel, canOPEN_ACCEPT_VIRTUAL);
+    *handle = canOpenChannel(channel_index, canOPEN_ACCEPT_VIRTUAL);
 
     if (*handle < 0)
       return ReturnStatuses::INIT_FAILED;
@@ -160,11 +157,11 @@ ReturnStatuses KvaserCan::close()
   return ReturnStatuses::OK;
 }
 
-ReturnStatuses KvaserCan::read(int64_t *id,
-                               uint8_t *msg,
-                               uint32_t *size,
-                               bool *extended,
-                               uint64_t *time)
+ReturnStatuses KvaserCan::read(uint32_t * id,
+                               uint8_t * msg,
+                               uint32_t * size,
+                               bool * extended,
+                               uint64_t * time)
 {
   if (*handle < 0)
   {
@@ -177,7 +174,9 @@ ReturnStatuses KvaserCan::read(int64_t *id,
 
   while (!done)
   {
-    canStatus ret = canRead(*handle, id, msg, size, &flag, time);
+    int64_t id_proxy = 0;
+    canStatus ret = canRead(*handle, &id_proxy, msg, size, &flag, time);
+    *id = static_cast<uint32_t>(id_proxy);
 
     if (ret == canERR_NOTINITIALIZED)
     {
@@ -211,10 +210,10 @@ ReturnStatuses KvaserCan::read(int64_t *id,
   return ret_val;
 }
 
-ReturnStatuses KvaserCan::write(const int64_t& id,
-                                uint8_t *msg,
-                                const uint32_t& size,
-                                const bool& extended)
+ReturnStatuses KvaserCan::write(const uint32_t & id,
+                                uint8_t * msg,
+                                const uint32_t & size,
+                                const bool & extended)
 {
   if (*handle < 0)
     return ReturnStatuses::CHANNEL_CLOSED;
@@ -246,11 +245,12 @@ ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t & canlibSt
   }
 }
 
-ReturnStatuses KvaserCanUtils::getChannelCount(int32_t * numChan)
+void KvaserCanUtils::getChannelCount(int32_t * numChan)
 {
   auto stat = canGetNumberOfChannels(numChan);
 
-  return canlibStatToReturnStatus(stat);
+  if (stat != canOK)
+    *numChan = -1;
 }
 
 std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
@@ -278,17 +278,12 @@ std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
 
 std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
 {
-  std::vector<std::shared_ptr<KvaserChannel>> channels;
-
   int32_t numChan = -1;
-  ReturnStatuses retStat = ReturnStatuses::OK;
-
-  retStat = KvaserCanUtils::getChannelCount(&numChan);
+  std::vector<std::shared_ptr<KvaserChannel>> channels;
+  KvaserCanUtils::getChannelCount(&numChan);
 
   // Sanity checks before continuing
-  if (retStat == ReturnStatuses::OK &&
-    numChan > -1 &&
-    numChan < 300)
+  if (numChan > -1 && numChan < 300)
   {
     for (auto i = 0; i < numChan; ++i)
     {
