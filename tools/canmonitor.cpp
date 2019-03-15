@@ -90,8 +90,7 @@ int main(int argc, char ** argv)
           (std::chrono::system_clock::now().time_since_epoch()).count();
 
         std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
-        std::cout << "ID: 0x" << std::hex << std::uppercase << id;
-        std::cout << ":";
+        std::cout << "ID 0x" << std::hex << std::uppercase << id << ":";
         std::cout << std::internal << std::setfill('0');
 
         for (uint8_t i = 0; i < size; ++i)

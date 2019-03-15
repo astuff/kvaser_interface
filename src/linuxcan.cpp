@@ -12,6 +12,7 @@
 #include <cstring>
 #include <sstream>
 #include <algorithm>
+#include <iomanip>
 
 using namespace AS::CAN;
 
@@ -359,9 +360,9 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
       if (stat == canOK)
       {
         std::ostringstream oss;
-        oss << (upc_no[1] >> 12) << "-";
+        oss << std::hex << (upc_no[1] >> 12) << "-";
         oss << (((upc_no[1] & 0xfff) << 8) | ((upc_no[0] >> 24) & 0xff)) << "-";
-        oss << ((upc_no[0] >> 4) & 0xfffff) << "-";
+        oss << std::setfill('0') << std::setw(5) << ((upc_no[0] >> 4) & 0xfffff) << "-";
         oss << (upc_no[0] & 0x0f);
         chan.upc_no = oss.str();
       }
