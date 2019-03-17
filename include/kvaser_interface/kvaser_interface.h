@@ -75,6 +75,49 @@ enum class HardwareType
   HWTYPE_CANLINHYBRID = 84
 };
 
+struct MsgFlags
+{
+  bool rtr;
+  bool std_id;
+  bool ext_id;
+  bool wakeup_mode;
+  bool error_frame;
+  bool tx_ack;
+  bool tx_rq;
+  bool msg_delayed;
+  bool single_shot;
+  bool tx_nack;
+  bool arb_lost;
+  bool fd_msg;
+  bool fd_bitrate_switch;
+  bool fd_sndr_err_pass_md;
+};
+
+struct MsgErrFlags
+{
+  bool has_err;
+  bool hw_overrun_err;
+  bool sw_overrun_err;
+  bool stuff_err;
+  bool form_err;
+  bool crc_err;
+  bool bit0_err;
+  bool bit1_err;
+  bool any_overrun_err;
+  bool any_bit_err;
+  bool any_rx_err;
+};
+
+struct CanMsg
+{
+  uint32_t id;
+  uint32_t dlc;
+  MsgFlags flags;
+  MsgErrFlags error_flags;
+  std::vector<uint8_t> data;
+  uint64_t timestamp;
+};
+
 class KvaserCard
 {
   public:
