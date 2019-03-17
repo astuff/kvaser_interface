@@ -114,21 +114,21 @@ class KvaserCan
     // Moving and copying not allowed because of
     // state associated with handle.
     KvaserCan(KvaserCan && p) = delete;
-    KvaserCan & operator=(KvaserCan && p) = delete;
+    KvaserCan &operator=(KvaserCan && p) = delete;
     KvaserCan(const KvaserCan &) = delete;
-    KvaserCan & operator=(const KvaserCan &) = delete;
+    KvaserCan &operator=(const KvaserCan &) = delete;
 
     ~KvaserCan();
 
     // Called to pass in parameters and open can link
-    ReturnStatuses open(const uint64_t & hardware_id,
-                        const uint32_t & circuit_id,
-                        const uint32_t & bitrate,
-                        const bool & echo_on = true);
+    ReturnStatuses open(const uint64_t &hardware_id,
+                        const uint32_t &circuit_id,
+                        const uint32_t &bitrate,
+                        const bool &echo_on = true);
 
-    ReturnStatuses open(const uint32_t & channel_index,
-                        const uint32_t & bitrate,
-                        const bool & echo_on = true);
+    ReturnStatuses open(const uint32_t &channel_index,
+                        const uint32_t &bitrate,
+                        const bool &echo_on = true);
 
     // Close the can link
     ReturnStatuses close();
@@ -137,17 +137,17 @@ class KvaserCan
     bool isOpen();
 
     // Read a message
-    ReturnStatuses read(uint32_t * id,
-                        uint8_t * msg,
-                        uint32_t * size,
-                        bool * extended,
-                        uint64_t * time);
+    ReturnStatuses read(uint32_t *id,
+                        uint8_t *msg,
+                        uint32_t *size,
+                        bool *extended,
+                        uint64_t *time);
 
     // Send a message
-    ReturnStatuses write(const uint32_t & id,
-                         uint8_t * msg,
-                         const uint32_t & size,
-                         const bool & extended);
+    ReturnStatuses write(const uint32_t &id,
+                         uint8_t *msg,
+                         const uint32_t &size,
+                         const bool &extended);
 
   private:
     std::unique_ptr<CanHandle> handle;
@@ -157,12 +157,12 @@ class KvaserCan
 class KvaserCanUtils
 {
   public:
-    static ReturnStatuses canlibStatToReturnStatus(const int32_t & canlibStat);
-    static void getChannelCount(int32_t * numChannels);
+    static ReturnStatuses canlibStatToReturnStatus(const int32_t &canlibStat);
+    static void getChannelCount(int32_t *numChannels);
     static std::vector<std::shared_ptr<KvaserCard>> getCards();
     static std::vector<std::shared_ptr<KvaserChannel>> getChannels();
-    static std::vector<std::shared_ptr<KvaserChannel>> getChannelsOnCard(const uint64_t & serialNo);
-    static std::string returnStatusDesc(const ReturnStatuses& ret);
+    static std::vector<std::shared_ptr<KvaserChannel>> getChannelsOnCard(const uint64_t &serialNo);
+    static std::string returnStatusDesc(const ReturnStatuses &ret);
 };
 
 }  // namespace CAN

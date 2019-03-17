@@ -29,16 +29,16 @@ KvaserCan::~KvaserCan()
     canClose(*handle);
 }
 
-ReturnStatuses KvaserCan::open(const uint64_t& hardware_id,
-                               const uint32_t& circuit_id,
-                               const uint32_t& bitrate,
-                               const bool& echo_on)
+ReturnStatuses KvaserCan::open(const uint64_t &hardware_id,
+                               const uint32_t &circuit_id,
+                               const uint32_t &bitrate,
+                               const bool &echo_on)
 {
   auto channels = KvaserCanUtils::getChannels();
   uint32_t channel_index = 0;
   bool channel_found = false;
 
-  for (const auto & channel : channels)
+  for (const auto &channel : channels)
   {
     if (hardware_id == channel->serial_no &&
         circuit_id == channel->channel_no_on_card)
@@ -55,9 +55,9 @@ ReturnStatuses KvaserCan::open(const uint64_t& hardware_id,
     return ReturnStatuses::BAD_PARAM;
 }
 
-ReturnStatuses KvaserCan::open(const uint32_t& channel_index,
-                               const uint32_t& bitrate,
-                               const bool& echo_on)
+ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
+                               const uint32_t &bitrate,
+                               const bool &echo_on)
 {
   if (!on_bus)
   {
@@ -158,11 +158,11 @@ ReturnStatuses KvaserCan::close()
   return ReturnStatuses::OK;
 }
 
-ReturnStatuses KvaserCan::read(uint32_t * id,
-                               uint8_t * msg,
-                               uint32_t * size,
-                               bool * extended,
-                               uint64_t * time)
+ReturnStatuses KvaserCan::read(uint32_t *id,
+                               uint8_t *msg,
+                               uint32_t *size,
+                               bool *extended,
+                               uint64_t *time)
 {
   if (*handle < 0)
   {
@@ -211,10 +211,10 @@ ReturnStatuses KvaserCan::read(uint32_t * id,
   return ret_val;
 }
 
-ReturnStatuses KvaserCan::write(const uint32_t & id,
-                                uint8_t * msg,
-                                const uint32_t & size,
-                                const bool & extended)
+ReturnStatuses KvaserCan::write(const uint32_t &id,
+                                uint8_t *msg,
+                                const uint32_t &size,
+                                const bool &extended)
 {
   if (*handle < 0)
     return ReturnStatuses::CHANNEL_CLOSED;
@@ -231,7 +231,7 @@ ReturnStatuses KvaserCan::write(const uint32_t & id,
   return (ret == canOK) ? ReturnStatuses::OK : ReturnStatuses::WRITE_FAILED;
 }
 
-ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t & canlibStat)
+ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t &canlibStat)
 {
   switch (canlibStat)
   {
@@ -246,7 +246,7 @@ ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t & canlibSt
   }
 }
 
-void KvaserCanUtils::getChannelCount(int32_t * numChan)
+void KvaserCanUtils::getChannelCount(int32_t *numChan)
 {
   auto stat = canGetNumberOfChannels(numChan);
 
@@ -260,11 +260,11 @@ std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
 
   std::vector<std::shared_ptr<KvaserCard>> cards;
 
-  for (const auto & channel : channels)
+  for (const auto &channel : channels)
   {
     bool found = false;
 
-    for (const auto & card : cards)
+    for (const auto &card : cards)
     {
       if (card->serial_no == channel->serial_no)
         found = true;
@@ -398,13 +398,13 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
   return channels;
 }
 
-std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannelsOnCard(const uint64_t & serialNo)
+std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannelsOnCard(const uint64_t &serialNo)
 {
   std::vector<std::shared_ptr<KvaserChannel>> channelsOnCard;
 
   auto channels = getChannels();
 
-  for (const auto & channel : channels)
+  for (const auto &channel : channels)
   {
     if (channel->serial_no == serialNo)
       channelsOnCard.emplace_back(std::move(channel));
