@@ -133,7 +133,7 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
     msg.flags.ext_id = ros_msg->is_extended;
     msg.flags.rtr = ros_msg->is_rtr;
     std::copy(ros_msg->data.begin(), ros_msg->data.end(), msg.data.begin());
-    
+
     ret = can_writer.write(std::move(msg));
 
     if (ret != ReturnStatuses::OK)
