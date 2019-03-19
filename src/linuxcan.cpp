@@ -17,6 +17,7 @@
 using namespace AS::CAN;
 
 KvaserCan *KvaserReadCbProxy::kvCanObj = nullptr;
+auto KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
 
 KvaserCan::KvaserCan() :
   handle(new CanHandle)
@@ -241,6 +242,8 @@ ReturnStatuses KvaserCan::write(CanMsg &&msg)
 
 ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::shared_ptr<CanHandle> &hdl)
 {
+  handle = std::shared_ptr<CanHandle>(hdl);
+
   auto stat = canSetNotify(*(hdl), KvaserReadCbProxy::proxyCallback, canNOTIFY_RX, nullptr);
 
   if (stat == canOK)

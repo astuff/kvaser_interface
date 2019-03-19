@@ -202,6 +202,7 @@ class KvaserReadCbProxy
 
   private:
     static void proxyCallback(canNotifyData *data);
+    static std::shared_ptr<CanHandle> handle;
 };
 
 class KvaserCanUtils
