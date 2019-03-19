@@ -83,21 +83,29 @@ int main(int argc, char ** argv)
 
       while ((ret = kv_can.read(&msg)) == ReturnStatuses::OK)
       {
-        // Write the message to stdout
         auto unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
           (std::chrono::system_clock::now().time_since_epoch()).count();
 
         std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
-        std::cout << "ID 0x" << std::hex << std::uppercase << msg.id << ":";
-        std::cout << std::internal << std::setfill('0');
 
-        for (const auto byte : msg.data)
+        if (msg.flags.error_frame)
         {
-          std::cout << " " << std::hex << std::setw(2);
-          std::cout << std::uppercase << static_cast<unsigned int>(byte);
+          std::cout << "ERROR FRAME" << std::endl;
         }
+        else if (msg.dlc > 0)
+        {
+          // Write the message to stdout
+          std::cout << "ID 0x" << std::hex << std::uppercase << msg.id << ":";
+          std::cout << std::internal << std::setfill('0');
 
-        std::cout << std::endl;
+          for (const auto byte : msg.data)
+          {
+            std::cout << " " << std::hex << std::setw(2);
+            std::cout << std::uppercase << static_cast<unsigned int>(byte);
+          }
+
+          std::cout << std::endl;
+        }
       }
 
       if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED)

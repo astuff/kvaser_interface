@@ -165,59 +165,41 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
     return ReturnStatuses::CHANNEL_CLOSED;
   }
 
-  bool done = false;
-  ReturnStatuses ret_val = ReturnStatuses::INIT_FAILED;
-  unsigned int flag = 0;
+  int64_t id_proxy = 0;
+  uint32_t dlc = 0;
+  uint32_t flags = 0;
+  char data[64];
+  size_t bytes = 0;
 
-  while (!done)
+  canStatus ret = canRead(*handle, &id_proxy, data, &dlc, &flags, &msg->timestamp);
+
+  msg->id = static_cast<uint32_t>(id_proxy);
+  bytes = KvaserCanUtils::dlcToSize(dlc);
+
+  msg->data.reserve(bytes);
+
+  for (uint8_t i = 0; i < bytes; ++i)
   {
-    int64_t id_proxy = 0;
-    uint32_t dlc = 0;
-    uint32_t flags = 0;
-    char data[64];
-    size_t bytes = 0;
-
-    canStatus ret = canRead(*handle, &id_proxy, data, &dlc, &flags, &msg->timestamp);
-
-    msg->id = static_cast<uint32_t>(id_proxy);
-    bytes = KvaserCanUtils::dlcToSize(dlc);
-
-    msg->data.reserve(bytes);
-
-    for (uint8_t i = 0; i < bytes; ++i)
-    {
-      msg->data.emplace_back(std::move(data[i]));
-    }
-
-    KvaserCanUtils::setMsgFlags(msg, flags);
-
-    if (ret == canERR_NOTINITIALIZED)
-    {
-      ret_val = ReturnStatuses::CHANNEL_CLOSED;
-      on_bus = false;
-      done = true;
-    }
-    else if (ret == canERR_NOMSG)
-    {
-      ret_val = ReturnStatuses::NO_MESSAGES_RECEIVED;
-      done = true;
-    }
-    else if (ret != canOK)
-    {
-      ret_val = ReturnStatuses::READ_FAILED;
-      done = true;
-    }
-    else if (!(flag & 0xF9))
-    {
-      // Was a received message with actual data
-      ret_val = ReturnStatuses::OK;
-      done = true;
-    }
-    // Else a protocol message, such as a TX ACK, was received
-    // Keep looping until one of the other conditions above is met
+    msg->data.emplace_back(std::move(data[i]));
   }
 
-  return ret_val;
+  KvaserCanUtils::setMsgFlags(msg, flags);
+
+  switch (ret)
+  {
+    case canOK:
+      return ReturnStatuses::OK;
+      break;
+    case canERR_NOTINITIALIZED:
+      on_bus = false;
+      return ReturnStatuses::CHANNEL_CLOSED;
+      break;
+    case canERR_NOMSG:
+      return ReturnStatuses::NO_MESSAGES_RECEIVED;
+      break;
+    default:
+      return ReturnStatuses::READ_FAILED;
+  }
 }
 
 ReturnStatuses KvaserCan::write(const uint32_t &id,
