@@ -42,3 +42,13 @@ This is the 0-based index of the channel number *on the specific hardware device
 *~can_bit_rate*
 
 This is the communication rate to be used on the CAN channel in bits per second (default: 500000).
+
+**TOOLS**
+
+*list_channels*
+
+A simple tool with no ROS dependencies which returns a list of all Kvaser devices and channels available on those devices.
+
+*canmonitor*
+
+A simple tool with no ROS depedencies to output the CAN messages received on a given channel index (-i - default: 0) and bitrate (-b - default: 500000) to the terminal.

@@ -26,7 +26,7 @@ ros::Publisher can_tx_pub;
 
 void can_read()
 {
-  int64_t id;
+  uint32_t id;
   uint8_t msg[8] = {};  // zero-initialize array
   uint32_t size;
   bool extended;
@@ -57,16 +57,25 @@ void can_read()
     }
     else
     {
-      while ((ret = can_reader.read(&id, msg, &size, &extended, &t)) == ReturnStatuses::OK)
+      while (true)
       {
-        can_msgs::Frame can_pub_msg;
-        can_pub_msg.header.frame_id = "0";
-        can_pub_msg.id = id;
-        can_pub_msg.dlc = size;
-        can_pub_msg.is_extended = extended;
-        std::copy(msg, msg + size, can_pub_msg.data.begin());
-        can_pub_msg.header.stamp = ros::Time::now();
-        can_tx_pub.publish(can_pub_msg);
+        ret = can_reader.read(&id, msg, &size, &extended, &t);
+
+        if (ret  == ReturnStatuses::OK)
+        {
+          can_msgs::Frame can_pub_msg;
+          can_pub_msg.header.frame_id = "0";
+          can_pub_msg.id = id;
+          can_pub_msg.dlc = size;
+          can_pub_msg.is_extended = extended;
+          std::copy(msg, msg + size, can_pub_msg.data.begin());
+          can_pub_msg.header.stamp = ros::Time::now();
+          can_tx_pub.publish(can_pub_msg);
+        }
+        else
+        {
+          break;
+        }
       }
 
       if (ret != ReturnStatuses::NO_MESSAGES_RECEIVED)
