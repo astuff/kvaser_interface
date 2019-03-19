@@ -108,7 +108,7 @@ void can_read()
   }
 }
 
-void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
+void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
 {
   ReturnStatuses ret;
 
@@ -126,10 +126,15 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& msg)
 
   if (can_writer.isOpen())
   {
-    ret = can_writer.write(msg->id,
-                           const_cast<unsigned char*>(&(msg->data[0])),
-                           msg->dlc,
-                           msg->is_extended);
+    CanMsg msg;
+
+    msg.id = ros_msg->id;
+    msg.dlc = ros_msg->dlc;
+    msg.flags.ext_id = ros_msg->is_extended;
+    msg.flags.rtr = ros_msg->is_rtr;
+    std::copy(ros_msg->data.begin(), ros_msg->data.end(), msg.data.begin());
+    
+    ret = can_writer.write(std::move(msg));
 
     if (ret != ReturnStatuses::OK)
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s",

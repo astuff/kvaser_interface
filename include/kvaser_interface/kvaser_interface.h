@@ -183,10 +183,7 @@ class KvaserCan
     ReturnStatuses read(CanMsg *msg);
 
     // Send a message
-    ReturnStatuses write(const uint32_t &id,
-                         uint8_t *msg,
-                         const uint32_t &size,
-                         const bool &extended);
+    ReturnStatuses write(CanMsg &&msg);
 
   private:
     std::unique_ptr<CanHandle> handle;

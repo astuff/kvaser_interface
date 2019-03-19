@@ -202,22 +202,15 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   }
 }
 
-ReturnStatuses KvaserCan::write(const uint32_t &id,
-                                uint8_t *msg,
-                                const uint32_t &size,
-                                const bool &extended)
+ReturnStatuses KvaserCan::write(CanMsg &&msg)
 {
   if (*handle < 0)
     return ReturnStatuses::CHANNEL_CLOSED;
 
-  uint32_t flag;
+  uint32_t flags = 0;
+  KvaserCanUtils::setMsgFlags(&msg, flags);
 
-  if (extended)
-    flag = canMSG_EXT;
-  else
-    flag = canMSG_STD;
-
-  canStatus ret = canWrite(*handle, id, msg, size, flag);
+  canStatus ret = canWrite(*handle, msg.id, &msg.data[0], msg.dlc, flags);
 
   return (ret == canOK) ? ReturnStatuses::OK : ReturnStatuses::WRITE_FAILED;
 }
