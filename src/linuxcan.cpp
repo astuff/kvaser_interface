@@ -17,7 +17,7 @@
 using namespace AS::CAN;
 
 KvaserCan *KvaserReadCbProxy::kvCanObj = nullptr;
-auto KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
+std::shared_ptr<CanHandle> KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
 
 KvaserCan::KvaserCan() :
   handle(new CanHandle)

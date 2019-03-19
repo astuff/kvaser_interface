@@ -197,11 +197,13 @@ class KvaserCan
 class KvaserReadCbProxy
 {
   public:
+    KvaserReadCbProxy();
     static ReturnStatuses registerCb(KvaserCan *canObj, const std::shared_ptr<CanHandle> &hdl);
-    static KvaserCan *kvCanObj;
 
   private:
     static void proxyCallback(canNotifyData *data);
+
+    static KvaserCan *kvCanObj;
     static std::shared_ptr<CanHandle> handle;
 };
 
