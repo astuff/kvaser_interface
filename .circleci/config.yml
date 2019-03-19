@@ -169,32 +169,29 @@ workflows:
   version: 2
   ros_build:
     jobs:
-      - kinetic:
-          filters:
-            branches:
-              ignore: release
-      - lunar:
-          filters:
-            branches:
-              ignore: release
-      - melodic:
-          filters:
-            branches:
-              ignore: release
+      - kinetic
+      - lunar
+      - melodic
   ros_release:
     jobs:
       - kinetic_release:
           context: ubuntu-pkg-build
           filters:
             branches:
-              only: release
+              ignore: /.*/
+            tags:
+              only: /^[0-9]*.[0-9]*.[0-9]*$/
       - lunar_release:
           context: ubuntu-pkg-build
           filters:
             branches:
-              only: release
+              ignore: /.*/
+            tags:
+              only: /^[0-9]*.[0-9]*.[0-9]*$/
       - melodic_release:
           context: ubuntu-pkg-build
           filters:
             branches:
-              only: release
+              ignore: /.*/
+            tags:
+              only: /^[0-9]*.[0-9]*.[0-9]*$/
