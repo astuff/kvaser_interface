@@ -2,6 +2,21 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#20 <https://github.com/astuff/kvaser_interface/issues/20>`_ from astuff/feat/more_tools
+  Adding canmonitor tool.
+* Updating README with new tools.
+* Adding basic list_channels.
+* Adding KvaserCanUtils and ability to pull channels.
+* Merge pull request `#19 <https://github.com/astuff/kvaser_interface/issues/19>`_ from astuff/maint/add_lint_to_run_tests
+  Maint/add lint to run tests
+* Merge pull request `#18 <https://github.com/astuff/kvaser_interface/issues/18>`_ from astuff/maint/scoped_enum
+  Changing ReturnStatuses to Scoped Enum
+* Merge pull request `#17 <https://github.com/astuff/kvaser_interface/issues/17>`_ from astuff/maint/lint_cleanup
+  Removing some rule exceptions from roslint.
+* Contributors: Joshua Whitley
+
 3.0.0 (2019-01-23)
 ------------------
 * Merge pull request `#14 <https://github.com/astuff/kvaser_interface/issues/14>`_ from astuff/memory-management
