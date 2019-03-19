@@ -171,16 +171,43 @@ int main(int argc, char** argv)
   }
 
   if (exit)
+  {
+    ros::shutdown();
     return 0;
-
-  // Set up read callback
-  can_reader.registerReadCallback(std::function<void()>(can_read));
-
-  spinner.start();
-
-  ros::waitForShutdown();
+  }
 
   ReturnStatuses ret;
+
+  // Open CAN reader channel
+  ret = can_reader.open(hardware_id, circuit_id, bit_rate, false);
+
+  if (ret == ReturnStatuses::OK)
+  {
+    // Set up read callback
+    ret = can_reader.registerReadCallback(std::function<void()>(can_read));
+
+    if (ret == ReturnStatuses::OK)
+    {
+      // Only start spinner if reader initialized OK
+      spinner.start();
+    }
+    else
+    {
+      ROS_ERROR("Kvaser CAN Interface - Error registering reader callback: %d - %s",
+        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+      ros::shutdown();
+      return -1;
+    }
+  }
+  else
+  {
+    ROS_ERROR("Kvaser CAN Interface - Error opening reader: %d - %s",
+      static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+    ros::shutdown();
+    return -1;
+  }
+
+  ros::waitForShutdown();
 
   if (can_reader.isOpen())
   {

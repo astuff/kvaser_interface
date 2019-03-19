@@ -41,6 +41,9 @@ ReturnStatuses KvaserCan::open(const uint64_t &hardware_id,
   uint32_t channel_index = 0;
   bool channel_found = false;
 
+  if (channels.size() < 1)
+    return ReturnStatuses::NO_CHANNELS_FOUND;
+
   for (const auto &channel : channels)
   {
     if (hardware_id == channel->serial_no &&
@@ -67,7 +70,7 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
     int32_t numChan = -1;
     KvaserCanUtils::getChannelCount(&numChan);
 
-    if (numChan < 0)
+    if (numChan < 1)
       return ReturnStatuses::NO_CHANNELS_FOUND;
 
     // Open channel

@@ -26,15 +26,19 @@ KvaserCan kv_can;
 uint32_t channel_idx = 0;
 uint32_t bitrate = 500000;
 
-void shutdown()
+void shutdown_with_error(const ReturnStatuses &ret, const int &error_num)
 {
+  std::cerr << static_cast<int>(ret);
+  std::cerr << " - " << KvaserCanUtils::returnStatusDesc(ret).c_str();
+  std::cerr << std::endl;
   kv_can.close();
+  exit(error_num);
 }
 
 void sig_handler(int s)
 {
   std::cout << "Caught signal " << s << std::endl;
-  shutdown();
+  kv_can.close();
   exit(1);
 }
 
@@ -47,54 +51,49 @@ void can_read()
 
   if (ret == ReturnStatuses::OK)
   {
-    while (1)
+    while (true)
     {
       CanMsg msg;
 
-      while ((ret = kv_can.read(&msg)) == ReturnStatuses::OK)
+      auto unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::system_clock::now().time_since_epoch()).count();
+
+      std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
+
+      if (msg.flags.error_frame)
       {
-        auto unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
-          (std::chrono::system_clock::now().time_since_epoch()).count();
+        std::cout << "ERROR FRAME" << std::endl;
+      }
+      else if (msg.dlc > 0)
+      {
+        // Write the message to stdout
+        std::cout << "ID 0x" << std::hex << std::uppercase << msg.id << ":";
+        std::cout << std::internal << std::setfill('0');
 
-        std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
-
-        if (msg.flags.error_frame)
+        for (const auto byte : msg.data)
         {
-          std::cout << "ERROR FRAME" << std::endl;
+          std::cout << " " << std::hex << std::setw(2);
+          std::cout << std::uppercase << static_cast<unsigned int>(byte);
         }
-        else if (msg.dlc > 0)
-        {
-          // Write the message to stdout
-          std::cout << "ID 0x" << std::hex << std::uppercase << msg.id << ":";
-          std::cout << std::internal << std::setfill('0');
 
-          for (const auto byte : msg.data)
-          {
-            std::cout << " " << std::hex << std::setw(2);
-            std::cout << std::uppercase << static_cast<unsigned int>(byte);
-          }
-
-          std::cout << std::endl;
-        }
+        std::cout << std::endl;
       }
 
       if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED)
       {
         break;
       }
-      else
+      else if (ret != ReturnStatuses::OK)
       {
-        std::cerr << KvaserCanUtils::returnStatusDesc(ret);
-        shutdown();
-        exit(-1);
+        std::cerr << "Error reading CAN message: ";
+        shutdown_with_error(ret, -4);
       }
     }
   }
   else
   {
-    std::cerr << KvaserCanUtils::returnStatusDesc(ret) << std::endl;
-    shutdown();
-    exit(-1);
+    std::cerr << "Error opening Kvaser interface: ";
+    shutdown_with_error(ret, -3);
   }
 }
 
@@ -127,10 +126,28 @@ int main(int argc, char ** argv)
     std::cout << std::endl;
     std::cout << options.help();
     std::cout << std::endl;
-    return -1;
+    return 0;
   }
 
-  kv_can.registerReadCallback(std::function<void()>(can_read));
+  ReturnStatuses ret;
+
+  ret = kv_can.open(channel_idx, bitrate);
+
+  if (ret == ReturnStatuses::OK)
+  {
+    ret = kv_can.registerReadCallback(std::function<void()>(can_read));
+
+    if (ret != ReturnStatuses::OK)
+    {
+      std::cerr << "Error registering reader callback: ";
+      shutdown_with_error(ret, -1);
+    }
+  }
+  else
+  {
+    std::cerr << "Error opening Kvaser interface: ";
+    shutdown_with_error(ret, -2);
+  }
 
   std::getchar();
 
