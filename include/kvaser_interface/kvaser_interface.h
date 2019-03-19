@@ -180,11 +180,7 @@ class KvaserCan
     bool isOpen();
 
     // Read a message
-    ReturnStatuses read(uint32_t *id,
-                        uint8_t *msg,
-                        uint32_t *size,
-                        bool *extended,
-                        uint64_t *time);
+    ReturnStatuses read(CanMsg *msg);
 
     // Send a message
     ReturnStatuses write(const uint32_t &id,
@@ -201,11 +197,14 @@ class KvaserCanUtils
 {
   public:
     static ReturnStatuses canlibStatToReturnStatus(const int32_t &canlibStat);
+    static size_t dlcToSize(const uint8_t &dlc);
+    static uint8_t sizeToDlc(const size_t &size);
     static void getChannelCount(int32_t *numChannels);
     static std::vector<std::shared_ptr<KvaserCard>> getCards();
     static std::vector<std::shared_ptr<KvaserChannel>> getChannels();
     static std::vector<std::shared_ptr<KvaserChannel>> getChannelsOnCard(const uint64_t &serialNo);
     static std::string returnStatusDesc(const ReturnStatuses &ret);
+    static void setMsgFlags(CanMsg *msg, const uint32_t &flags);
 };
 
 }  // namespace CAN

@@ -158,11 +158,7 @@ ReturnStatuses KvaserCan::close()
   return ReturnStatuses::OK;
 }
 
-ReturnStatuses KvaserCan::read(uint32_t *id,
-                               uint8_t *msg,
-                               uint32_t *size,
-                               bool *extended,
-                               uint64_t *time)
+ReturnStatuses KvaserCan::read(CanMsg *msg)
 {
   if (*handle < 0)
   {
@@ -176,8 +172,24 @@ ReturnStatuses KvaserCan::read(uint32_t *id,
   while (!done)
   {
     int64_t id_proxy = 0;
-    canStatus ret = canRead(*handle, &id_proxy, msg, size, &flag, time);
-    *id = static_cast<uint32_t>(id_proxy);
+    uint32_t dlc = 0;
+    uint32_t flags = 0;
+    char data[64];
+    size_t bytes = 0;
+
+    canStatus ret = canRead(*handle, &id_proxy, data, &dlc, &flags, &msg->timestamp);
+
+    msg->id = static_cast<uint32_t>(id_proxy);
+    bytes = KvaserCanUtils::dlcToSize(dlc);
+
+    msg->data.reserve(bytes);
+
+    for (uint8_t i = 0; i < bytes; ++i)
+    {
+      msg->data.emplace_back(std::move(data[i]));
+    }
+
+    KvaserCanUtils::setMsgFlags(msg, flags);
 
     if (ret == canERR_NOTINITIALIZED)
     {
@@ -204,9 +216,6 @@ ReturnStatuses KvaserCan::read(uint32_t *id,
     // Else a protocol message, such as a TX ACK, was received
     // Keep looping until one of the other conditions above is met
   }
-
-  if (ret_val == ReturnStatuses::OK)
-    *extended = ((flag & canMSG_EXT) > 0);
 
   return ret_val;
 }
@@ -243,6 +252,80 @@ ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t &canlibSta
       return ReturnStatuses::NO_CHANNELS_FOUND;
     default:
       return ReturnStatuses::INIT_FAILED;
+  }
+}
+
+size_t KvaserCanUtils::dlcToSize(const uint8_t &dlc)
+{
+  if (dlc < 9)
+  {
+    return dlc;
+  }
+  else
+  {
+    switch (dlc)
+    {
+      case 9:
+        return 12;
+        break;
+      case 10:
+        return 16;
+        break;
+      case 11:
+        return 20;
+        break;
+      case 12:
+        return 24;
+        break;
+      case 13:
+        return 32;
+        break;
+      case 14:
+        return 48;
+        break;
+      case 15:
+        return 64;
+        break;
+      default:
+        return 0;
+    }
+  }
+}
+
+uint8_t KvaserCanUtils::sizeToDlc(const size_t &size)
+{
+  if (size < 9)
+  {
+    return size;
+  }
+  else
+  {
+    switch (size)
+    {
+      case 12:
+        return 9;
+        break;
+      case 16:
+        return 10;
+        break;
+      case 20:
+        return 11;
+        break;
+      case 24:
+        return 12;
+        break;
+      case 32:
+        return 13;
+        break;
+      case 48:
+        return 14;
+        break;
+      case 64:
+        return 15;
+        break;
+      default:
+        return 0;
+    }
   }
 }
 
@@ -435,4 +518,38 @@ std::string KvaserCanUtils::returnStatusDesc(const ReturnStatuses& ret)
     status_string = "Closing the CAN interface failed.";
 
   return status_string;
+}
+
+void KvaserCanUtils::setMsgFlags(CanMsg *msg, const uint32_t &flags)
+{
+  // Regular CAN message flags
+  msg->flags.rtr = ((flags & canMSG_RTR) > 0);
+  msg->flags.std_id = ((flags & canMSG_STD) > 0);
+  msg->flags.ext_id = ((flags & canMSG_EXT) > 0);
+  msg->flags.wakeup_mode = ((flags & canMSG_WAKEUP) > 0);
+  msg->flags.error_frame = ((flags & canMSG_ERROR_FRAME) > 0);
+  msg->flags.tx_ack = ((flags & canMSG_TXACK) > 0);
+  msg->flags.tx_rq = ((flags & canMSG_TXRQ) > 0);
+  msg->flags.msg_delayed = ((flags & canMSG_DELAY_MSG) > 0);
+  msg->flags.single_shot = ((flags & canMSG_SINGLE_SHOT) > 0);
+  msg->flags.tx_nack = ((flags & canMSG_TXNACK) > 0);
+  msg->flags.arb_lost = ((flags & canMSG_ABL) > 0);
+
+  // CAN FD flags
+  msg->flags.fd_msg = ((flags & canFDMSG_FDF) > 0);
+  msg->flags.fd_bitrate_switch = ((flags & canFDMSG_BRS) > 0);
+  msg->flags.fd_sndr_err_pass_md = ((flags & canFDMSG_ESI) > 0);
+
+  // Error flags
+  msg->error_flags.has_err = ((flags & canMSGERR_MASK) > 0);
+  msg->error_flags.hw_overrun_err = ((flags & canMSGERR_HW_OVERRUN) > 0);
+  msg->error_flags.sw_overrun_err = ((flags & canMSGERR_SW_OVERRUN) > 0);
+  msg->error_flags.stuff_err = ((flags & canMSGERR_STUFF) > 0);
+  msg->error_flags.form_err = ((flags & canMSGERR_FORM) > 0);
+  msg->error_flags.crc_err = ((flags & canMSGERR_CRC) > 0);
+  msg->error_flags.bit0_err = ((flags & canMSGERR_BIT0) > 0);
+  msg->error_flags.bit1_err = ((flags & canMSGERR_BIT1) > 0);
+  msg->error_flags.any_overrun_err = ((flags & canMSGERR_OVERRUN) > 0);
+  msg->error_flags.any_bit_err = ((flags & canMSGERR_BIT) > 0);
+  msg->error_flags.any_rx_err = ((flags & canMSGERR_BUSERR) > 0);
 }
