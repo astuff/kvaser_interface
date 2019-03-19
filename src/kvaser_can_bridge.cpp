@@ -26,12 +26,6 @@ ros::Publisher can_tx_pub;
 
 void can_read()
 {
-  uint32_t id;
-  uint8_t msg[8] = {};  // zero-initialize array
-  uint32_t size;
-  bool extended;
-  uint64_t t;
-
   const std::chrono::milliseconds loop_pause = std::chrono::milliseconds(10);
   bool keep_going = true;
 
@@ -59,16 +53,20 @@ void can_read()
     {
       while (true)
       {
-        ret = can_reader.read(&id, msg, &size, &extended, &t);
+        CanMsg msg;
+
+        ret = can_reader.read(&msg);
 
         if (ret  == ReturnStatuses::OK)
         {
           can_msgs::Frame can_pub_msg;
           can_pub_msg.header.frame_id = "0";
-          can_pub_msg.id = id;
-          can_pub_msg.dlc = size;
-          can_pub_msg.is_extended = extended;
-          std::copy(msg, msg + size, can_pub_msg.data.begin());
+          can_pub_msg.id = msg.id;
+          can_pub_msg.dlc = msg.data.size();
+          can_pub_msg.is_extended = msg.flags.ext_id;
+          can_pub_msg.is_error = msg.flags.error_frame;
+          can_pub_msg.is_rtr = msg.flags.rtr;
+          std::copy(msg.data.begin(), msg.data.end(), can_pub_msg.data.begin());
           can_pub_msg.header.stamp = ros::Time::now();
           can_tx_pub.publish(can_pub_msg);
         }

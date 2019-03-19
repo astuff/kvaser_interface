@@ -20,6 +20,7 @@ using AS::CAN::KvaserCanUtils;
 using AS::CAN::KvaserChannel;
 using AS::CAN::KvaserCan;
 using AS::CAN::ReturnStatuses;
+using AS::CAN::CanMsg;
 
 KvaserCan kv_can;
 
@@ -74,29 +75,26 @@ int main(int argc, char ** argv)
 
   if (ret == ReturnStatuses::OK)
   {
-    uint32_t id;
-    uint8_t msg[8] = {};  // zero-initialize array
-    uint32_t size;
-    bool extended;
-    uint64_t t;
     uint16_t no_msg_count = 0;
 
     while (1)
     {
-      while ((ret = kv_can.read(&id, msg, &size, &extended, &t)) == ReturnStatuses::OK)
+      CanMsg msg;
+
+      while ((ret = kv_can.read(&msg)) == ReturnStatuses::OK)
       {
         // Write the message to stdout
         auto unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
           (std::chrono::system_clock::now().time_since_epoch()).count();
 
         std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
-        std::cout << "ID 0x" << std::hex << std::uppercase << id << ":";
+        std::cout << "ID 0x" << std::hex << std::uppercase << msg.id << ":";
         std::cout << std::internal << std::setfill('0');
 
-        for (uint8_t i = 0; i < size; ++i)
+        for (const auto byte : msg.data)
         {
           std::cout << " " << std::hex << std::setw(2);
-          std::cout << std::uppercase << static_cast<unsigned int>(msg[i]);
+          std::cout << std::uppercase << static_cast<unsigned int>(byte);
         }
 
         std::cout << std::endl;
