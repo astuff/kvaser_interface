@@ -16,8 +16,10 @@
 
 using namespace AS::CAN;
 
+KvaserCan *KvaserReadCbProxy::kvCanObj = nullptr;
+
 KvaserCan::KvaserCan() :
-  handle(new int32_t)
+  handle(new CanHandle)
 {
   *handle = -1;
   canInitializeLibrary();
@@ -202,6 +204,28 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   }
 }
 
+ReturnStatuses KvaserCan::registerReadCallback(std::function<void()> &&callable)
+{
+  if (!isOpen())
+  {
+    return ReturnStatuses::CHANNEL_CLOSED;
+  }
+  else
+  {
+    auto ret = KvaserReadCbProxy::registerCb(this, handle);
+
+    if (ret == ReturnStatuses::OK)
+      readFunc = callable;
+
+    return ret;
+  }
+}
+
+void KvaserCan::callReadFunc()
+{
+  readFunc();
+}
+
 ReturnStatuses KvaserCan::write(CanMsg &&msg)
 {
   if (*handle < 0)
@@ -213,6 +237,27 @@ ReturnStatuses KvaserCan::write(CanMsg &&msg)
   canStatus ret = canWrite(*handle, msg.id, &msg.data[0], msg.dlc, flags);
 
   return (ret == canOK) ? ReturnStatuses::OK : ReturnStatuses::WRITE_FAILED;
+}
+
+ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::shared_ptr<CanHandle> &hdl)
+{
+  auto stat = canSetNotify(*(hdl), KvaserReadCbProxy::proxyCallback, canNOTIFY_RX, nullptr);
+
+  if (stat == canOK)
+  {
+    kvCanObj = canObj;
+    return ReturnStatuses::OK;
+  }
+  else
+  {
+    return ReturnStatuses::BAD_PARAM;
+  }
+}
+
+void KvaserReadCbProxy::proxyCallback(canNotifyData *data)
+{
+  if (data->eventType == canEVENT_RX)
+    kvCanObj->callReadFunc();
 }
 
 ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t &canlibStat)

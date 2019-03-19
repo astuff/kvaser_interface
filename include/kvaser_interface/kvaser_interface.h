@@ -18,6 +18,7 @@ extern "C"
 #include <memory>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace AS
 {
@@ -181,13 +182,26 @@ class KvaserCan
 
     // Read a message
     ReturnStatuses read(CanMsg *msg);
+    ReturnStatuses registerReadCallback(std::function<void()> &&callable);
+    void callReadFunc();
 
     // Send a message
     ReturnStatuses write(CanMsg &&msg);
 
   private:
-    std::unique_ptr<CanHandle> handle;
+    std::shared_ptr<CanHandle> handle;
     bool on_bus;
+    std::function<void()> readFunc;
+};
+
+class KvaserReadCbProxy
+{
+  public:
+    static ReturnStatuses registerCb(KvaserCan *canObj, const std::shared_ptr<CanHandle> &hdl);
+    static KvaserCan *kvCanObj;
+
+  private:
+    static void proxyCallback(canNotifyData *data);
 };
 
 class KvaserCanUtils
