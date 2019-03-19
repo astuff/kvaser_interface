@@ -23,6 +23,8 @@ using AS::CAN::ReturnStatuses;
 using AS::CAN::CanMsg;
 
 KvaserCan kv_can;
+uint32_t channel_idx = 0;
+uint32_t bitrate = 500000;
 
 void shutdown()
 {
@@ -36,38 +38,8 @@ void sig_handler(int s)
   exit(1);
 }
 
-int main(int argc, char ** argv)
+void can_read()
 {
-  // Catch CTRL+C
-  struct sigaction sigIntHandler;
-  sigemptyset(&sigIntHandler.sa_mask);
-  sigIntHandler.sa_flags = 0;
-  sigaction(SIGINT, &sigIntHandler, NULL);
-
-  // Parse options
-  cxxopts::Options options("canmonitor", "A simple tool for reading data from a CAN channel.");
-
-  options.add_options()
-    ("i, index", "Channel index", cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))
-    ("b, bitrate", "Bitrate", cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))
-    ("h, help", "Print help", cxxopts::value<bool>()->implicit_value("true")->default_value("false"));
-
-  auto result = options.parse(argc, argv);
-
-  uint32_t channel_idx = result["index"].as<unsigned int>();
-  uint32_t bitrate = result["bitrate"].as<unsigned int>();
-
-  if (channel_idx > 300 ||
-      bitrate < 100 ||
-      bitrate > 8000000 ||
-      result["help"].as<bool>())
-  {
-    std::cout << std::endl;
-    std::cout << options.help();
-    std::cout << std::endl;
-    return -1;
-  }
-
   // Read CAN data
   auto ret = ReturnStatuses::OK;
 
@@ -75,8 +47,6 @@ int main(int argc, char ** argv)
 
   if (ret == ReturnStatuses::OK)
   {
-    uint16_t no_msg_count = 0;
-
     while (1)
     {
       CanMsg msg;
@@ -110,21 +80,13 @@ int main(int argc, char ** argv)
 
       if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED)
       {
-        no_msg_count++;
-
-        if (no_msg_count > 150)
-        {
-          std::cout << "No messages received." << std::endl;
-          no_msg_count = 0;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        break;
       }
       else
       {
         std::cerr << KvaserCanUtils::returnStatusDesc(ret);
         shutdown();
-        return -1;
+        exit(-1);
       }
     }
   }
@@ -132,8 +94,45 @@ int main(int argc, char ** argv)
   {
     std::cerr << KvaserCanUtils::returnStatusDesc(ret) << std::endl;
     shutdown();
+    exit(-1);
+  }
+}
+
+int main(int argc, char ** argv)
+{
+  // Catch CTRL+C
+  struct sigaction sigIntHandler;
+  sigemptyset(&sigIntHandler.sa_mask);
+  sigIntHandler.sa_flags = 0;
+  sigaction(SIGINT, &sigIntHandler, NULL);
+
+  // Parse options
+  cxxopts::Options options("canmonitor", "A simple tool for reading data from a CAN channel.");
+
+  options.add_options()
+    ("i, index", "Channel index", cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))
+    ("b, bitrate", "Bitrate", cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))
+    ("h, help", "Print help", cxxopts::value<bool>()->implicit_value("true")->default_value("false"));
+
+  auto result = options.parse(argc, argv);
+
+  channel_idx = result["index"].as<unsigned int>();
+  bitrate = result["bitrate"].as<unsigned int>();
+
+  if (channel_idx > 300 ||
+      bitrate < 100 ||
+      bitrate > 8000000 ||
+      result["help"].as<bool>())
+  {
+    std::cout << std::endl;
+    std::cout << options.help();
+    std::cout << std::endl;
     return -1;
   }
+
+  kv_can.registerReadCallback(std::function<void()>(can_read));
+
+  std::getchar();
 
   return 0;
 }
