@@ -177,15 +177,21 @@ workflows:
       - kinetic_release:
           context: ubuntu-pkg-build
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^[0-9]*.[0-9]*.[0-9]*$/
       - lunar_release:
           context: ubuntu-pkg-build
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^[0-9]*.[0-9]*.[0-9]*$/
       - melodic_release:
           context: ubuntu-pkg-build
           filters:
+            branches:
+              ignore: /.*/
             tags:
               only: /^[0-9]*.[0-9]*.[0-9]*$/
