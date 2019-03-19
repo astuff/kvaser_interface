@@ -2,8 +2,8 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.1.0 (2019-03-19)
+------------------
 * Merge pull request `#20 <https://github.com/astuff/kvaser_interface/issues/20>`_ from astuff/feat/more_tools
   Adding canmonitor tool.
 * Updating README with new tools.
