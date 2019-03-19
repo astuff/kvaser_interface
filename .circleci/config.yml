@@ -173,13 +173,19 @@ workflows:
       - lunar
       - melodic
   ros_release:
-    filters:
-      tags:
-        only: /^[0-9]*.[0-9]*.[0-9]*$/
     jobs:
       - kinetic_release:
           context: ubuntu-pkg-build
+          filters:
+            tags:
+              only: /^[0-9]*.[0-9]*.[0-9]*$/
       - lunar_release:
           context: ubuntu-pkg-build
+          filters:
+            tags:
+              only: /^[0-9]*.[0-9]*.[0-9]*$/
       - melodic_release:
           context: ubuntu-pkg-build
+          filters:
+            tags:
+              only: /^[0-9]*.[0-9]*.[0-9]*$/
