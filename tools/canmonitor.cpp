@@ -49,13 +49,14 @@ void sig_handler(int s)
 
 void can_read()
 {
-  // Read CAN data
   auto ret = ReturnStatuses::OK;
 
   ret = kv_can.open(channel_idx, bitrate);
 
+  // Read CAN data if channel is OK
   if (ret == ReturnStatuses::OK)
   {
+    // Loop until ReturnStatus is NO_MESSAGES_RECEIVED
     while (true)
     {
       CanMsg msg;
@@ -142,27 +143,14 @@ int main(int argc, char ** argv)
     return 0;
   }
 
-  ReturnStatuses ret;
-
-  ret = kv_can.open(channel_idx, bitrate);
-
-  if (ret == ReturnStatuses::OK)
+  while (true)
   {
-    ret = kv_can.registerReadCallback(std::function<void()>(can_read));
-
-    if (ret != ReturnStatuses::OK)
-    {
-      std::cerr << "Error registering reader callback: ";
-      shutdown(ret, -1);
-    }
+    // Below is an example for one method of reading from a CAN
+    // channel using a KvaserCan object. However, if better performance
+    // is required, registering a read callback function is preferred.
+    can_read();
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
   }
-  else
-  {
-    std::cerr << "Error opening Kvaser interface: ";
-    shutdown(ret, -2);
-  }
-
-  std::getchar();
 
   return 0;
 }
