@@ -149,7 +149,7 @@ int main(int argc, char ** argv)
     // channel using a KvaserCan object. However, if better performance
     // is required, registering a read callback function is preferred.
     can_read();
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
   return 0;
