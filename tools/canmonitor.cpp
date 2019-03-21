@@ -91,8 +91,16 @@ void can_read()
       else if (ret != ReturnStatuses::OK)
       {
         std::cerr << "Error reading CAN message: ";
-        shutdown(ret, -4);
+        shutdown(ret, -5);
       }
+    }
+
+    ret = kv_can.close();
+
+    if (ret != ReturnStatuses::OK)
+    {
+      std::cerr << "Error closing Kvaser interface after read: ";
+      shutdown(ret, -4);
     }
   }
   else
