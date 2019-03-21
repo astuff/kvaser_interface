@@ -209,9 +209,16 @@ class KvaserReadCbProxy
 class KvaserCanUtils
 {
   public:
-    static ReturnStatuses canlibStatToReturnStatus(const int32_t &canlibStat);
+    // In classic CAN, the DLC == payload size. For CAN FD, the DLC
+    // indicates the payload size but the two values aren't the same.
+    // These two functions allow for translating between the DLC and
+    // the payload size. See
+    // https://www.kvaser.com/wp-content/uploads/2016/10/comparing-can-fd-with-classical-can.pdf
+    // for more information.
     static size_t dlcToSize(const uint8_t &dlc);
     static uint8_t sizeToDlc(const size_t &size);
+
+    static ReturnStatuses canlibStatToReturnStatus(const int32_t &canlibStat);
     static void getChannelCount(int32_t *numChannels);
     static std::vector<std::shared_ptr<KvaserCard>> getCards();
     static std::vector<std::shared_ptr<KvaserChannel>> getChannels();
