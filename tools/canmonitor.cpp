@@ -26,11 +26,17 @@ KvaserCan kv_can;
 uint32_t channel_idx = 0;
 uint32_t bitrate = 500000;
 
-void shutdown_with_error(const ReturnStatuses &ret, const int &error_num)
+void shutdown(
+  const ReturnStatuses &ret = ReturnStatuses::OK,
+  const int &error_num = 0)
 {
-  std::cerr << static_cast<int>(ret);
-  std::cerr << " - " << KvaserCanUtils::returnStatusDesc(ret).c_str();
-  std::cerr << std::endl;
+  if (ret != ReturnStatuses::OK || error_num != 0)
+  {
+    std::cerr << static_cast<int>(ret);
+    std::cerr << " - " << KvaserCanUtils::returnStatusDesc(ret).c_str();
+    std::cerr << std::endl;
+  }
+
   kv_can.close();
   exit(error_num);
 }
@@ -38,8 +44,7 @@ void shutdown_with_error(const ReturnStatuses &ret, const int &error_num)
 void sig_handler(int s)
 {
   std::cout << "Caught signal " << s << std::endl;
-  kv_can.close();
-  exit(1);
+  shutdown();
 }
 
 void can_read()
@@ -86,14 +91,14 @@ void can_read()
       else if (ret != ReturnStatuses::OK)
       {
         std::cerr << "Error reading CAN message: ";
-        shutdown_with_error(ret, -4);
+        shutdown(ret, -4);
       }
     }
   }
   else
   {
     std::cerr << "Error opening Kvaser interface: ";
-    shutdown_with_error(ret, -3);
+    shutdown(ret, -3);
   }
 }
 
@@ -140,13 +145,13 @@ int main(int argc, char ** argv)
     if (ret != ReturnStatuses::OK)
     {
       std::cerr << "Error registering reader callback: ";
-      shutdown_with_error(ret, -1);
+      shutdown(ret, -1);
     }
   }
   else
   {
     std::cerr << "Error opening Kvaser interface: ";
-    shutdown_with_error(ret, -2);
+    shutdown(ret, -2);
   }
 
   std::getchar();
