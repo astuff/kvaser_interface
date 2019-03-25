@@ -249,8 +249,12 @@ ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::share
   else
   {
     kvCanObj = canObj;
-    
-    auto stat = canSetNotify(*(hdl), &KvaserReadCbProxy::proxyCallback, canNOTIFY_RX, (char*)0);
+
+    auto stat = canSetNotify(
+      *(hdl),
+      &KvaserReadCbProxy::proxyCallback,
+      canNOTIFY_RX,
+      reinterpret_cast<char*>(0));
 
     if (stat == canOK)
     {
