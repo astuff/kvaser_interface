@@ -2,6 +2,23 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* After merging of PR #21, ros_linuxcan is now ros_kvaser_interface and has several API changes.
+* Merge pull request `#21 <https://github.com/astuff/kvaser_interface/issues/21>`_ from astuff/feat/callbacks
+* Changing canmonitor to polling loop at 100Hz.
+* Adding comment about CAN FD DLC/payload size.
+* Normalizing shutdowns in canmonitor.
+* Renaming file and library for consistency.
+* Normalizing error messages between open() functions.
+* Having read proxy hold copy of CanHandle for lifetime management.
+* Created read callback register func and proxy.
+* write() now uses CanMsg.
+* read() now returns all message types. Up to user to filter.
+* Changing read() to use CanMsg. Added util funcs.
+* Added CanMsg message struct.
+* Contributors: Joshua Whitley
+
 3.1.0 (2019-03-19)
 ------------------
 * Merge pull request `#20 <https://github.com/astuff/kvaser_interface/issues/20>`_ from astuff/feat/more_tools
