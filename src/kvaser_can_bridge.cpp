@@ -184,7 +184,7 @@ int main(int argc, char** argv)
   if (ret == ReturnStatuses::OK)
   {
     // Set up read callback
-    ret = can_reader.registerReadCallback(std::function<void()>(can_read));
+    ret = can_reader.registerReadCallback(can_read);
 
     if (ret == ReturnStatuses::OK)
     {

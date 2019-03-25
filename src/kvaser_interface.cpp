@@ -172,15 +172,14 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   }
 
   int64_t id_proxy = 0;
-  uint32_t dlc = 0;
   uint32_t flags = 0;
   char data[64];
   size_t bytes = 0;
 
-  canStatus ret = canRead(*handle, &id_proxy, data, &dlc, &flags, &msg->timestamp);
+  canStatus ret = canRead(*handle, &id_proxy, data, &msg->dlc, &flags, &msg->timestamp);
 
   msg->id = static_cast<uint32_t>(id_proxy);
-  bytes = KvaserCanUtils::dlcToSize(dlc);
+  bytes = KvaserCanUtils::dlcToSize(msg->dlc);
 
   msg->data.reserve(bytes);
 
@@ -208,7 +207,7 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   }
 }
 
-ReturnStatuses KvaserCan::registerReadCallback(std::function<void()> &&callable)
+ReturnStatuses KvaserCan::registerReadCallback(std::function<void(void)> callable)
 {
   if (!isOpen())
   {
@@ -216,18 +215,16 @@ ReturnStatuses KvaserCan::registerReadCallback(std::function<void()> &&callable)
   }
   else
   {
+    readFunc = callable;
     auto ret = KvaserReadCbProxy::registerCb(this, handle);
 
-    if (ret == ReturnStatuses::OK)
-      readFunc = callable;
+    if (ret != ReturnStatuses::OK)
+    {
+      readFunc = nullptr;
+    }
 
     return ret;
   }
-}
-
-void KvaserCan::callReadFunc()
-{
-  readFunc();
 }
 
 ReturnStatuses KvaserCan::write(CanMsg &&msg)
@@ -247,23 +244,32 @@ ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::share
 {
   handle = std::shared_ptr<CanHandle>(hdl);
 
-  auto stat = canSetNotify(*(hdl), KvaserReadCbProxy::proxyCallback, canNOTIFY_RX, nullptr);
-
-  if (stat == canOK)
-  {
-    kvCanObj = canObj;
-    return ReturnStatuses::OK;
-  }
+  if (!canObj->isOpen())
+    return ReturnStatuses::CHANNEL_CLOSED;
   else
   {
-    return ReturnStatuses::BAD_PARAM;
+    kvCanObj = canObj;
+    
+    auto stat = canSetNotify(*(hdl), &KvaserReadCbProxy::proxyCallback, canNOTIFY_RX, (char*)0);
+
+    if (stat == canOK)
+    {
+      return ReturnStatuses::OK;
+    }
+    else
+    {
+      kvCanObj = nullptr;
+      return ReturnStatuses::BAD_PARAM;
+    }
   }
 }
 
 void KvaserReadCbProxy::proxyCallback(canNotifyData *data)
 {
   if (data->eventType == canEVENT_RX)
-    kvCanObj->callReadFunc();
+  {
+    kvCanObj->readFunc();
+  }
 }
 
 ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t &canlibStat)

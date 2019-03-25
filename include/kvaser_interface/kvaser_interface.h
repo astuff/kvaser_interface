@@ -78,45 +78,45 @@ enum class HardwareType
 
 struct MsgFlags
 {
-  bool rtr;
-  bool std_id;
-  bool ext_id;
-  bool wakeup_mode;
-  bool error_frame;
-  bool tx_ack;
-  bool tx_rq;
-  bool msg_delayed;
-  bool single_shot;
-  bool tx_nack;
-  bool arb_lost;
-  bool fd_msg;
-  bool fd_bitrate_switch;
-  bool fd_sndr_err_pass_md;
+  bool rtr = false;
+  bool std_id = false;
+  bool ext_id = false;
+  bool wakeup_mode = false;
+  bool error_frame = false;
+  bool tx_ack = false;
+  bool tx_rq = false;
+  bool msg_delayed = false;
+  bool single_shot = false;
+  bool tx_nack = false;
+  bool arb_lost = false;
+  bool fd_msg = false;
+  bool fd_bitrate_switch = false;
+  bool fd_sndr_err_pass_md = false;
 };
 
 struct MsgErrFlags
 {
-  bool has_err;
-  bool hw_overrun_err;
-  bool sw_overrun_err;
-  bool stuff_err;
-  bool form_err;
-  bool crc_err;
-  bool bit0_err;
-  bool bit1_err;
-  bool any_overrun_err;
-  bool any_bit_err;
-  bool any_rx_err;
+  bool has_err = false;
+  bool hw_overrun_err = false;
+  bool sw_overrun_err = false;
+  bool stuff_err = false;
+  bool form_err = false;
+  bool crc_err = false;
+  bool bit0_err = false;
+  bool bit1_err = false;
+  bool any_overrun_err = false;
+  bool any_bit_err = false;
+  bool any_rx_err = false;
 };
 
 struct CanMsg
 {
-  uint32_t id;
-  uint32_t dlc;
+  uint32_t id = 0;
+  uint32_t dlc = 0;
   MsgFlags flags;
   MsgErrFlags error_flags;
   std::vector<uint8_t> data;
-  uint64_t timestamp;
+  uint64_t timestamp = 0;
 };
 
 class KvaserCard
@@ -182,16 +182,17 @@ class KvaserCan
 
     // Read a message
     ReturnStatuses read(CanMsg *msg);
-    ReturnStatuses registerReadCallback(std::function<void()> &&callable);
-    void callReadFunc();
+    ReturnStatuses registerReadCallback(std::function<void(void)> callable);
 
     // Send a message
     ReturnStatuses write(CanMsg &&msg);
 
+    // Read callback function
+    std::function<void(void)> readFunc;
+
   private:
     std::shared_ptr<CanHandle> handle;
     bool on_bus;
-    std::function<void()> readFunc;
 };
 
 class KvaserReadCbProxy
