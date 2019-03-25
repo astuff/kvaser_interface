@@ -50,6 +50,7 @@ void sig_handler(int s)
 void can_read()
 {
   auto ret = ReturnStatuses::OK;
+  size_t unix_timestamp_ms;
 
   ret = kv_can.open(channel_idx, bitrate);
 
@@ -60,19 +61,20 @@ void can_read()
     while (true)
     {
       CanMsg msg;
+      ret = kv_can.read(&msg);
 
-      auto unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
+      unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
         (std::chrono::system_clock::now().time_since_epoch()).count();
-
-      std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
 
       if (msg.flags.error_frame)
       {
+        std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
         std::cout << "ERROR FRAME" << std::endl;
       }
       else if (msg.dlc > 0)
       {
         // Write the message to stdout
+        std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
         std::cout << "ID 0x" << std::hex << std::uppercase << msg.id << ":";
         std::cout << std::internal << std::setfill('0');
 
