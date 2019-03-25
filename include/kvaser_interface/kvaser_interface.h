@@ -18,6 +18,7 @@ extern "C"
 #include <memory>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace AS
 {
@@ -73,6 +74,49 @@ enum class HardwareType
   HWTYPE_LEAF2 = 80,
   HWTYPE_MEMORATOR_V2 = 82,
   HWTYPE_CANLINHYBRID = 84
+};
+
+struct MsgFlags
+{
+  bool rtr;
+  bool std_id;
+  bool ext_id;
+  bool wakeup_mode;
+  bool error_frame;
+  bool tx_ack;
+  bool tx_rq;
+  bool msg_delayed;
+  bool single_shot;
+  bool tx_nack;
+  bool arb_lost;
+  bool fd_msg;
+  bool fd_bitrate_switch;
+  bool fd_sndr_err_pass_md;
+};
+
+struct MsgErrFlags
+{
+  bool has_err;
+  bool hw_overrun_err;
+  bool sw_overrun_err;
+  bool stuff_err;
+  bool form_err;
+  bool crc_err;
+  bool bit0_err;
+  bool bit1_err;
+  bool any_overrun_err;
+  bool any_bit_err;
+  bool any_rx_err;
+};
+
+struct CanMsg
+{
+  uint32_t id;
+  uint32_t dlc;
+  MsgFlags flags;
+  MsgErrFlags error_flags;
+  std::vector<uint8_t> data;
+  uint64_t timestamp;
 };
 
 class KvaserCard
@@ -137,32 +181,50 @@ class KvaserCan
     bool isOpen();
 
     // Read a message
-    ReturnStatuses read(uint32_t *id,
-                        uint8_t *msg,
-                        uint32_t *size,
-                        bool *extended,
-                        uint64_t *time);
+    ReturnStatuses read(CanMsg *msg);
+    ReturnStatuses registerReadCallback(std::function<void()> &&callable);
+    void callReadFunc();
 
     // Send a message
-    ReturnStatuses write(const uint32_t &id,
-                         uint8_t *msg,
-                         const uint32_t &size,
-                         const bool &extended);
+    ReturnStatuses write(CanMsg &&msg);
 
   private:
-    std::unique_ptr<CanHandle> handle;
+    std::shared_ptr<CanHandle> handle;
     bool on_bus;
+    std::function<void()> readFunc;
+};
+
+class KvaserReadCbProxy
+{
+  public:
+    static ReturnStatuses registerCb(KvaserCan *canObj, const std::shared_ptr<CanHandle> &hdl);
+
+  private:
+    static void proxyCallback(canNotifyData *data);
+
+    static KvaserCan *kvCanObj;
+    static std::shared_ptr<CanHandle> handle;
 };
 
 class KvaserCanUtils
 {
   public:
+    // In classic CAN, the DLC == payload size. For CAN FD, the DLC
+    // indicates the payload size but the two values aren't the same.
+    // These two functions allow for translating between the DLC and
+    // the payload size. See
+    // https://www.kvaser.com/wp-content/uploads/2016/10/comparing-can-fd-with-classical-can.pdf
+    // for more information.
+    static size_t dlcToSize(const uint8_t &dlc);
+    static uint8_t sizeToDlc(const size_t &size);
+
     static ReturnStatuses canlibStatToReturnStatus(const int32_t &canlibStat);
     static void getChannelCount(int32_t *numChannels);
     static std::vector<std::shared_ptr<KvaserCard>> getCards();
     static std::vector<std::shared_ptr<KvaserChannel>> getChannels();
     static std::vector<std::shared_ptr<KvaserChannel>> getChannelsOnCard(const uint64_t &serialNo);
     static std::string returnStatusDesc(const ReturnStatuses &ret);
+    static void setMsgFlags(CanMsg *msg, const uint32_t &flags);
 };
 
 }  // namespace CAN

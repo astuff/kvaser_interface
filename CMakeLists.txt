@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   CATKIN_DEPENDS roscpp can_msgs
   INCLUDE_DIRS include
-  LIBRARIES ros_linuxcan
+  LIBRARIES ros_${PROJECT_NAME}
 )
 
 include_directories(
@@ -20,11 +20,11 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(ros_linuxcan
-  src/linuxcan.cpp
+add_library(ros_${PROJECT_NAME}
+  src/kvaser_interface.cpp
 )
 
-target_link_libraries(ros_linuxcan
+target_link_libraries(ros_${PROJECT_NAME}
   canlib
   ${catkin_LIBRARIES}
 )
@@ -34,7 +34,7 @@ add_executable(kvaser_can_bridge
 )
 
 target_link_libraries(kvaser_can_bridge
-  ros_linuxcan
+  ros_${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 
@@ -43,7 +43,7 @@ add_executable(canmonitor
 )
 
 target_link_libraries(canmonitor
-  ros_linuxcan
+  ros_${PROJECT_NAME}
 )
 
 add_executable(list_channels
@@ -51,13 +51,13 @@ add_executable(list_channels
 )
 
 target_link_libraries(list_channels
-  ros_linuxcan
+  ros_${PROJECT_NAME}
 )
 
 set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/c++11")
 roslint_cpp(
   include/kvaser_interface/kvaser_interface.h
-  src/linuxcan.cpp
+  src/kvaser_interface.cpp
   src/kvaser_can_bridge.cpp
   tools/canmonitor.cpp
   tools/list_channels.cpp
@@ -69,7 +69,7 @@ endif()
 
 install(
   TARGETS
-  ros_linuxcan
+  ros_${PROJECT_NAME}
   kvaser_can_bridge
   canmonitor
   list_channels
