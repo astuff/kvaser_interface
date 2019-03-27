@@ -2,8 +2,8 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.0.0 (2019-03-27)
+------------------
 * After merging of PR #21, ros_linuxcan is now ros_kvaser_interface and has several API changes.
 * Merge pull request `#21 <https://github.com/astuff/kvaser_interface/issues/21>`_ from astuff/feat/callbacks
 * Changing canmonitor to polling loop at 100Hz.
