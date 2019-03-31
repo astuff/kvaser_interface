@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>kvaser_interface</name>
-  <version>4.0.1</version>
+  <version>4.0.2</version>
   <description>Kvaser CAN interface for ROS device drivers.</description>
   <license>MIT</license>
 

@@ -2,8 +2,8 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.0.2 (2019-03-31)
+------------------
 * Merge pull request `#29 <https://github.com/astuff/kvaser_interface/issues/29>`_ from astuff/hotfix/reader_bug
 * No Longer Closes Channel After Read
 * Contributors: Joshua Whitley
