@@ -78,12 +78,6 @@ void can_read()
       }
     }
   }
-
-  ret = can_reader.close();
-
-  if (ret != ReturnStatuses::OK)
-    ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error closing reader: %d - %s",
-      static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
 }
 
 void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
