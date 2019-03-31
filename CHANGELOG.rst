@@ -2,8 +2,8 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.0.1 (2019-03-31)
+------------------
 * Merge pull request `#28 <https://github.com/astuff/kvaser_interface/issues/28>`_ from astuff/hotfix/can_reader_callback
 * Fixing bug in ROS callback.
 * Contributors: Joshua Whitley
