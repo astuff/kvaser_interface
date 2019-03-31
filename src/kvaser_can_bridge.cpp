@@ -110,7 +110,11 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
     msg.dlc = ros_msg->dlc;
     msg.flags.ext_id = ros_msg->is_extended;
     msg.flags.rtr = ros_msg->is_rtr;
-    std::copy(ros_msg->data.begin(), ros_msg->data.end(), msg.data.begin());
+
+    for (size_t i = 0; i < ros_msg->data.size(); ++i)
+    {
+      msg.data.push_back(ros_msg->data[i]);
+    }
 
     ret = can_writer.write(std::move(msg));
 
