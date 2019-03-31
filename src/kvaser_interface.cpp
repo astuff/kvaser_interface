@@ -270,10 +270,7 @@ ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::share
 
 void KvaserReadCbProxy::proxyCallback(canNotifyData *data)
 {
-  if (data->eventType == canEVENT_RX)
-  {
-    kvCanObj->readFunc();
-  }
+  kvCanObj->readFunc();
 }
 
 ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t &canlibStat)
