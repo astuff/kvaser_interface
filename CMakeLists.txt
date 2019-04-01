@@ -68,12 +68,7 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES})
 
   find_package(catkin REQUIRED COMPONENTS rostest)
-  add_rostest_gtest(${PROJECT_NAME}_reader_writer_tests
-    tests/reader_writer.test
-    tests/reader_writer.cpp)
-  target_link_libraries(${PROJECT_NAME}_reader_writer_tests
-    ros_${PROJECT_NAME}
-    ${catkin_LIBRARIES})
+  add_rostest(tests/reader_writer.test)
 endif()
 
 install(
