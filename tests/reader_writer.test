@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Start Virtual Channels -->
+  <node name="vchannels" pkg="kvaser_interface" type="create_virtual_channels.sh" args="start" />
+</launch>

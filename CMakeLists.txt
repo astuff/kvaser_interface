@@ -55,16 +55,25 @@ target_link_libraries(list_channels
 )
 
 set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/c++11")
-roslint_cpp(
-  include/kvaser_interface/kvaser_interface.h
-  src/kvaser_interface.cpp
-  src/kvaser_can_bridge.cpp
-  tools/canmonitor.cpp
-  tools/list_channels.cpp
-)
+roslint_cpp()
 
 if(CATKIN_ENABLE_TESTING)
   roslint_add_test()
+
+  find_package(catkin REQUIRED COMPONENTS rosunit)
+  catkin_add_gtest(${PROJECT_NAME}_tests
+    tests/${PROJECT_NAME}_tests.cpp)
+  target_link_libraries(${PROJECT_NAME}_tests
+    ros_${PROJECT_NAME}
+    ${catkin_LIBRARIES})
+
+  find_package(catkin REQUIRED COMPONENTS rostest)
+  add_rostest_gtest(${PROJECT_NAME}_reader_writer_tests
+    tests/reader_writer.test
+    tests/reader_writer.cpp)
+  target_link_libraries(${PROJECT_NAME}_reader_writer_tests
+    ros_${PROJECT_NAME}
+    ${catkin_LIBRARIES})
 endif()
 
 install(
