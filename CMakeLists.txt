@@ -68,7 +68,7 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES})
 
   find_package(catkin REQUIRED COMPONENTS rostest)
-  add_rostest(tests/reader_writer.test)
+  add_rostest(tests/reader_writer_10hz.test)
 endif()
 
 install(
@@ -87,5 +87,9 @@ install(DIRECTORY include
 )
 
 install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(DIRECTORY scripts
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

@@ -205,7 +205,7 @@ int main(int argc, char** argv)
   ReturnStatuses ret;
 
   // Open CAN reader channel
-  ret = can_reader.open(hardware_id, circuit_id, bit_rate, debug_ticks);
+  ret = can_reader.open(hardware_id, circuit_id, bit_rate, false);
 
   if (ret == ReturnStatuses::OK)
   {

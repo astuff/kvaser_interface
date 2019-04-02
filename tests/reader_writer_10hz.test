@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find kvaser_interface)/tests/bridge_tests.test" />
+
+  <node name="topic_pub" type="rostopic" pkg="rostopic"
+    args="pub -r 10 /writer/can_rx can_msgs/Frame '{header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: ''}, id: 0, is_rtr: false, is_extended: false, is_error: false, dlc: 8, data: [0,0,0,0,0,0,0,0]}'" />
+
+  <test test-name="bridge_10hz_test" pkg="rostest" type="hztest">
+    <param name="hz" value="10.0" />
+    <param name="hzerror" value="1.0" />
+    <param name="test_duration" value="5.0" />
+    <param name="topic" value="/reader/can_tx" />
+  </test>
+</launch>
