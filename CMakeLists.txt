@@ -69,7 +69,7 @@ if(CATKIN_ENABLE_TESTING)
 
   find_package(catkin REQUIRED COMPONENTS rostest)
   add_rostest(tests/reader_writer_100hz.test)
-  add_rostest(tests/reader_writer_100hz_extended.test)
+#  add_rostest(tests/reader_writer_100hz_extended.test)
 endif()
 
 install(
