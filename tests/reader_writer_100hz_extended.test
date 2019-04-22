@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Start Kvaser Can Bridge with Read/Write Ticks Enabled -->
+  <node name="kvaser_can_bridge" pkg="kvaser_interface" type="kvaser_can_bridge" ns="reader">
+    <param name="can_hardware_id" value="1" />
+    <param name="can_circuit_id" value="0" />
+    <param name="can_bit_rate" value="500000" />
+    <param name="enable_debug_ticks" value="true" />
+  </node>
+
+  <!-- Start Kvaser Can Bridge with Read/Write Ticks Enabled -->
+  <node name="kvaser_can_bridge" pkg="kvaser_interface" type="kvaser_can_bridge" ns="writer">
+    <param name="can_hardware_id" value="1" />
+    <param name="can_circuit_id" value="1" />
+    <param name="can_bit_rate" value="500000" />
+    <param name="enable_debug_ticks" value="true" />
+  </node>
+
+  <node name="topic_pub" type="rostopic" pkg="rostopic"
+    args="pub -r 100 /writer/can_rx can_msgs/Frame '{header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: ''}, id: 2457, is_rtr: false, is_extended: true, is_error: false, dlc: 8, data: [0,0,0,0,0,0,0,0]}'" />
+
+  <test test-name="bridge_100hz_write_tick_extended" pkg="rostest" type="hztest" time-limit="10.0">
+    <param name="hz" value="100.0" />
+    <param name="hzerror" value="3.0" />
+    <param name="test_duration" value="3.0" />
+    <param name="topic" value="/writer/can_write_tick" />
+  </test>
+
+  <test test-name="bridge_100hz_read_tick_extended" pkg="rostest" type="hztest" time-limit="10.0">
+    <param name="hz" value="100.0" />
+    <param name="hzerror" value="3.0" />
+    <param name="test_duration" value="3.0" />
+    <param name="topic" value="/reader/can_read_tick" />
+  </test>
+
+  <test test-name="bridge_100hz_pub_extended" pkg="rostest" type="hztest" time-limit="10.0">
+    <param name="hz" value="100.0" />
+    <param name="hzerror" value="3.0" />
+    <param name="test_duration" value="3.0" />
+    <param name="topic" value="/reader/can_tx" />
+  </test>
+</launch>

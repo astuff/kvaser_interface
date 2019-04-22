@@ -12,6 +12,7 @@
 
 #include <ros/ros.h>
 #include <kvaser_interface/kvaser_interface.h>
+#include <std_msgs/Empty.h>
 #include <can_msgs/Frame.h>
 
 using namespace AS::CAN;
@@ -19,8 +20,11 @@ using namespace AS::CAN;
 int bit_rate = 500000;
 int hardware_id = 0;
 int circuit_id = 0;
+bool debug_ticks = false;
 KvaserCan can_reader, can_writer;
 ros::Publisher can_tx_pub;
+ros::Publisher can_read_tick;
+ros::Publisher can_write_tick;
 
 void can_read()
 {
@@ -67,6 +71,9 @@ void can_read()
           can_pub_msg.header.stamp = ros::Time::now();
           can_tx_pub.publish(can_pub_msg);
         }
+
+        if (debug_ticks)
+          can_read_tick.publish(std_msgs::Empty());
       }
       else
       {
@@ -112,9 +119,16 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
 
     ret = can_writer.write(std::move(msg));
 
-    if (ret != ReturnStatuses::OK)
+    if (ret == ReturnStatuses::OK)
+    {
+      if (debug_ticks)
+        can_write_tick.publish(std_msgs::Empty());
+    }
+    else
+    {
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s",
         static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+    }
   }
 }
 
@@ -128,10 +142,6 @@ int main(int argc, char** argv)
   ros::NodeHandle priv("~");
   ros::AsyncSpinner spinner(1);
 
-  can_tx_pub = n.advertise<can_msgs::Frame>("can_tx", 500);
-
-  ros::Subscriber can_rx_sub = n.subscribe("can_rx", 500, can_rx_callback);
-
   // Wait for time to be valid
   ros::Time::waitForValid();
 
@@ -139,7 +149,7 @@ int main(int argc, char** argv)
   {
     ROS_INFO("Kvaser CAN Interface - Got hardware_id: %d", hardware_id);
 
-    if (hardware_id <= 0)
+    if (hardware_id < 0)
     {
       ROS_ERROR("Kvaser CAN Interface - CAN hardware ID is invalid.");
       exit = true;
@@ -168,11 +178,29 @@ int main(int argc, char** argv)
     }
   }
 
+  if (priv.getParam("enable_debug_ticks", debug_ticks))
+  {
+    if (debug_ticks)
+    {
+      ROS_INFO("Kvaser CAN Interface - Debug ticks enabled.");
+    }
+  }
+
   if (exit)
   {
     ros::shutdown();
     return 0;
   }
+
+  can_tx_pub = n.advertise<can_msgs::Frame>("can_tx", 500);
+
+  if (debug_ticks)
+  {
+    can_read_tick = n.advertise<std_msgs::Empty>("can_read_tick", 100);
+    can_write_tick = n.advertise<std_msgs::Empty>("can_write_tick", 100);
+  }
+
+  ros::Subscriber can_rx_sub = n.subscribe("can_rx", 500, can_rx_callback);
 
   ReturnStatuses ret;
 
