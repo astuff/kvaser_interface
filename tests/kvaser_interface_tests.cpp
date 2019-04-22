@@ -30,7 +30,7 @@ TEST(KvaserCanUtils, setFlags)
 {
   CanMsg msg;
 
-  KvaserCanUtils::setMsgFlags(&msg, 0xFFFFFFFF);
+  KvaserCanUtils::setMsgFromFlags(&msg, 0xFFFFFFFF);
   ASSERT_EQ(msg.flags.rtr, true);
   ASSERT_EQ(msg.flags.std_id, true);
   ASSERT_EQ(msg.flags.ext_id, true);
@@ -57,7 +57,7 @@ TEST(KvaserCanUtils, setFlags)
   ASSERT_EQ(msg.error_flags.any_bit_err, true);
   ASSERT_EQ(msg.error_flags.any_rx_err, true);
 
-  KvaserCanUtils::setMsgFlags(&msg, 0x00000000);
+  KvaserCanUtils::setMsgFromFlags(&msg, 0x00000000);
   ASSERT_EQ(msg.flags.rtr, false);
   ASSERT_EQ(msg.flags.std_id, false);
   ASSERT_EQ(msg.flags.ext_id, false);
