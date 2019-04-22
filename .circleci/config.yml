@@ -29,35 +29,6 @@ jobs:
             catkin_test_results
     working_directory: ~/src
 
-  lunar:
-    docker:
-      - image: autonomoustuff/docker-builds:lunar-ros-base
-    steps:
-      - checkout
-      - run:
-          name: Set Up Container
-          command: |
-            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
-            apt-get update -qq && apt-get install -y linux-headers-generic linuxcan-dkms
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-            cd ..
-            catkin init
-            catkin config --extend /opt/ros/$ROS_DISTRO
-      - run:
-          name: Build
-          command: |
-            cd ..
-            catkin build
-      - run:
-          name: Run Tests
-          command: |
-            source /opt/ros/lunar/setup.bash
-            cd ..
-            catkin run_tests
-            catkin_test_results
-    working_directory: ~/src
-
   melodic:
     docker:
       - image: autonomoustuff/docker-builds:melodic-ros-base
@@ -113,32 +84,6 @@ jobs:
             deb-s3 upload -b autonomoustuff-repo -c xenial --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
     working_directory: ~/src
 
-  lunar_release:
-    docker:
-      - image: autonomoustuff/docker-builds:lunar-ros-base
-    steps:
-      - checkout
-      - run:
-          name: Set Up Container
-          command: |
-            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
-            apt-get update -qq && apt-get install -y linux-headers-generic linuxcan-dkms dh-make python-bloom ruby
-            gem install --no-rdoc --no-ri deb-s3
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-      - run:
-          name: Build
-          command: |
-            bloom-generate rosdebian --os-name ubuntu --os-version xenial --ros-distro lunar
-            sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
-            fakeroot debian/rules binary
-      - run:
-          name: Upload
-          command: |
-            cd ..
-            deb-s3 upload -b autonomoustuff-repo -c xenial --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
-    working_directory: ~/src
-
   melodic_release:
     docker:
       - image: autonomoustuff/docker-builds:melodic-ros-base
@@ -170,18 +115,10 @@ workflows:
   ros_build:
     jobs:
       - kinetic
-      - lunar
       - melodic
   ros_release:
     jobs:
       - kinetic_release:
-          context: ubuntu-pkg-build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^[0-9]*.[0-9]*.[0-9]*$/
-      - lunar_release:
           context: ubuntu-pkg-build
           filters:
             branches:
