@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Run Tests in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests && catkin_test_results"
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
       - run:
           name: Shut Down Container
           command: |
@@ -83,7 +83,7 @@ jobs:
       - run:
           name: Run Tests in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests && catkin_test_results"
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
       - run:
           name: Shut Down Container
           command: |
