@@ -14,16 +14,16 @@ TEST(KvaserCanUtils, getChannels)
 {
   int32_t chan_count = -1;
   KvaserCanUtils::getChannelCount(&chan_count);
-  ASSERT_EQ(chan_count, 0);
+  ASSERT_EQ(chan_count, 2);
 
   auto chans = KvaserCanUtils::getChannels();
-  ASSERT_EQ(chans.size(), 0);
+  ASSERT_EQ(chans.size(), 2);
 
   auto cards = KvaserCanUtils::getCards();
-  ASSERT_EQ(cards.size(), 0);
+  ASSERT_EQ(cards.size(), 1);
 
-  chans = KvaserCanUtils::getChannelsOnCard(0);
-  ASSERT_EQ(chans.size(), 0);
+  chans = KvaserCanUtils::getChannelsOnCard(1);
+  ASSERT_EQ(chans.size(), 2);
 }
 
 TEST(KvaserCanUtils, setFlags)
@@ -94,24 +94,32 @@ TEST(KvaserCan, channelStatus)
   KvaserCan kv_can;
   CanMsg msg;
 
-  auto stat = kv_can.open(0, 0, 0, false);
-  ASSERT_EQ(stat, ReturnStatuses::NO_CHANNELS_FOUND);
-  ASSERT_EQ(kv_can.isOpen(), false);
+  auto stat = kv_can.open(1, 0, 250000, false);
+  ASSERT_EQ(stat, ReturnStatuses::OK);
+  ASSERT_EQ(kv_can.isOpen(), true);
 
   stat = kv_can.close();
-  ASSERT_EQ(stat, ReturnStatuses::CHANNEL_CLOSED);
+  ASSERT_EQ(stat, ReturnStatuses::OK);
   ASSERT_EQ(kv_can.isOpen(), false);
+
+  stat = kv_can.open(0, 500000);
+  ASSERT_EQ(stat, ReturnStatuses::OK);
+  ASSERT_EQ(kv_can.isOpen(), true);
 
   stat = kv_can.read(&msg);
-  ASSERT_EQ(stat, ReturnStatuses::CHANNEL_CLOSED);
-  ASSERT_EQ(kv_can.isOpen(), false);
+  ASSERT_EQ(stat, ReturnStatuses::NO_MESSAGES_RECEIVED);
+  ASSERT_EQ(kv_can.isOpen(), true);
 
   stat = kv_can.registerReadCallback(std::function<void(void)>(dummyCb));
-  ASSERT_EQ(stat, ReturnStatuses::CHANNEL_CLOSED);
-  ASSERT_EQ(kv_can.isOpen(), false);
+  ASSERT_EQ(stat, ReturnStatuses::OK);
+  ASSERT_EQ(kv_can.isOpen(), true);
 
   stat = kv_can.write(std::move(msg));
-  ASSERT_EQ(stat, ReturnStatuses::CHANNEL_CLOSED);
+  ASSERT_EQ(stat, ReturnStatuses::OK);
+  ASSERT_EQ(kv_can.isOpen(), true);
+
+  stat = kv_can.close();
+  ASSERT_EQ(stat, ReturnStatuses::OK);
   ASSERT_EQ(kv_can.isOpen(), false);
 }
 

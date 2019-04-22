@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-  <!-- Start Virtual Channels -->
-  <node name="vchannels" pkg="kvaser_interface" type="create_virtual_channels.sh" args="start" />
-
   <group ns="reader">
     <!-- Start Kvaser Can Bridge with Read/Write Ticks Enabled -->
     <node name="kvaser_can_bridge" pkg="kvaser_interface" type="kvaser_can_bridge">

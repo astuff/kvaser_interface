@@ -1,61 +1,93 @@
 version: 2
 jobs:
   kinetic:
-    docker:
-      - image: autonomoustuff/docker-builds:kinetic-ros-base
+    machine:
+      image: circleci/classic:edge
+      docker_layer_caching: true
     steps:
       - checkout
       - run:
-          name: Set Up Container
+          name: Install Linuxcan on Host
           command: |
-            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
-            apt-get update -qq && apt-get install -y linux-headers-generic linuxcan-dkms
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-            cd ..
-            catkin init
-            catkin config --extend /opt/ros/$ROS_DISTRO
+            sudo apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
+            sudo apt-get install -y linux-headers-`uname -r` linuxcan-dkms
+            sudo depmod
+            sudo virtualcan.sh start
+            cd /usr/src/linuxcan-*/canlib/examples
+            ./listChannels
       - run:
-          name: Build
+          name: Clone and Run AS Docker Image
           command: |
-            cd ..
-            catkin build
+            docker pull autonomoustuff/docker-builds:kinetic-ros-base
+            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:kinetic-ros-base sh -c "sleep infinity"
       - run:
-          name: Run Tests
+          name: Install Linuxcan in Docker
           command: |
-            source /opt/ros/kinetic/setup.bash
-            cd ..
-            catkin run_tests
-            catkin_test_results
+            docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms && apt update -qq"
+            docker exec test /bin/bash -c "apt install -y linux-headers-generic linuxcan-dkms"
+      - run:
+          name: Set Up ROS in Docker
+          command: |
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
+      - run:
+          name: Build in Docker
+          command: |
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin build"
+      - run:
+          name: Run Tests in Docker
+          command: |
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests && catkin_test_results"
+      - run:
+          name: Shut Down Container
+          command: |
+            docker kill $(docker ps -l -q)
     working_directory: ~/src
 
   melodic:
-    docker:
-      - image: autonomoustuff/docker-builds:melodic-ros-base
+    machine:
+      image: circleci/classic:edge
+      docker_layer_caching: true
     steps:
       - checkout
       - run:
-          name: Set Up Container
+          name: Install Linuxcan on Host
           command: |
-            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
-            apt-get update -qq && apt-get install -y linux-headers-generic linuxcan-dkms
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-            cd ..
-            catkin init
-            catkin config --extend /opt/ros/$ROS_DISTRO
+            sudo apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
+            sudo apt-get install -y linux-headers-`uname -r` linuxcan-dkms
+            sudo depmod
+            sudo virtualcan.sh start
+            cd /usr/src/linuxcan-*/canlib/examples
+            ./listChannels
       - run:
-          name: Build
+          name: Clone and Run AS Docker Image
           command: |
-            cd ..
-            catkin build
+            docker pull autonomoustuff/docker-builds:melodic-ros-base
+            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:melodic-ros-base sh -c "sleep infinity"
       - run:
-          name: Run Tests
+          name: Install Linuxcan in Docker
           command: |
-            source /opt/ros/melodic/setup.bash
-            cd ..
-            catkin run_tests
-            catkin_test_results
+            docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms && apt update -qq"
+            docker exec test /bin/bash -c "apt install -y linux-headers-generic linuxcan-dkms"
+      - run:
+          name: Set Up ROS in Docker
+          command: |
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
+      - run:
+          name: Build in Docker
+          command: |
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin build"
+      - run:
+          name: Run Tests in Docker
+          command: |
+            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests && catkin_test_results"
+      - run:
+          name: Shut Down Container
+          command: |
+            docker kill $(docker ps -l -q)
     working_directory: ~/src
 
   kinetic_release:
