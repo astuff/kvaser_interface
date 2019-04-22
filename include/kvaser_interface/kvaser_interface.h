@@ -225,7 +225,8 @@ class KvaserCanUtils
     static std::vector<std::shared_ptr<KvaserChannel>> getChannels();
     static std::vector<std::shared_ptr<KvaserChannel>> getChannelsOnCard(const uint64_t &serialNo);
     static std::string returnStatusDesc(const ReturnStatuses &ret);
-    static void setMsgFlags(CanMsg *msg, const uint32_t &flags);
+    static void setMsgFromFlags(CanMsg *msg, const uint32_t &flags);
+    static void setFlagsFromMsg(const CanMsg &msg, uint32_t *flags);
 };
 
 }  // namespace CAN
