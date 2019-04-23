@@ -169,8 +169,16 @@ TEST(KvaserCan, readWriteTests)
 
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
   ASSERT_EQ(reader_stat, ReturnStatuses::OK);
-  
-  // TODO: Implement reader/writer tests.
+
+  msg.id = 0x555;
+  msg.dlc = 8;
+  msg.flags.std_id = true;
+
+  for (auto i = 0; i < 4; ++i)
+  {
+    msg.data.push_back(0);
+    msg.data.push_back(1);
+  }
 
   writer_stat = kv_can_writer.close();
   reader_stat = kv_can_reader.close();
