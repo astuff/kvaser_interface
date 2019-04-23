@@ -8,7 +8,10 @@
 #include <kvaser_interface/kvaser_interface.h>
 #include <gtest/gtest.h>
 
-using namespace AS::CAN;  // NOLINT
+using AS::CAN::CanMsg;
+using AS::CAN::KvaserCan;
+using AS::CAN::KvaserCanUtils;
+using AS::CAN::ReturnStatuses;
 
 TEST(KvaserCanUtils, getChannels)
 {
@@ -26,6 +29,7 @@ TEST(KvaserCanUtils, getChannels)
   ASSERT_EQ(chans.size(), 2);
 }
 
+/*
 TEST(KvaserCanUtils, setFlags)
 {
   CanMsg msg;
@@ -84,47 +88,99 @@ TEST(KvaserCanUtils, setFlags)
   ASSERT_EQ(msg.error_flags.any_bit_err, false);
   ASSERT_EQ(msg.error_flags.any_rx_err, false);
 }
+*/
 
 void dummyCb()
 {
 }
 
-TEST(KvaserCan, channelStatus)
+TEST(KvaserCan, channelOpenClose)
+{
+  KvaserCan kv_can;
+
+  // Channel closed, call KvaserCan::open()
+  auto stat = kv_can.open(1, 0, 500000, false);
+  ASSERT_EQ(stat, ReturnStatuses::OK);
+  ASSERT_EQ(kv_can.isOpen(), true);
+
+  // Channel open, call KvaserCan::open()
+  stat = kv_can.open(1, 0, 250000, false);
+  ASSERT_EQ(stat, ReturnStatuses::OK);
+
+  // Channel open, call KvaserCan::isOpen()
+  ASSERT_EQ(kv_can.isOpen(), true);
+
+  // Channel open, call KvaserCan::close()
+  stat = kv_can.close();
+  ASSERT_EQ(stat, ReturnStatuses::OK);
+
+  // Channel closed, call KvaserCan::close()
+  stat = kv_can.close();
+  ASSERT_EQ(stat, ReturnStatuses::CHANNEL_CLOSED);
+
+  // Channel closed, call KvaserCan::isOpen()
+  ASSERT_EQ(kv_can.isOpen(), false);
+}
+
+TEST(KvaserCan, singleChannelTests)
 {
   KvaserCan kv_can;
   CanMsg msg;
 
-  auto stat = kv_can.open(1, 0, 250000, false);
+  auto stat = kv_can.open(0, 500000);
   ASSERT_EQ(stat, ReturnStatuses::OK);
-  ASSERT_EQ(kv_can.isOpen(), true);
 
-  stat = kv_can.close();
-  ASSERT_EQ(stat, ReturnStatuses::OK);
-  ASSERT_EQ(kv_can.isOpen(), false);
-
-  stat = kv_can.open(0, 500000);
-  ASSERT_EQ(stat, ReturnStatuses::OK);
-  ASSERT_EQ(kv_can.isOpen(), true);
-
+  // Channel open, no messages transmitted, call KvaserCan::read()
   stat = kv_can.read(&msg);
   ASSERT_EQ(stat, ReturnStatuses::NO_MESSAGES_RECEIVED);
-  ASSERT_EQ(kv_can.isOpen(), true);
 
+  // Channel open, call KvaserCan::registerReadCallback()
   stat = kv_can.registerReadCallback(std::function<void(void)>(dummyCb));
   ASSERT_EQ(stat, ReturnStatuses::OK);
-  ASSERT_EQ(kv_can.isOpen(), true);
 
+  // Channel open, call KvaserCan::write()
   stat = kv_can.write(std::move(msg));
   ASSERT_EQ(stat, ReturnStatuses::OK);
-  ASSERT_EQ(kv_can.isOpen(), true);
 
   stat = kv_can.close();
   ASSERT_EQ(stat, ReturnStatuses::OK);
-  ASSERT_EQ(kv_can.isOpen(), false);
+
+  // Channel closed, call KvaserCan::read()
+  stat = kv_can.read(&msg);
+  ASSERT_EQ(stat, ReturnStatuses::CHANNEL_CLOSED);
+
+  // Channel closed, call KvaserCan::registerReadCallback()
+  stat = kv_can.registerReadCallback(std::function<void(void)>(dummyCb));
+  ASSERT_EQ(stat, ReturnStatuses::CHANNEL_CLOSED);
+
+  // Channel closed, call KvaserCan::write()
+  stat = kv_can.write(std::move(msg));
+  ASSERT_EQ(stat, ReturnStatuses::CHANNEL_CLOSED);
+}
+
+TEST(KvaserCan, readWriteTests)
+{
+  KvaserCan kv_can_writer;
+  KvaserCan kv_can_reader;
+  CanMsg msg;
+
+  auto writer_stat = kv_can_writer.open(1, 500000);
+  auto reader_stat = kv_can_reader.open(0, 500000);
+
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
+  ASSERT_EQ(reader_stat, ReturnStatuses::OK);
+  
+  // TODO: Implement reader/writer tests.
+
+  writer_stat = kv_can_writer.close();
+  reader_stat = kv_can_reader.close();
+
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
+  ASSERT_EQ(reader_stat, ReturnStatuses::OK);
 }
 
 int main(int argc, char **argv)
 {
-  testing::InitGoogleTest(&argc, argv);
+  ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
