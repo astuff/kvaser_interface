@@ -20,11 +20,8 @@ using namespace AS::CAN;
 int bit_rate = 500000;
 int hardware_id = 0;
 int circuit_id = 0;
-bool debug_ticks = false;
 KvaserCan can_reader, can_writer;
 ros::Publisher can_tx_pub;
-ros::Publisher can_read_tick;
-ros::Publisher can_write_tick;
 
 void can_read()
 {
@@ -71,9 +68,6 @@ void can_read()
           can_pub_msg.header.stamp = ros::Time::now();
           can_tx_pub.publish(can_pub_msg);
         }
-
-        if (debug_ticks)
-          can_read_tick.publish(std_msgs::Empty());
       }
       else
       {
@@ -119,12 +113,7 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
 
     ret = can_writer.write(std::move(msg));
 
-    if (ret == ReturnStatuses::OK)
-    {
-      if (debug_ticks)
-        can_write_tick.publish(std_msgs::Empty());
-    }
-    else
+    if (ret != ReturnStatuses::OK)
     {
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s",
         static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
@@ -178,14 +167,6 @@ int main(int argc, char** argv)
     }
   }
 
-  if (priv.getParam("enable_debug_ticks", debug_ticks))
-  {
-    if (debug_ticks)
-    {
-      ROS_INFO("Kvaser CAN Interface - Debug ticks enabled.");
-    }
-  }
-
   if (exit)
   {
     ros::shutdown();
@@ -193,13 +174,6 @@ int main(int argc, char** argv)
   }
 
   can_tx_pub = n.advertise<can_msgs::Frame>("can_tx", 500);
-
-  if (debug_ticks)
-  {
-    can_read_tick = n.advertise<std_msgs::Empty>("can_read_tick", 100);
-    can_write_tick = n.advertise<std_msgs::Empty>("can_write_tick", 100);
-  }
-
   ros::Subscriber can_rx_sub = n.subscribe("can_rx", 500, can_rx_callback);
 
   ReturnStatuses ret;
