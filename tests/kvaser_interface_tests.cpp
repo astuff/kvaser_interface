@@ -162,7 +162,8 @@ TEST(KvaserCan, readWriteTests)
 {
   KvaserCan kv_can_writer;
   KvaserCan kv_can_reader;
-  CanMsg msg;
+  CanMsg sent_msg;
+  CanMsg rcvd_msg;
 
   auto writer_stat = kv_can_writer.open(1, 500000);
   auto reader_stat = kv_can_reader.open(0, 500000);
@@ -170,15 +171,24 @@ TEST(KvaserCan, readWriteTests)
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
   ASSERT_EQ(reader_stat, ReturnStatuses::OK);
 
-  msg.id = 0x555;
-  msg.dlc = 8;
-  msg.flags.std_id = true;
+  sent_msg.id = 0x555;
+  sent_msg.dlc = 8;
 
   for (auto i = 0; i < 4; ++i)
   {
-    msg.data.push_back(0);
-    msg.data.push_back(1);
+    sent_msg.data.push_back(0);
+    sent_msg.data.push_back(1);
   }
+
+  // Send standard CAN ID with no flags and 8 DLC
+  writer_stat = kv_can_writer.write(CanMsg(sent_msg));
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
+
+  // Receive standard CAN ID with no flags and 8 DLC
+  kv_can_reader.read(&rcvd_msg);
+  ASSERT_EQ(reader_stat, ReturnStatuses::OK);
+
+  // TODO(JWhitleyAStuff): Finish writing tests and write comparison operator.
 
   writer_stat = kv_can_writer.close();
   reader_stat = kv_can_reader.close();
