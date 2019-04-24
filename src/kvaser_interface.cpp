@@ -232,6 +232,12 @@ ReturnStatuses KvaserCan::write(CanMsg &&msg)
   if (*handle < 0)
     return ReturnStatuses::CHANNEL_CLOSED;
 
+  // DLC to Payload Size Check
+  auto payload_size = KvaserCanUtils::dlcToSize(msg.dlc);
+
+  if (payload_size != msg.data.size())
+    return ReturnStatuses::DLC_PAYLOAD_MISMATCH;
+
   uint32_t flags = 0;
   KvaserCanUtils::setFlagsFromMsg(msg, &flags);
 
