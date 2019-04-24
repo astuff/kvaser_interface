@@ -35,7 +35,8 @@ enum class ReturnStatuses
   NO_MESSAGES_RECEIVED = -5,
   READ_FAILED = -6,
   WRITE_FAILED = -7,
-  CLOSE_FAILED = -8
+  CLOSE_FAILED = -8,
+  DLC_PAYLOAD_MISMATCH = -9
 };
 
 enum class HardwareType
@@ -76,91 +77,108 @@ enum class HardwareType
   HWTYPE_CANLINHYBRID = 84
 };
 
-struct MsgFlags
+class MsgFlags
 {
-  inline bool operator==(const MsgFlags& other)
-  {
-    return (rtr == other.rtr &&
-      std_id == other.std_id &&
-      ext_id == other.ext_id &&
-      wakeup_mode == other.wakeup_mode &&
-      error_frame == other.error_frame &&
-      tx_ack == other.tx_ack &&
-      tx_rq == other.tx_rq &&
-      msg_delayed == other.msg_delayed &&
-      single_shot == other.single_shot &&
-      tx_nack == other.tx_nack &&
-      arb_lost == other.arb_lost &&
-      fd_msg == other.fd_msg &&
-      fd_bitrate_switch == other.fd_bitrate_switch &&
-      fd_sndr_err_pass_md == other.fd_sndr_err_pass_md);
-  }
+  public:
+    friend bool operator==(const MsgFlags& lhs, const MsgFlags& rhs);
 
-  bool rtr = false;
-  bool std_id = false;
-  bool ext_id = false;
-  bool wakeup_mode = false;
-  bool error_frame = false;
-  bool tx_ack = false;
-  bool tx_rq = false;
-  bool msg_delayed = false;
-  bool single_shot = false;
-  bool tx_nack = false;
-  bool arb_lost = false;
-  bool fd_msg = false;
-  bool fd_bitrate_switch = false;
-  bool fd_sndr_err_pass_md = false;
+    bool rtr = false;
+    bool std_id = false;
+    bool ext_id = false;
+    bool wakeup_mode = false;
+    bool error_frame = false;
+    bool tx_ack = false;
+    bool tx_rq = false;
+    bool msg_delayed = false;
+    bool single_shot = false;
+    bool tx_nack = false;
+    bool arb_lost = false;
+    bool fd_msg = false;
+    bool fd_bitrate_switch = false;
+    bool fd_sndr_err_pass_md = false;
 };
 
-struct MsgErrFlags
+bool operator==(const MsgFlags& lhs, const MsgFlags& rhs)
 {
-  inline bool operator==(const MsgErrFlags& other)
-  {
-    return (has_err == other.has_err &&
-      hw_overrun_err == other.hw_overrun_err &&
-      sw_overrun_err == other.sw_overrun_err &&
-      stuff_err == other.stuff_err &&
-      form_err == other.form_err &&
-      crc_err == other.crc_err &&
-      bit0_err == other.bit0_err &&
-      bit1_err == other.bit1_err &&
-      any_overrun_err == other.any_overrun_err &&
-      any_bit_err == other.any_bit_err &&
-      any_rx_err == other.any_rx_err);
-  }
+  return (lhs.rtr == rhs.rtr &&
+    lhs.std_id == rhs.std_id &&
+    lhs.ext_id == rhs.ext_id &&
+    lhs.wakeup_mode == rhs.wakeup_mode &&
+    lhs.error_frame == rhs.error_frame &&
+    lhs.tx_ack == rhs.tx_ack &&
+    lhs.tx_rq == rhs.tx_rq &&
+    lhs.msg_delayed == rhs.msg_delayed &&
+    lhs.single_shot == rhs.single_shot &&
+    lhs.tx_nack == rhs.tx_nack &&
+    lhs.arb_lost == rhs.arb_lost &&
+    lhs.fd_msg == rhs.fd_msg &&
+    lhs.fd_bitrate_switch == rhs.fd_bitrate_switch &&
+    lhs.fd_sndr_err_pass_md == rhs.fd_sndr_err_pass_md);
+}
 
-  bool has_err = false;
-  bool hw_overrun_err = false;
-  bool sw_overrun_err = false;
-  bool stuff_err = false;
-  bool form_err = false;
-  bool crc_err = false;
-  bool bit0_err = false;
-  bool bit1_err = false;
-  bool any_overrun_err = false;
-  bool any_bit_err = false;
-  bool any_rx_err = false;
+class MsgErrFlags
+{
+  public:
+    friend bool operator==(const MsgErrFlags& lhs, const MsgErrFlags& rhs);
+
+    bool has_err = false;
+    bool hw_overrun_err = false;
+    bool sw_overrun_err = false;
+    bool stuff_err = false;
+    bool form_err = false;
+    bool crc_err = false;
+    bool bit0_err = false;
+    bool bit1_err = false;
+    bool any_overrun_err = false;
+    bool any_bit_err = false;
+    bool any_rx_err = false;
 };
 
-struct CanMsg
+bool operator==(const MsgErrFlags& lhs, const MsgErrFlags& rhs)
 {
-  bool operator==(const CanMsg& other)
-  {
-    return (id == other.id &&
-      dlc == other.dlc &&
-      flags == other.flags &&
-      error_flags == other.error_flags &&
-      data == other.data &&
-      timestamp == other.timestamp);
-  }
+  return (lhs.has_err == rhs.has_err &&
+    lhs.hw_overrun_err == rhs.hw_overrun_err &&
+    lhs.sw_overrun_err == rhs.sw_overrun_err &&
+    lhs.stuff_err == rhs.stuff_err &&
+    lhs.form_err == rhs.form_err &&
+    lhs.crc_err == rhs.crc_err &&
+    lhs.bit0_err == rhs.bit0_err &&
+    lhs.bit1_err == rhs.bit1_err &&
+    lhs.any_overrun_err == rhs.any_overrun_err &&
+    lhs.any_bit_err == rhs.any_bit_err &&
+    lhs.any_rx_err == rhs.any_rx_err);
+}
 
-  uint32_t id = 0;
-  uint32_t dlc = 0;
-  MsgFlags flags;
-  MsgErrFlags error_flags;
-  std::vector<uint8_t> data;
-  uint64_t timestamp = 0;
+class CanMsg
+{
+  public:
+    inline bool operator==(const CanMsg& other)
+    {
+      return (id == other.id &&
+        dlc == other.dlc &&
+        flags == other.flags &&
+        error_flags == other.error_flags &&
+        data == other.data &&
+        timestamp == other.timestamp);
+    }
+
+    uint32_t id = 0;
+    uint32_t dlc = 0;
+    MsgFlags flags;
+    MsgErrFlags error_flags;
+    std::vector<uint8_t> data;
+    uint64_t timestamp = 0;
 };
+
+bool operator==(const CanMsg& lhs, const CanMsg& rhs)
+{
+  return (lhs.id == rhs.id &&
+    lhs.dlc == rhs.dlc &&
+    lhs.flags == rhs.flags &&
+    lhs.error_flags == rhs.error_flags &&
+    lhs.data == rhs.data &&
+    lhs.timestamp == rhs.timestamp);
+}
 
 class KvaserCard
 {

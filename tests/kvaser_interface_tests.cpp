@@ -171,30 +171,127 @@ TEST(KvaserCan, readWriteTests)
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
   ASSERT_EQ(reader_stat, ReturnStatuses::OK);
 
-  sent_msg.id = 0x555;
-  sent_msg.dlc = 8;
-
+  // Populate message data
   for (auto i = 0; i < 4; ++i)
   {
     sent_msg.data.push_back(0);
     sent_msg.data.push_back(1);
   }
 
-  // Send standard CAN ID with no flags and 8 DLC
+  // Send standard CAN ID with std flag true and extended flag false
+  sent_msg.id = 0x555;
+  sent_msg.dlc = 8;
+  sent_msg.flags.std_id = true;
+  sent_msg.flags.ext_id = false;
   writer_stat = kv_can_writer.write(CanMsg(sent_msg));
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
 
-  // Receive standard CAN ID with no flags and 8 DLC
+  // Receive standard CAN ID with std flag true and extended flag false
   kv_can_reader.read(&rcvd_msg);
   ASSERT_EQ(reader_stat, ReturnStatuses::OK);
 
-  // TODO(JWhitleyAStuff): Finish writing tests and write comparison operator.
+  // Check that sent and received messages are identical
+  ASSERT_EQ(sent_msg, rcvd_msg);
+
+  /*
+  // Send extended CAN ID with std flag false and extended flag true
+  sent_msg.id = 0x15555555;
+  sent_msg.dlc = 8;
+  sent_msg.flags.std_id = false;
+  sent_msg.flags.ext_id = true;
+  writer_stat = kv_can_writer.write(CanMsg(sent_msg));
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
+
+  // Receive extended CAN ID with std flag false and extended flag true
+  kv_can_reader.read(&rcvd_msg);
+  ASSERT_EQ(reader_stat, ReturnStatuses::OK);
+
+  // Check that sent and received messages are identical
+  ASSERT_EQ(sent_msg, rcvd_msg);
+  */
 
   writer_stat = kv_can_writer.close();
   reader_stat = kv_can_reader.close();
 
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
   ASSERT_EQ(reader_stat, ReturnStatuses::OK);
+}
+
+TEST(KvaserCan, writeTests)
+{
+  KvaserCan kv_can_writer;
+  CanMsg sent_msg;
+
+  auto writer_stat = kv_can_writer.open(0, 500000);
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
+
+  // Send standard CAN ID with 0 DLC and 0 payload bytes
+  sent_msg.id = 0x555;
+  sent_msg.dlc = 0;
+  sent_msg.data.clear();
+  sent_msg.flags.std_id = true;
+  writer_stat = kv_can_writer.write(CanMsg(sent_msg));
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
+
+  // Send standard CAN ID with 8 DLC and 0 payload bytes
+  sent_msg.id = 0x555;
+  sent_msg.dlc = 8;
+  sent_msg.data.clear();
+  sent_msg.flags.std_id = true;
+  writer_stat = kv_can_writer.write(CanMsg(sent_msg));
+  ASSERT_EQ(writer_stat, ReturnStatuses::DLC_PAYLOAD_MISMATCH);
+
+  // Populate message data
+  for (auto i = 0; i < 4; ++i)
+  {
+    sent_msg.data.push_back(0);
+    sent_msg.data.push_back(1);
+  }
+
+  // Send standard CAN ID with std flag true and extended flag true
+  sent_msg.id = 0x555;
+  sent_msg.dlc = 8;
+  sent_msg.flags.std_id = true;
+  sent_msg.flags.ext_id = true;
+  writer_stat = kv_can_writer.write(CanMsg(sent_msg));
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
+
+  /*
+  // Send extended CAN ID with 0 DLC and 0 payload bytes
+  sent_msg.id = 0x15555555;
+  sent_msg.dlc = 0;
+  sent_msg.data.clear();
+  sent_msg.flags.std_id = false;
+  sent_msg.flags.ext_id = true;
+  writer_stat = kv_can_writer.write(CanMsg(sent_msg));
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
+
+  // Populate message data
+  for (auto i = 0; i < 4; ++i)
+  {
+    sent_msg.data.push_back(0);
+    sent_msg.data.push_back(1);
+  }
+
+  // Send extended CAN ID with extended flag false and std flag false
+  sent_msg.id = 0x15555555;
+  sent_msg.dlc = 8;
+  sent_msg.flags.ext_id = false;
+  sent_msg.flags.std_id = false;
+  writer_stat = kv_can_writer.write(CanMsg(sent_msg));
+  ASSERT_EQ(writer_stat, ReturnStatuses::WRITE_FAILED);
+
+  // Send extended CAN ID with extended flag false and std flag true
+  sent_msg.id = 0x15555555;
+  sent_msg.dlc = 8;
+  sent_msg.flags.std_id = true;
+  sent_msg.flags.ext_id = false;
+  writer_stat = kv_can_writer.write(CanMsg(sent_msg));
+  ASSERT_EQ(writer_stat, ReturnStatuses::WRITE_FAILED);
+  */
+
+  writer_stat = kv_can_writer.close();
+  ASSERT_EQ(writer_stat, ReturnStatuses::OK);
 }
 
 int main(int argc, char **argv)
