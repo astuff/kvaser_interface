@@ -12,7 +12,6 @@
 
 #include <ros/ros.h>
 #include <kvaser_interface/kvaser_interface.h>
-#include <std_msgs/Empty.h>
 #include <can_msgs/Frame.h>
 
 using namespace AS::CAN;
