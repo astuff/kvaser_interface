@@ -171,6 +171,14 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
     return ReturnStatuses::CHANNEL_CLOSED;
   }
 
+  // Make sure the incoming message is empty
+  msg->id = 0;
+  msg->dlc = 0;
+  msg->flags.clear();
+  msg->error_flags.clear();
+  msg->data.clear();
+  msg->timestamp = 0;
+
   int64_t id_proxy = 0;
   uint32_t flags = 0;
   char data[64];

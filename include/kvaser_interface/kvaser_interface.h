@@ -82,6 +82,24 @@ class MsgFlags
   public:
     friend bool operator==(const MsgFlags& lhs, const MsgFlags& rhs);
 
+    void clear()
+    {
+      rtr = false;
+      std_id = false;
+      ext_id = false;
+      wakeup_mode = false;
+      error_frame = false;
+      tx_ack = false;
+      tx_rq = false;
+      msg_delayed = false;
+      single_shot = false;
+      tx_nack = false;
+      arb_lost = false;
+      fd_msg = false;
+      fd_bitrate_switch = false;
+      fd_sndr_err_pass_md = false;
+    }
+
     bool rtr = false;
     bool std_id = false;
     bool ext_id = false;
@@ -120,6 +138,21 @@ class MsgErrFlags
 {
   public:
     friend bool operator==(const MsgErrFlags& lhs, const MsgErrFlags& rhs);
+
+    void clear()
+    {
+      has_err = false;
+      hw_overrun_err = false;
+      sw_overrun_err = false;
+      stuff_err = false;
+      form_err = false;
+      crc_err = false;
+      bit0_err = false;
+      bit1_err = false;
+      any_overrun_err = false;
+      any_bit_err = false;
+      any_rx_err = false;
+    }
 
     bool has_err = false;
     bool hw_overrun_err = false;

@@ -193,7 +193,6 @@ TEST(KvaserCan, readWriteTests)
   // Check that sent and received messages are identical
   ASSERT_EQ(sent_msg, rcvd_msg);
 
-  /*
   // Send extended CAN ID with std flag false and extended flag true
   sent_msg.id = 0x15555555;
   sent_msg.dlc = 8;
@@ -208,7 +207,6 @@ TEST(KvaserCan, readWriteTests)
 
   // Check that sent and received messages are identical
   ASSERT_EQ(sent_msg, rcvd_msg);
-  */
 
   writer_stat = kv_can_writer.close();
   reader_stat = kv_can_reader.close();
@@ -256,7 +254,6 @@ TEST(KvaserCan, writeTests)
   writer_stat = kv_can_writer.write(CanMsg(sent_msg));
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
 
-  /*
   // Send extended CAN ID with 0 DLC and 0 payload bytes
   sent_msg.id = 0x15555555;
   sent_msg.dlc = 0;
@@ -288,7 +285,6 @@ TEST(KvaserCan, writeTests)
   sent_msg.flags.ext_id = false;
   writer_stat = kv_can_writer.write(CanMsg(sent_msg));
   ASSERT_EQ(writer_stat, ReturnStatuses::WRITE_FAILED);
-  */
 
   writer_stat = kv_can_writer.close();
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
