@@ -78,6 +78,24 @@ enum class HardwareType
 
 struct MsgFlags
 {
+  inline bool operator==(const MsgFlags& other)
+  {
+    return (rtr == other.rtr &&
+      std_id == other.std_id &&
+      ext_id == other.ext_id &&
+      wakeup_mode == other.wakeup_mode &&
+      error_frame == other.error_frame &&
+      tx_ack == other.tx_ack &&
+      tx_rq == other.tx_rq &&
+      msg_delayed == other.msg_delayed &&
+      single_shot == other.single_shot &&
+      tx_nack == other.tx_nack &&
+      arb_lost == other.arb_lost &&
+      fd_msg == other.fd_msg &&
+      fd_bitrate_switch == other.fd_bitrate_switch &&
+      fd_sndr_err_pass_md == other.fd_sndr_err_pass_md);
+  }
+
   bool rtr = false;
   bool std_id = false;
   bool ext_id = false;
@@ -96,6 +114,21 @@ struct MsgFlags
 
 struct MsgErrFlags
 {
+  inline bool operator==(const MsgErrFlags& other)
+  {
+    return (has_err == other.has_err &&
+      hw_overrun_err == other.hw_overrun_err &&
+      sw_overrun_err == other.sw_overrun_err &&
+      stuff_err == other.stuff_err &&
+      form_err == other.form_err &&
+      crc_err == other.crc_err &&
+      bit0_err == other.bit0_err &&
+      bit1_err == other.bit1_err &&
+      any_overrun_err == other.any_overrun_err &&
+      any_bit_err == other.any_bit_err &&
+      any_rx_err == other.any_rx_err);
+  }
+
   bool has_err = false;
   bool hw_overrun_err = false;
   bool sw_overrun_err = false;
@@ -111,6 +144,16 @@ struct MsgErrFlags
 
 struct CanMsg
 {
+  bool operator==(const CanMsg& other)
+  {
+    return (id == other.id &&
+      dlc == other.dlc &&
+      flags == other.flags &&
+      error_flags == other.error_flags &&
+      data == other.data &&
+      timestamp == other.timestamp);
+  }
+
   uint32_t id = 0;
   uint32_t dlc = 0;
   MsgFlags flags;
