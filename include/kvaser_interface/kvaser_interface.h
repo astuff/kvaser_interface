@@ -88,6 +88,7 @@ class MsgFlags
       std_id = false;
       ext_id = false;
       wakeup_mode = false;
+      nerr_active = false;
       error_frame = false;
       tx_ack = false;
       tx_rq = false;
@@ -104,6 +105,7 @@ class MsgFlags
     bool std_id = false;
     bool ext_id = false;
     bool wakeup_mode = false;
+    bool nerr_active = false;
     bool error_frame = false;
     bool tx_ack = false;
     bool tx_rq = false;
@@ -122,6 +124,7 @@ bool operator==(const MsgFlags& lhs, const MsgFlags& rhs)
     lhs.std_id == rhs.std_id &&
     lhs.ext_id == rhs.ext_id &&
     lhs.wakeup_mode == rhs.wakeup_mode &&
+    lhs.nerr_active == rhs.nerr_active &&
     lhs.error_frame == rhs.error_frame &&
     lhs.tx_ack == rhs.tx_ack &&
     lhs.tx_rq == rhs.tx_rq &&

@@ -574,6 +574,7 @@ void KvaserCanUtils::setMsgFromFlags(CanMsg *msg, const uint32_t &flags)
   msg->flags.std_id = ((flags & canMSG_STD) > 0);
   msg->flags.ext_id = ((flags & canMSG_EXT) > 0);
   msg->flags.wakeup_mode = ((flags & canMSG_WAKEUP) > 0);
+  msg->flags.nerr_active = ((flags & canMSG_NERR) > 0);
   msg->flags.error_frame = ((flags & canMSG_ERROR_FRAME) > 0);
   msg->flags.tx_ack = ((flags & canMSG_TXACK) > 0);
   msg->flags.tx_rq = ((flags & canMSG_TXRQ) > 0);
@@ -604,29 +605,30 @@ void KvaserCanUtils::setMsgFromFlags(CanMsg *msg, const uint32_t &flags)
 void KvaserCanUtils::setFlagsFromMsg(const CanMsg &msg, uint32_t *flags)
 {
   // Regular CAN message flags
-  *flags |= (msg.flags.rtr ? canMSG_RTR : 0);
-  *flags |= (msg.flags.std_id ? canMSG_STD : 0);
-  *flags |= (msg.flags.ext_id ? canMSG_EXT : 0);
-  *flags |= (msg.flags.wakeup_mode ? canMSG_WAKEUP : 0);
-  *flags |= (msg.flags.error_frame ? canMSG_ERROR_FRAME : 0);
-  *flags |= (msg.flags.tx_ack ? canMSG_TXACK : 0);
-  *flags |= (msg.flags.tx_rq ? canMSG_TXRQ : 0);
-  *flags |= (msg.flags.msg_delayed ? canMSG_DELAY_MSG : 0);
-  *flags |= (msg.flags.single_shot ? canMSG_SINGLE_SHOT : 0);
-  *flags |= (msg.flags.tx_nack ? canMSG_TXNACK : 0);
-  *flags |= (msg.flags.arb_lost ? canMSG_ABL : 0);
+  msg.flags.rtr ? *flags |= canMSG_RTR : *flags &= ~canMSG_RTR;
+  msg.flags.std_id ? *flags |= canMSG_STD : *flags &= ~canMSG_STD;
+  msg.flags.ext_id ? *flags |= canMSG_EXT : *flags &= ~canMSG_EXT;
+  msg.flags.wakeup_mode ? *flags |= canMSG_WAKEUP : *flags &= ~canMSG_WAKEUP;
+  msg.flags.nerr_active ? *flags |= canMSG_NERR : *flags &= ~canMSG_NERR;
+  msg.flags.error_frame ? *flags |= canMSG_ERROR_FRAME : *flags &= ~canMSG_ERROR_FRAME;
+  msg.flags.tx_ack ? *flags |= canMSG_TXACK : *flags &= ~canMSG_TXACK;
+  msg.flags.tx_rq ? *flags |= canMSG_TXRQ : *flags &= ~canMSG_TXRQ;
+  msg.flags.msg_delayed ? *flags |= canMSG_DELAY_MSG : *flags &= ~canMSG_DELAY_MSG;
+  msg.flags.single_shot ? *flags |= canMSG_SINGLE_SHOT : *flags &= ~canMSG_SINGLE_SHOT;
+  msg.flags.tx_nack ? *flags |= canMSG_TXNACK : *flags &= ~canMSG_TXNACK;
+  msg.flags.arb_lost ? *flags |= canMSG_ABL : *flags &= ~canMSG_ABL;
 
-  // CAN FD flags
-  *flags |= (msg.flags.fd_msg ? canFDMSG_FDF : 0);
-  *flags |= (msg.flags.fd_bitrate_switch ? canFDMSG_BRS : 0);
-  *flags |= (msg.flags.fd_sndr_err_pass_md ? canFDMSG_ESI : 0);
+  // CAN FD *flags
+  msg.flags.fd_msg ? *flags |= canFDMSG_FDF : *flags &= ~canFDMSG_FDF;
+  msg.flags.fd_bitrate_switch ? *flags |= canFDMSG_BRS : *flags &= ~canFDMSG_BRS;
+  msg.flags.fd_sndr_err_pass_md ? *flags |= canFDMSG_ESI : *flags &= ~canFDMSG_ESI;
 
-  // Error flags
-  *flags |= (msg.error_flags.hw_overrun_err ? canMSGERR_HW_OVERRUN : 0);
-  *flags |= (msg.error_flags.sw_overrun_err ? canMSGERR_SW_OVERRUN : 0);
-  *flags |= (msg.error_flags.stuff_err ? canMSGERR_STUFF : 0);
-  *flags |= (msg.error_flags.form_err ? canMSGERR_FORM : 0);
-  *flags |= (msg.error_flags.crc_err ? canMSGERR_CRC : 0);
-  *flags |= (msg.error_flags.bit0_err ? canMSGERR_BIT0 : 0);
-  *flags |= (msg.error_flags.bit1_err ? canMSGERR_BIT1 : 0);
+  // Error *flags
+  msg.error_flags.hw_overrun_err ? *flags |= canMSGERR_HW_OVERRUN : *flags &= ~canMSGERR_HW_OVERRUN;
+  msg.error_flags.sw_overrun_err ? *flags |= canMSGERR_SW_OVERRUN : *flags &= ~canMSGERR_SW_OVERRUN;
+  msg.error_flags.stuff_err ? *flags |= canMSGERR_STUFF : *flags &= ~canMSGERR_STUFF;
+  msg.error_flags.form_err ? *flags |= canMSGERR_FORM : *flags &= ~canMSGERR_FORM;
+  msg.error_flags.crc_err ? *flags |= canMSGERR_CRC : *flags &= ~canMSGERR_CRC;
+  msg.error_flags.bit0_err ? *flags |= canMSGERR_BIT0 : *flags &= ~canMSGERR_BIT0;
+  msg.error_flags.bit1_err ? *flags |= canMSGERR_BIT1 : *flags &= ~canMSGERR_BIT1;
 }

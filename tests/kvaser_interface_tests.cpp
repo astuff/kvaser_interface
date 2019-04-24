@@ -126,9 +126,12 @@ TEST(KvaserCanUtils, setFlags)
   ASSERT_GT((flags & canMSGERR_BIT0), 0);
   ASSERT_GT((flags & canMSGERR_BIT1), 0);
 
+  // Set all flags in msg to false
+  KvaserCanUtils::setMsgFromFlags(&msg, 0x00000000);
+
   // Set all flags in int to false
   KvaserCanUtils::setFlagsFromMsg(msg, &flags);
-  ASSERT_EQ(flags, 0);
+  ASSERT_EQ(flags, 0x00000000);
 }
 
 void dummyCb()
