@@ -6,6 +6,7 @@
 */
 
 #include <kvaser_interface/kvaser_interface.h>
+#include <canstat.h>
 #include <gtest/gtest.h>
 
 using AS::CAN::CanMsg;
@@ -29,11 +30,12 @@ TEST(KvaserCanUtils, getChannels)
   ASSERT_EQ(chans.size(), 2);
 }
 
-/*
 TEST(KvaserCanUtils, setFlags)
 {
+  // All flags start false
   CanMsg msg;
 
+  // Set all flags in msg to true
   KvaserCanUtils::setMsgFromFlags(&msg, 0xFFFFFFFF);
   ASSERT_EQ(msg.flags.rtr, true);
   ASSERT_EQ(msg.flags.std_id, true);
@@ -61,6 +63,7 @@ TEST(KvaserCanUtils, setFlags)
   ASSERT_EQ(msg.error_flags.any_bit_err, true);
   ASSERT_EQ(msg.error_flags.any_rx_err, true);
 
+  // Set all flags in msg to false
   KvaserCanUtils::setMsgFromFlags(&msg, 0x00000000);
   ASSERT_EQ(msg.flags.rtr, false);
   ASSERT_EQ(msg.flags.std_id, false);
@@ -87,8 +90,46 @@ TEST(KvaserCanUtils, setFlags)
   ASSERT_EQ(msg.error_flags.any_overrun_err, false);
   ASSERT_EQ(msg.error_flags.any_bit_err, false);
   ASSERT_EQ(msg.error_flags.any_rx_err, false);
+
+  uint32_t flags = 0;
+  // Set all flags in msg to true
+  KvaserCanUtils::setMsgFromFlags(&msg, 0xFFFFFFFF);
+
+  // Set all flags in int to true
+  KvaserCanUtils::setFlagsFromMsg(msg, &flags);
+
+  // Check information flags
+  ASSERT_GT((flags & canMSG_RTR), 0);
+  ASSERT_GT((flags & canMSG_STD), 0);
+  ASSERT_GT((flags & canMSG_EXT), 0);
+  ASSERT_GT((flags & canMSG_WAKEUP), 0);
+  ASSERT_GT((flags & canMSG_NERR), 0);
+  ASSERT_GT((flags & canMSG_ERROR_FRAME), 0);
+  ASSERT_GT((flags & canMSG_TXACK), 0);
+  ASSERT_GT((flags & canMSG_TXRQ), 0);
+  ASSERT_GT((flags & canMSG_DELAY_MSG), 0);
+  ASSERT_GT((flags & canMSG_SINGLE_SHOT), 0);
+  ASSERT_GT((flags & canMSG_TXNACK), 0);
+  ASSERT_GT((flags & canMSG_ABL), 0);
+
+  // Check CAN FD flags
+  ASSERT_GT((flags & canFDMSG_FDF), 0);
+  ASSERT_GT((flags & canFDMSG_BRS), 0);
+  ASSERT_GT((flags & canFDMSG_ESI), 0);
+
+  // Check error flags
+  ASSERT_GT((flags & canMSGERR_HW_OVERRUN), 0);
+  ASSERT_GT((flags & canMSGERR_SW_OVERRUN), 0);
+  ASSERT_GT((flags & canMSGERR_STUFF), 0);
+  ASSERT_GT((flags & canMSGERR_FORM), 0);
+  ASSERT_GT((flags & canMSGERR_CRC), 0);
+  ASSERT_GT((flags & canMSGERR_BIT0), 0);
+  ASSERT_GT((flags & canMSGERR_BIT1), 0);
+
+  // Set all flags in int to false
+  KvaserCanUtils::setFlagsFromMsg(msg, &flags);
+  ASSERT_EQ(flags, 0);
 }
-*/
 
 void dummyCb()
 {
