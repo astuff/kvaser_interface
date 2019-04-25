@@ -113,8 +113,10 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
     ret = can_writer.write(std::move(msg));
 
     if (ret != ReturnStatuses::OK)
+    {
       ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s",
         static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+    }
   }
 }
 
@@ -128,10 +130,6 @@ int main(int argc, char** argv)
   ros::NodeHandle priv("~");
   ros::AsyncSpinner spinner(1);
 
-  can_tx_pub = n.advertise<can_msgs::Frame>("can_tx", 500);
-
-  ros::Subscriber can_rx_sub = n.subscribe("can_rx", 500, can_rx_callback);
-
   // Wait for time to be valid
   ros::Time::waitForValid();
 
@@ -139,7 +137,7 @@ int main(int argc, char** argv)
   {
     ROS_INFO("Kvaser CAN Interface - Got hardware_id: %d", hardware_id);
 
-    if (hardware_id <= 0)
+    if (hardware_id < 0)
     {
       ROS_ERROR("Kvaser CAN Interface - CAN hardware ID is invalid.");
       exit = true;
@@ -173,6 +171,9 @@ int main(int argc, char** argv)
     ros::shutdown();
     return 0;
   }
+
+  can_tx_pub = n.advertise<can_msgs::Frame>("can_tx", 500);
+  ros::Subscriber can_rx_sub = n.subscribe("can_rx", 500, can_rx_callback);
 
   ReturnStatuses ret;
 
