@@ -2,8 +2,8 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.0.3 (2019-04-26)
+------------------
 * Fixing additional bug with setting flags.
 * Added flag tests.
 * Adding comparison operators to custom structs.
