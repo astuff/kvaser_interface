@@ -2,6 +2,19 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixing additional bug with setting flags.
+* Added flag tests.
+* Adding comparison operators to custom structs.
+* Adding more unit tests.
+* Merge pull request `#31 <https://github.com/astuff/kvaser_interface/issues/31>`_ from astuff/fix/extended_id_transmission
+* Hotfix: Flags were not being propery set on transmitted messages.
+* Adding basic tests and infrastructure for node tests.
+* Merge pull request `#32 <https://github.com/astuff/kvaser_interface/issues/32>`_ from astuff/maint/ci_remove_lunar
+* CI: Remove Lunar (EOL) build.
+* Contributors: Daniel-Stanek, Joshua Whitley
+
 4.0.2 (2019-03-31)
 ------------------
 * Merge pull request `#29 <https://github.com/astuff/kvaser_interface/issues/29>`_ from astuff/hotfix/reader_bug
