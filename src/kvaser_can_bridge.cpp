@@ -59,7 +59,7 @@ void can_read()
           can_msgs::Frame can_pub_msg;
           can_pub_msg.header.frame_id = "0";
           can_pub_msg.id = msg.id;
-          can_pub_msg.dlc = msg.data.size();
+          can_pub_msg.dlc = msg.dlc;
           can_pub_msg.is_extended = msg.flags.ext_id;
           can_pub_msg.is_error = msg.flags.error_frame;
           can_pub_msg.is_rtr = msg.flags.rtr;
@@ -105,7 +105,9 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
     msg.flags.ext_id = ros_msg->is_extended;
     msg.flags.rtr = ros_msg->is_rtr;
 
-    for (size_t i = 0; i < ros_msg->data.size(); ++i)
+    auto msg_size = KvaserCanUtils::dlcToSize(ros_msg->dlc);
+
+    for (size_t i = 0; i < msg_size; ++i)
     {
       msg.data.push_back(ros_msg->data[i]);
     }
