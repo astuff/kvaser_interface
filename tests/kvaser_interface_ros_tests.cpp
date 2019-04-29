@@ -8,36 +8,153 @@
 #include <ros/ros.h>
 #include <kvaser_interface/kvaser_interface.h>
 #include <can_msgs/Frame.h>
+#include <gtest/gtest.h>
 
-can_msgs::Frame test_frame_1,
-  test_frame_2,
-  test_frame_3,
-  test_frame_4;
+#include <vector>
+
+std::vector<can_msgs::Frame::ConstPtr> rcvd_msgs;
+
+TEST(ROSKvaserInterface, MessageContents)
+{
+  ASSERT_EQ(rcvd_msgs.size(), 3) << "Incorrect number of valid messages received.";
+
+  for (const auto& msg : rcvd_msgs)
+  {
+    switch (msg->header.seq)
+    {
+      case 0:
+      {
+        ASSERT_EQ(msg->id, 0x555) << "Got incorrect message ID on seq 0.";
+        ASSERT_EQ(msg->dlc, 8) << "Got incorrect DLC on seq 0.";
+        ASSERT_FALSE(msg->is_rtr) << "Got unexptected is_rtr value on seq 0.";
+        ASSERT_FALSE(msg->is_extended) << "Got unexpected is_extended value on seq 0.";
+        ASSERT_FALSE(msg->is_error) << "Got unexpected is_error value on seq 0.";
+
+        for (auto i = 0; i < msg->data.size(); ++i)
+        {
+          if (i % 2 == 0)
+            ASSERT_EQ(msg->data[i], 0x55) << "Got unexpected payload value on seq 0, byte " << i;
+          else
+            ASSERT_EQ(msg->data[i], 0xAA) << "Got unexpected payload value on seq 0, byte " << i;
+        }
+      }
+      break;
+      case 1:
+      {
+        ASSERT_EQ(msg->id, 0x555) << "Got incorrect message ID on seq 1.";
+        ASSERT_EQ(msg->dlc, 8) << "Got incorrect DLC on seq 1.";
+        ASSERT_FALSE(msg->is_rtr) << "Got unexptected is_rtr value on seq 1.";
+        ASSERT_FALSE(msg->is_extended) << "Got unexpected is_extended value on seq 1.";
+        ASSERT_FALSE(msg->is_error) << "Got unexpected is_error value on seq 1.";
+
+        for (auto i = 0; i < msg->data.size(); ++i)
+        {
+          ASSERT_EQ(msg->data[i], 0) << "Got unexpected payload value on seq 1, byte " << i;
+        }
+      }
+      break;
+      case 2:
+        FAIL() << "Received message seq 2 which should have caused a write failure.";
+        break;
+      case 3:
+      {
+        ASSERT_EQ(msg->id, 0x15555555) << "Got incorrect message ID on seq 3.";
+        ASSERT_EQ(msg->dlc, 8) << "Got incorrect DLC on seq 3.";
+        ASSERT_FALSE(msg->is_rtr) << "Got unexptected is_rtr value on seq 3.";
+        ASSERT_TRUE(msg->is_extended) << "Got unexpected is_extended value on seq 3.";
+        ASSERT_FALSE(msg->is_error) << "Got unexpected is_error value on seq 3.";
+
+        for (auto i = 0; i < msg->data.size(); ++i)
+        {
+          if (i % 2 == 0)
+            ASSERT_EQ(msg->data[i], 0x55) << "Got unexpected payload value on seq 3, byte " << i;
+          else
+            ASSERT_EQ(msg->data[i], 0xAA) << "Got unexpected payload value on seq 3, byte " << i;
+        }
+      }
+      break;
+      case 4:
+        FAIL() << "Received message seq 4 which should have caused a write failure.";
+        break;
+      default:
+        FAIL() << "Received message seq " << msg->header.seq << " which was unexpected.";
+    }
+  }
+}
+
+void reader_callback(const can_msgs::Frame::ConstPtr& msg)
+{
+  rcvd_msgs.push_back(msg);
+}
 
 int main(int argc, char** argv)
 {
+  ::testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "Kvaser Interface Testing Node");
   ros::NodeHandle nh;
-  ros::NodeHandle pnh("~");
 
-  // Populate test frames
-  test_frame_1.header.seq = 0;
-  test_frame_1.id = 0x555;
-  test_frame_1.dlc = 8;
+  auto msg_pub = nh.advertise<can_msgs::Frame>("/writer3/can_rx", 20);
+  auto msg_sub = nh.subscribe("/reader3/can_tx", 20, reader_callback);
 
-  for (auto i = 0; i < test_frame_1.dlc; ++i)
+  // Wait until reader and writer are ready
+  while (true)
   {
-    test_frame_1.data[i] = (i % 2 == 0) ? 1 : 0;
+    if (msg_pub.getNumSubscribers() < 1 &&
+        msg_sub.getNumPublishers() < 1)
+      ros::Duration(0.1).sleep();
+    else
+      break;
   }
 
-  test_frame_2.header.seq = 1;
-  test_frame_2.id = 0x555;
-  test_frame_2.dlc = 4;
+  can_msgs::Frame can_msg;
 
-  for (auto i = 0; i < test_frame_1.dlc; ++i)
+  // Standard ID and DLC matches payload
+  can_msg.header.seq = 0;
+  can_msg.id = 0x555;
+  can_msg.dlc = 8;
+
+  for (auto i = 0; i < can_msg.dlc; ++i)
   {
-    test_frame_1.data[i] = (i % 2 == 0) ? 1 : 0;
+    can_msg.data[i] = (i % 2 == 0) ? 0x55 : 0xAA;
   }
 
-  return 0;
+  msg_pub.publish(can_msg);
+
+  // Standard ID and DLC does not match payload
+  can_msg.header.seq = 1;
+  can_msg.dlc = 0;
+
+  msg_pub.publish(can_msg);
+
+  // Standard ID but is_extended = true
+  // Should not be received (write failure)
+  can_msg.header.seq = 2;
+  can_msg.is_extended = true;
+  can_msg.dlc = 8;
+
+  msg_pub.publish(can_msg);
+
+  // Extended ID and is_extended = true
+  can_msg.header.seq = 3;
+  can_msg.id = 0x15555555;
+
+  msg_pub.publish(can_msg);
+
+  // Extended ID and is_extended = false
+  // Should not be received (write failure)
+  can_msg.header.seq = 4;
+  can_msg.is_extended = false;
+
+  msg_pub.publish(can_msg);
+
+  auto later = ros::Time::now() + ros::Duration(5.0);
+
+  // Spin for 5 seconds, then run tests
+  while (later > ros::Time::now())
+  {
+    ros::spinOnce();
+    ros::Duration(0.1).sleep();
+  }
+
+  return RUN_ALL_TESTS();
 }

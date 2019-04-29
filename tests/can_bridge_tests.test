@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Start Kvaser Can Bridge reader -->
+  <node name="kvaser_can_bridge" pkg="kvaser_interface" type="kvaser_can_bridge" ns="reader3">
+    <param name="can_hardware_id" value="3" />
+    <param name="can_circuit_id" value="0" />
+    <param name="can_bit_rate" value="500000" />
+  </node>
+
+  <!-- Start Kvaser Can Bridge writer -->
+  <node name="kvaser_can_bridge" pkg="kvaser_interface" type="kvaser_can_bridge" ns="writer3">
+    <param name="can_hardware_id" value="3" />
+    <param name="can_circuit_id" value="1" />
+    <param name="can_bit_rate" value="500000" />
+  </node>
+
+  <test test-name="can_bridge_tests" pkg="kvaser_interface" type="kvaser_interface_ros_tests" time-limit="15.0" />
+</launch>
