@@ -18,73 +18,49 @@ TEST(ROSKvaserInterface, MessageContents)
 {
   ASSERT_EQ(rcvd_msgs.size(), 3) << "Incorrect number of valid messages received.";
 
-  for (const auto& msg : rcvd_msgs)
+  // Hoping we receive them in the same order they were sent.
+  ASSERT_EQ(rcvd_msgs[0]->id, 0x555) << "Got incorrect message ID on msg 0.";
+  ASSERT_EQ(rcvd_msgs[0]->dlc, 8) << "Got incorrect DLC on msg 0.";
+  ASSERT_FALSE(rcvd_msgs[0]->is_rtr) << "Got unexptected is_rtr value on msg 0.";
+  ASSERT_FALSE(rcvd_msgs[0]->is_extended) << "Got unexpected is_extended value on msg 0.";
+  ASSERT_FALSE(rcvd_msgs[0]->is_error) << "Got unexpected is_error value on msg 0.";
+
+  for (auto i = 0; i < rcvd_msgs[0]->data.size(); ++i)
   {
-    switch (msg->header.seq)
-    {
-      case 0:
-      {
-        ASSERT_EQ(msg->id, 0x555) << "Got incorrect message ID on seq 0.";
-        ASSERT_EQ(msg->dlc, 8) << "Got incorrect DLC on seq 0.";
-        ASSERT_FALSE(msg->is_rtr) << "Got unexptected is_rtr value on seq 0.";
-        ASSERT_FALSE(msg->is_extended) << "Got unexpected is_extended value on seq 0.";
-        ASSERT_FALSE(msg->is_error) << "Got unexpected is_error value on seq 0.";
+    if (i % 2 == 0)
+      ASSERT_EQ(rcvd_msgs[0]->data[i], 0x55) << "Got unexpected payload value on msg 0, byte " << i;
+    else
+      ASSERT_EQ(rcvd_msgs[0]->data[i], 0xAA) << "Got unexpected payload value on msg 0, byte " << i;
+  }
+  
+  ASSERT_EQ(rcvd_msgs[1]->id, 0x555) << "Got incorrect message ID on msg 1.";
+  ASSERT_EQ(rcvd_msgs[1]->dlc, 8) << "Got incorrect DLC on msg 1.";
+  ASSERT_FALSE(rcvd_msgs[1]->is_rtr) << "Got unexptected is_rtr value on msg 1.";
+  ASSERT_FALSE(rcvd_msgs[1]->is_extended) << "Got unexpected is_extended value on msg 1.";
+  ASSERT_FALSE(rcvd_msgs[1]->is_error) << "Got unexpected is_error value on msg 1.";
 
-        for (auto i = 0; i < msg->data.size(); ++i)
-        {
-          if (i % 2 == 0)
-            ASSERT_EQ(msg->data[i], 0x55) << "Got unexpected payload value on seq 0, byte " << i;
-          else
-            ASSERT_EQ(msg->data[i], 0xAA) << "Got unexpected payload value on seq 0, byte " << i;
-        }
-      }
-      break;
-      case 1:
-      {
-        ASSERT_EQ(msg->id, 0x555) << "Got incorrect message ID on seq 1.";
-        ASSERT_EQ(msg->dlc, 8) << "Got incorrect DLC on seq 1.";
-        ASSERT_FALSE(msg->is_rtr) << "Got unexptected is_rtr value on seq 1.";
-        ASSERT_FALSE(msg->is_extended) << "Got unexpected is_extended value on seq 1.";
-        ASSERT_FALSE(msg->is_error) << "Got unexpected is_error value on seq 1.";
+  for (auto i = 0; i < rcvd_msgs[1]->data.size(); ++i)
+  {
+    ASSERT_EQ(rcvd_msgs[1]->data[i], 0) << "Got unexpected payload value on msg 1, byte " << i;
+  }
 
-        for (auto i = 0; i < msg->data.size(); ++i)
-        {
-          ASSERT_EQ(msg->data[i], 0) << "Got unexpected payload value on seq 1, byte " << i;
-        }
-      }
-      break;
-      case 2:
-        FAIL() << "Received message seq 2 which should have caused a write failure.";
-        break;
-      case 3:
-      {
-        ASSERT_EQ(msg->id, 0x15555555) << "Got incorrect message ID on seq 3.";
-        ASSERT_EQ(msg->dlc, 8) << "Got incorrect DLC on seq 3.";
-        ASSERT_FALSE(msg->is_rtr) << "Got unexptected is_rtr value on seq 3.";
-        ASSERT_TRUE(msg->is_extended) << "Got unexpected is_extended value on seq 3.";
-        ASSERT_FALSE(msg->is_error) << "Got unexpected is_error value on seq 3.";
+  ASSERT_EQ(rcvd_msgs[2]->id, 0x15555555) << "Got incorrect message ID on msg 2.";
+  ASSERT_EQ(rcvd_msgs[2]->dlc, 8) << "Got incorrect DLC on msg 2.";
+  ASSERT_FALSE(rcvd_msgs[2]->is_rtr) << "Got unexptected is_rtr value on msg 2.";
+  ASSERT_TRUE(rcvd_msgs[2]->is_extended) << "Got unexpected is_extended value on msg 2.";
+  ASSERT_FALSE(rcvd_msgs[2]->is_error) << "Got unexpected is_error value on msg 2.";
 
-        for (auto i = 0; i < msg->data.size(); ++i)
-        {
-          if (i % 2 == 0)
-            ASSERT_EQ(msg->data[i], 0x55) << "Got unexpected payload value on seq 3, byte " << i;
-          else
-            ASSERT_EQ(msg->data[i], 0xAA) << "Got unexpected payload value on seq 3, byte " << i;
-        }
-      }
-      break;
-      case 4:
-        FAIL() << "Received message seq 4 which should have caused a write failure.";
-        break;
-      default:
-        FAIL() << "Received message seq " << msg->header.seq << " which was unexpected.";
-    }
+  for (auto i = 0; i < rcvd_msgs[2]->data.size(); ++i)
+  {
+    if (i % 2 == 0)
+      ASSERT_EQ(rcvd_msgs[2]->data[i], 0x55) << "Got unexpected payload value on msg 2, byte " << i;
+    else
+      ASSERT_EQ(rcvd_msgs[2]->data[i], 0xAA) << "Got unexpected payload value on msg 2, byte " << i;
   }
 }
 
 void reader_callback(const can_msgs::Frame::ConstPtr& msg)
 {
-  std::cout << "********* GOT A MESSAGE **********" << std::endl;
   rcvd_msgs.push_back(msg);
 }
 
@@ -109,6 +85,10 @@ int main(int argc, char** argv)
 
   can_msgs::Frame can_msg;
 
+  can_msg.is_rtr = false;
+  can_msg.is_extended = false;
+  can_msg.is_error = false;
+
   // Standard ID and DLC matches payload
   can_msg.header.seq = 0;
   can_msg.id = 0x555;
@@ -121,6 +101,7 @@ int main(int argc, char** argv)
 
   msg_pub.publish(can_msg);
 
+  /*
   // Standard ID and DLC does not match payload
   can_msg.header.seq = 1;
   can_msg.dlc = 0;
@@ -147,6 +128,7 @@ int main(int argc, char** argv)
   can_msg.is_extended = false;
 
   msg_pub.publish(can_msg);
+  */
 
   auto later = ros::Time::now() + ros::Duration(3.0);
 
