@@ -16,46 +16,64 @@ std::vector<can_msgs::Frame::ConstPtr> rcvd_msgs;
 
 TEST(ROSKvaserInterface, MessageContents)
 {
-  ASSERT_EQ(rcvd_msgs.size(), 3) << "Incorrect number of valid messages received.";
+  ASSERT_EQ(rcvd_msgs.size(), 4) << "Incorrect number of valid messages received.";
 
   // Hoping we receive them in the same order they were sent.
-  ASSERT_EQ(rcvd_msgs[0]->id, 0x555) << "Got incorrect message ID on msg 0.";
-  ASSERT_EQ(rcvd_msgs[0]->dlc, 8) << "Got incorrect DLC on msg 0.";
-  ASSERT_FALSE(rcvd_msgs[0]->is_rtr) << "Got unexptected is_rtr value on msg 0.";
-  ASSERT_FALSE(rcvd_msgs[0]->is_extended) << "Got unexpected is_extended value on msg 0.";
-  ASSERT_FALSE(rcvd_msgs[0]->is_error) << "Got unexpected is_error value on msg 0.";
+  // MSG 1
+  ASSERT_EQ(rcvd_msgs[0]->id, 0x555) << "Got incorrect message ID on msg 1.";
+  ASSERT_EQ(rcvd_msgs[0]->dlc, 8) << "Got incorrect DLC on msg 1.";
+  ASSERT_FALSE(rcvd_msgs[0]->is_rtr) << "Got unexptected is_rtr value on msg 1.";
+  ASSERT_FALSE(rcvd_msgs[0]->is_extended) << "Got unexpected is_extended value on msg 1.";
+  ASSERT_FALSE(rcvd_msgs[0]->is_error) << "Got unexpected is_error value on msg 1.";
 
   for (auto i = 0; i < rcvd_msgs[0]->data.size(); ++i)
   {
     if (i % 2 == 0)
-      ASSERT_EQ(rcvd_msgs[0]->data[i], 0x55) << "Got unexpected payload value on msg 0, byte " << i;
+      ASSERT_EQ(rcvd_msgs[0]->data[i], 0x55) << "Got unexpected payload value on msg 1, byte " << i;
     else
-      ASSERT_EQ(rcvd_msgs[0]->data[i], 0xAA) << "Got unexpected payload value on msg 0, byte " << i;
+      ASSERT_EQ(rcvd_msgs[0]->data[i], 0xAA) << "Got unexpected payload value on msg 1, byte " << i;
   }
 
-  ASSERT_EQ(rcvd_msgs[1]->id, 0x555) << "Got incorrect message ID on msg 1.";
-  ASSERT_EQ(rcvd_msgs[1]->dlc, 8) << "Got incorrect DLC on msg 1.";
-  ASSERT_FALSE(rcvd_msgs[1]->is_rtr) << "Got unexptected is_rtr value on msg 1.";
-  ASSERT_FALSE(rcvd_msgs[1]->is_extended) << "Got unexpected is_extended value on msg 1.";
-  ASSERT_FALSE(rcvd_msgs[1]->is_error) << "Got unexpected is_error value on msg 1.";
+  // MSG 2
+  ASSERT_EQ(rcvd_msgs[1]->id, 0x555) << "Got incorrect message ID on msg 2.";
+  ASSERT_EQ(rcvd_msgs[1]->dlc, 0) << "Got incorrect DLC on msg 2.";
+  ASSERT_FALSE(rcvd_msgs[1]->is_rtr) << "Got unexptected is_rtr value on msg 2.";
+  ASSERT_FALSE(rcvd_msgs[1]->is_extended) << "Got unexpected is_extended value on msg 2.";
+  ASSERT_FALSE(rcvd_msgs[1]->is_error) << "Got unexpected is_error value on msg 2.";
 
   for (auto i = 0; i < rcvd_msgs[1]->data.size(); ++i)
   {
-    ASSERT_EQ(rcvd_msgs[1]->data[i], 0) << "Got unexpected payload value on msg 1, byte " << i;
+    ASSERT_EQ(rcvd_msgs[1]->data[i], 0) << "Got unexpected payload value on msg 2, byte " << i;
   }
 
-  ASSERT_EQ(rcvd_msgs[2]->id, 0x15555555) << "Got incorrect message ID on msg 2.";
-  ASSERT_EQ(rcvd_msgs[2]->dlc, 8) << "Got incorrect DLC on msg 2.";
-  ASSERT_FALSE(rcvd_msgs[2]->is_rtr) << "Got unexptected is_rtr value on msg 2.";
-  ASSERT_TRUE(rcvd_msgs[2]->is_extended) << "Got unexpected is_extended value on msg 2.";
-  ASSERT_FALSE(rcvd_msgs[2]->is_error) << "Got unexpected is_error value on msg 2.";
+  // MSG 3
+  ASSERT_EQ(rcvd_msgs[2]->id, 0x555) << "Got incorrect message ID on msg 3.";
+  ASSERT_EQ(rcvd_msgs[2]->dlc, 8) << "Got incorrect DLC on msg 3.";
+  ASSERT_FALSE(rcvd_msgs[2]->is_rtr) << "Got unexptected is_rtr value on msg 3.";
+  ASSERT_TRUE(rcvd_msgs[2]->is_extended) << "Got unexpected is_extended value on msg 3.";
+  ASSERT_FALSE(rcvd_msgs[2]->is_error) << "Got unexpected is_error value on msg 3.";
 
   for (auto i = 0; i < rcvd_msgs[2]->data.size(); ++i)
   {
     if (i % 2 == 0)
-      ASSERT_EQ(rcvd_msgs[2]->data[i], 0x55) << "Got unexpected payload value on msg 2, byte " << i;
+      ASSERT_EQ(rcvd_msgs[2]->data[i], 0x55) << "Got unexpected payload value on msg 3, byte " << i;
     else
-      ASSERT_EQ(rcvd_msgs[2]->data[i], 0xAA) << "Got unexpected payload value on msg 2, byte " << i;
+      ASSERT_EQ(rcvd_msgs[2]->data[i], 0xAA) << "Got unexpected payload value on msg 3, byte " << i;
+  }
+
+  // MSG 4
+  ASSERT_EQ(rcvd_msgs[3]->id, 0x15555555) << "Got incorrect message ID on msg 4.";
+  ASSERT_EQ(rcvd_msgs[3]->dlc, 8) << "Got incorrect DLC on msg 4.";
+  ASSERT_FALSE(rcvd_msgs[3]->is_rtr) << "Got unexptected is_rtr value on msg 4.";
+  ASSERT_TRUE(rcvd_msgs[3]->is_extended) << "Got unexpected is_extended value on msg 4.";
+  ASSERT_FALSE(rcvd_msgs[3]->is_error) << "Got unexpected is_error value on msg 4.";
+
+  for (auto i = 0; i < rcvd_msgs[3]->data.size(); ++i)
+  {
+    if (i % 2 == 0)
+      ASSERT_EQ(rcvd_msgs[3]->data[i], 0x55) << "Got unexpected payload value on msg 4, byte " << i;
+    else
+      ASSERT_EQ(rcvd_msgs[3]->data[i], 0xAA) << "Got unexpected payload value on msg 4, byte " << i;
   }
 }
 
@@ -89,7 +107,8 @@ int main(int argc, char** argv)
   can_msg.is_extended = false;
   can_msg.is_error = false;
 
-  // Standard ID and DLC matches payload
+  // MSG 1
+  // (VALID) Standard ID and DLC matches payload
   can_msg.header.seq = 0;
   can_msg.id = 0x555;
   can_msg.dlc = 8;
@@ -101,27 +120,32 @@ int main(int argc, char** argv)
 
   msg_pub.publish(can_msg);
 
-  // Standard ID and DLC does not match payload
+  // MSG 2
+  // (VALID) Standard ID and DLC does not match payload
+  // Because can_msgs/Frame->data is fixed length, payload bytes are ignored.
   can_msg.header.seq = 1;
   can_msg.dlc = 0;
 
   msg_pub.publish(can_msg);
 
-  // Standard ID but is_extended = true
-  // Should not be received (write failure)
+  // MSG 3
+  // (VALID) Standard ID but is_extended = true
+  // Standard IDs are a subset of extended IDs so still valid.
   can_msg.header.seq = 2;
   can_msg.is_extended = true;
   can_msg.dlc = 8;
 
   msg_pub.publish(can_msg);
 
-  // Extended ID and is_extended = true
+  // MSG 4
+  // (VALID) Extended ID and is_extended = true
   can_msg.header.seq = 3;
   can_msg.id = 0x15555555;
 
   msg_pub.publish(can_msg);
 
-  // Extended ID and is_extended = false
+  // MSG 5
+  // (INVALID) Extended ID and is_extended = false
   // Should not be received (write failure)
   can_msg.header.seq = 4;
   can_msg.is_extended = false;
