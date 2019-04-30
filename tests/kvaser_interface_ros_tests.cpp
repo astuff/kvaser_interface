@@ -32,7 +32,7 @@ TEST(ROSKvaserInterface, MessageContents)
     else
       ASSERT_EQ(rcvd_msgs[0]->data[i], 0xAA) << "Got unexpected payload value on msg 0, byte " << i;
   }
-  
+
   ASSERT_EQ(rcvd_msgs[1]->id, 0x555) << "Got incorrect message ID on msg 1.";
   ASSERT_EQ(rcvd_msgs[1]->dlc, 8) << "Got incorrect DLC on msg 1.";
   ASSERT_FALSE(rcvd_msgs[1]->is_rtr) << "Got unexptected is_rtr value on msg 1.";
