@@ -262,9 +262,7 @@ TEST(KvaserCan, readWriteTests)
 TEST(KvaserCan, writeTests)
 {
   KvaserCan kv_can_writer;
-  KvaserCan kv_can_reader;
   CanMsg sent_msg;
-  CanMsg rcvd_msg;
 
   auto writer_stat = kv_can_writer.open(0, 500000);
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
