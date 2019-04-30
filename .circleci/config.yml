@@ -13,8 +13,7 @@ jobs:
             sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
             sudo apt-get install -y linux-headers-`uname -r` linuxcan-dkms
             sudo depmod
-            # Add 6 channels total on 2 devices
-            cd /usr/src/linuxcan-*/
+            cd /usr/src/linuxcan-*
             sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
             sudo make
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/

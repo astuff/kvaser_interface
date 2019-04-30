@@ -84,6 +84,7 @@ TEST(ROSKvaserInterface, MessageContents)
 
 void reader_callback(const can_msgs::Frame::ConstPtr& msg)
 {
+  std::cout << "********* GOT A MESSAGE **********" << std::endl;
   rcvd_msgs.push_back(msg);
 }
 
@@ -147,9 +148,9 @@ int main(int argc, char** argv)
 
   msg_pub.publish(can_msg);
 
-  auto later = ros::Time::now() + ros::Duration(5.0);
+  auto later = ros::Time::now() + ros::Duration(3.0);
 
-  // Spin for 5 seconds, then run tests
+  // Spin for 3 seconds, then run tests
   while (later > ros::Time::now())
   {
     ros::spinOnce();
