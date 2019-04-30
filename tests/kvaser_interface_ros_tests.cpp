@@ -101,7 +101,6 @@ int main(int argc, char** argv)
 
   msg_pub.publish(can_msg);
 
-  /*
   // Standard ID and DLC does not match payload
   can_msg.header.seq = 1;
   can_msg.dlc = 0;
@@ -128,7 +127,6 @@ int main(int argc, char** argv)
   can_msg.is_extended = false;
 
   msg_pub.publish(can_msg);
-  */
 
   auto later = ros::Time::now() + ros::Duration(3.0);
 
