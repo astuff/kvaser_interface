@@ -16,7 +16,7 @@ jobs:
             # Add 6 channels total on 2 devices
             cd /usr/src/linuxcan-*/
             sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
-            sudo make virtualcan
+            sudo make
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
             cd /usr/src/linuxcan-*/canlib/examples
