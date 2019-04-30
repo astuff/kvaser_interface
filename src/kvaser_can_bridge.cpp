@@ -48,13 +48,16 @@ void can_read()
 
       if (ret  == ReturnStatuses::OK)
       {
-        // Only publish if msg is not CAN FD.
-        // Also, only publish if msg contains
-        // data, is RTR, or is error frame.
-        if (!msg.flags.fd_msg &&
-            (msg.dlc != 0 ||
-             msg.flags.rtr ||
-             msg.flags.error_frame))
+        // Only publish if msg is not CAN FD,
+        // a wakeup message, a transmit acknowledgement,
+        // a transmit request, a delay notification,
+        // or a failed single-shot.
+        if (!(msg.flags.fd_msg ||
+              msg.flags.wakeup_mode ||
+              msg.flags.tx_ack ||
+              msg.flags.tx_rq ||
+              msg.flags.msg_delayed ||
+              msg.flags.tx_nack))
         {
           can_msgs::Frame can_pub_msg;
           can_pub_msg.header.frame_id = "0";
