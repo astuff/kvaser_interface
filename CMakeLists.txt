@@ -68,7 +68,7 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES})
 
   find_package(catkin REQUIRED COMPONENTS rostest)
-  add_rostest(tests/reader_writer_100hz.test)
+  add_rostest(tests/reader_writer_1000hz.test)
 
   add_rostest_gtest(${PROJECT_NAME}_ros_tests
     tests/can_bridge_tests.test

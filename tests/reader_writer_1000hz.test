@@ -15,10 +15,10 @@
   </node>
 
   <node name="topic_pub" type="rostopic" pkg="rostopic"
-    args="pub -r 100 /writer2/can_rx can_msgs/Frame '{header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: ''}, id: 546, is_rtr: false, is_extended: false, is_error: false, dlc: 8, data: [0,0,0,0,0,0,0,0]}'" />
+    args="pub -r 1000 /writer2/can_rx can_msgs/Frame '{header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: ''}, id: 546, is_rtr: false, is_extended: false, is_error: false, dlc: 8, data: [0,0,0,0,0,0,0,0]}'" />
 
-  <test test-name="bridge_100hz_pub" pkg="rostest" type="hztest" time-limit="10.0">
-    <param name="hz" value="100.0" />
+  <test test-name="bridge_1000hz_pub" pkg="rostest" type="hztest" time-limit="10.0">
+    <param name="hz" value="1000.0" />
     <param name="hzerror" value="3.0" />
     <param name="test_duration" value="3.0" />
     <param name="topic" value="/reader2/can_tx" />
