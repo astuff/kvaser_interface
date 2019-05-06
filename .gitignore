@@ -5,3 +5,4 @@ bin/
 *.user
 *~
 .idea/
+.vscode/

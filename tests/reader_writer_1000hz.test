@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Start Kvaser Can Bridge reader -->
+  <node name="kvaser_can_bridge" pkg="kvaser_interface" type="kvaser_can_bridge" ns="reader2">
+    <param name="can_hardware_id" value="2" />
+    <param name="can_circuit_id" value="0" />
+    <param name="can_bit_rate" value="500000" />
+  </node>
+
+  <!-- Start Kvaser Can Bridge writer -->
+  <node name="kvaser_can_bridge" pkg="kvaser_interface" type="kvaser_can_bridge" ns="writer2">
+    <param name="can_hardware_id" value="2" />
+    <param name="can_circuit_id" value="1" />
+    <param name="can_bit_rate" value="500000" />
+  </node>
+
+  <node name="topic_pub" type="rostopic" pkg="rostopic"
+    args="pub -r 1000 /writer2/can_rx can_msgs/Frame '{header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: ''}, id: 546, is_rtr: false, is_extended: false, is_error: false, dlc: 8, data: [0,0,0,0,0,0,0,0]}'" />
+
+  <test test-name="bridge_1000hz_pub" pkg="rostest" type="hztest" time-limit="10.0">
+    <param name="hz" value="1000.0" />
+    <param name="hzerror" value="15.0" />
+    <param name="test_duration" value="3.0" />
+    <param name="topic" value="/reader2/can_tx" />
+  </test>
+</launch>

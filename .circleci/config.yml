@@ -13,6 +13,10 @@ jobs:
             sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
             sudo apt-get install -y linux-headers-`uname -r` linuxcan-dkms
             sudo depmod
+            cd /usr/src/linuxcan-*
+            sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
+            sudo make
+            sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
             cd /usr/src/linuxcan-*/canlib/examples
             ./listChannels
@@ -20,7 +24,7 @@ jobs:
           name: Clone and Run AS Docker Image
           command: |
             docker pull autonomoustuff/docker-builds:kinetic-ros-base
-            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:kinetic-ros-base sh -c "sleep infinity"
+            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 --device=/dev/kvvirtualcan2 --device=/dev/kvvirtualcan3 --device=/dev/kvvirtualcan4 --device=/dev/kvvirtualcan5 -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:kinetic-ros-base sh -c "sleep infinity"
       - run:
           name: Install Linuxcan in Docker
           command: |
@@ -58,6 +62,10 @@ jobs:
             sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
             sudo apt-get install -y linux-headers-`uname -r` linuxcan-dkms
             sudo depmod
+            cd /usr/src/linuxcan-*
+            sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
+            sudo make
+            sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
             cd /usr/src/linuxcan-*/canlib/examples
             ./listChannels
@@ -65,7 +73,7 @@ jobs:
           name: Clone and Run AS Docker Image
           command: |
             docker pull autonomoustuff/docker-builds:melodic-ros-base
-            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:melodic-ros-base sh -c "sleep infinity"
+            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 --device=/dev/kvvirtualcan2 --device=/dev/kvvirtualcan3 --device=/dev/kvvirtualcan4 --device=/dev/kvvirtualcan5 -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:kinetic-ros-base sh -c "sleep infinity"
       - run:
           name: Install Linuxcan in Docker
           command: |

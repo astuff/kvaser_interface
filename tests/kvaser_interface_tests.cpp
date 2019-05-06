@@ -18,13 +18,13 @@ TEST(KvaserCanUtils, getChannels)
 {
   int32_t chan_count = -1;
   KvaserCanUtils::getChannelCount(&chan_count);
-  ASSERT_EQ(chan_count, 2);
+  ASSERT_EQ(chan_count, 6);
 
   auto chans = KvaserCanUtils::getChannels();
-  ASSERT_EQ(chans.size(), 2);
+  ASSERT_EQ(chans.size(), 6);
 
   auto cards = KvaserCanUtils::getCards();
-  ASSERT_EQ(cards.size(), 1);
+  ASSERT_EQ(cards.size(), 3);
 
   chans = KvaserCanUtils::getChannelsOnCard(1);
   ASSERT_EQ(chans.size(), 2);
