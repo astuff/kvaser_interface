@@ -28,8 +28,8 @@ jobs:
       - run:
           name: Install Linuxcan in Docker
           command: |
-            docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms && apt update -qq"
-            docker exec test /bin/bash -c "apt install -y linux-headers-generic linuxcan-dkms"
+            docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux && apt update -qq"
+            docker exec test /bin/bash -c "apt install -y kvaser-canlib-dev"
       - run:
           name: Set Up ROS in Docker
           command: |
@@ -77,8 +77,8 @@ jobs:
       - run:
           name: Install Linuxcan in Docker
           command: |
-            docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms && apt update -qq"
-            docker exec test /bin/bash -c "apt install -y linux-headers-generic linuxcan-dkms"
+            docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux && apt update -qq"
+            docker exec test /bin/bash -c "apt install -y kvaser-canlib-dev"
       - run:
           name: Set Up ROS in Docker
           command: |
@@ -106,8 +106,8 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
-            apt-get update -qq && apt-get install -y linux-headers-generic linuxcan-dkms dh-make python-bloom ruby
+            apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux
+            apt-get update -qq && apt-get install -y kvaser-canlib-dev dh-make python-bloom ruby
             gem install --no-rdoc --no-ri deb-s3
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
@@ -132,8 +132,8 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
-            apt-get update -qq && apt-get install -y linux-headers-generic linuxcan-dkms dh-make python-bloom ruby
+            apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux
+            apt-get update -qq && apt-get install -y kvaser-canlib-dev dh-make python-bloom ruby
             gem install --no-rdoc --no-ri deb-s3
             source `find /opt/ros -name setup.bash | sort | head -1`
             rosdep install --from-paths . --ignore-src -y
