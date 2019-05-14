@@ -15,7 +15,7 @@ jobs:
             sudo depmod
             cd /usr/src/kvaser-drivers-*
             sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
-            sudo make
+            sudo make -C virtualcan
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
       - run:
@@ -62,7 +62,7 @@ jobs:
             sudo depmod
             cd /usr/src/kvaser-drivers-*
             sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
-            sudo make
+            sudo make -C virtualcan
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
       - run:
