@@ -18,8 +18,6 @@ jobs:
             sudo make
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
-            cd /usr/src/kvaser-drivers-*/canlib/examples
-            ./listChannels
       - run:
           name: Clone and Run AS Docker Image
           command: |
@@ -67,8 +65,6 @@ jobs:
             sudo make
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
-            cd /usr/src/kvaser-drivers-*/canlib/examples
-            ./listChannels
       - run:
           name: Clone and Run AS Docker Image
           command: |
