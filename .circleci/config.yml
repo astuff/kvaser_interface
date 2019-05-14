@@ -9,16 +9,16 @@ jobs:
       - run:
           name: Install Linuxcan on Host
           command: |
-            sudo apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            sudo apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux
             sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
-            sudo apt-get install -y linux-headers-`uname -r` linuxcan-dkms
+            sudo apt-get install -y linux-headers-`uname -r` kvaser-drivers-dkms
             sudo depmod
-            cd /usr/src/linuxcan-*
+            cd /usr/src/kvaser-drivers-*
             sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
             sudo make
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
-            cd /usr/src/linuxcan-*/canlib/examples
+            cd /usr/src/kvaser-drivers-*/canlib/examples
             ./listChannels
       - run:
           name: Clone and Run AS Docker Image
@@ -58,16 +58,16 @@ jobs:
       - run:
           name: Install Linuxcan on Host
           command: |
-            sudo apt-add-repository -y ppa:jwhitleyastuff/linuxcan-dkms
+            sudo apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux
             sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
-            sudo apt-get install -y linux-headers-`uname -r` linuxcan-dkms
+            sudo apt-get install -y linux-headers-`uname -r` kvaser-drivers-dkms
             sudo depmod
-            cd /usr/src/linuxcan-*
+            cd /usr/src/kvaser-drivers-*
             sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
             sudo make
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
-            cd /usr/src/linuxcan-*/canlib/examples
+            cd /usr/src/kvaser-drivers-*/canlib/examples
             ./listChannels
       - run:
           name: Clone and Run AS Docker Image
