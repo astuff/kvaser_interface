@@ -19,7 +19,7 @@
 
   <test test-name="bridge_1000hz_pub" pkg="rostest" type="hztest" time-limit="10.0">
     <param name="hz" value="1000.0" />
-    <param name="hzerror" value="15.0" />
+    <param name="hzerror" value="20.0" />
     <param name="test_duration" value="3.0" />
     <param name="topic" value="/reader2/can_tx" />
   </test>
