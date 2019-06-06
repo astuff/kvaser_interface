@@ -162,13 +162,18 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   canStatus ret = canRead(*handle, &id_proxy, data, &msg->dlc, &flags, &msg->timestamp);
 
   msg->id = static_cast<uint32_t>(id_proxy);
-  size_t bytes = KvaserCanUtils::dlcToSize(msg->dlc);
 
-  msg->data.reserve(bytes);
-
-  for (uint8_t i = 0; i < bytes; ++i)
+  // Only process payload if dlc != 0
+  if (msg->dlc != 0)
   {
-    msg->data.emplace_back(std::move(data[i]));
+    size_t bytes = KvaserCanUtils::dlcToSize(msg->dlc);
+
+    msg->data.reserve(bytes);
+
+    for (uint8_t i = 0; i < bytes; ++i)
+    {
+      msg->data.emplace_back(std::move(data[i]));
+    }
   }
 
   KvaserCanUtils::setMsgFromFlags(msg, flags);
