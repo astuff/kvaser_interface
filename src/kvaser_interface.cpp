@@ -13,6 +13,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iomanip>
+#include <chrono>
 
 using namespace AS::CAN;
 
@@ -67,6 +68,7 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
 {
   if (!on_bus)
   {
+    auto start = std::chrono::steady_clock::now();
     int32_t numChan = -1;
     KvaserCanUtils::getChannelCount(&numChan);
 
@@ -110,6 +112,8 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
       return ReturnStatuses::INIT_FAILED;
 
     on_bus = true;
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "open(): " << (end - start).count() << std::endl;
   }
 
   return ReturnStatuses::OK;
@@ -123,6 +127,7 @@ bool KvaserCan::isOpen()
   }
   else
   {
+    auto start = std::chrono::steady_clock::now();
     if (on_bus)
     {
       uint64_t flags;
@@ -146,6 +151,8 @@ bool KvaserCan::isOpen()
     {
       return false;
     }
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "isOpen(): " << (end - start).count() << std::endl;
   }
 }
 
@@ -170,6 +177,7 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   {
     return ReturnStatuses::CHANNEL_CLOSED;
   }
+  auto start = std::chrono::steady_clock::now();
 
   // Make sure the incoming message is empty
   msg->id = 0;
@@ -198,6 +206,8 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
 
   KvaserCanUtils::setMsgFromFlags(msg, flags);
 
+  auto end = std::chrono::steady_clock::now();
+  std::cout << "read(): " << (end - start).count() << std::endl;
   switch (ret)
   {
     case canOK:
