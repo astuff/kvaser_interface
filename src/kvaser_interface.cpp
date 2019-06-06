@@ -68,7 +68,6 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
 {
   if (!on_bus)
   {
-    auto start = std::chrono::steady_clock::now();
     int32_t numChan = -1;
     KvaserCanUtils::getChannelCount(&numChan);
 
@@ -112,8 +111,6 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
       return ReturnStatuses::INIT_FAILED;
 
     on_bus = true;
-    auto end = std::chrono::steady_clock::now();
-    std::cout << "open(): " << (end - start).count() << std::endl;
   }
 
   return ReturnStatuses::OK;
@@ -122,38 +119,9 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
 bool KvaserCan::isOpen()
 {
   if (*handle < 0)
-  {
     return false;
-  }
   else
-  {
-    auto start = std::chrono::steady_clock::now();
-    if (on_bus)
-    {
-      uint64_t flags;
-
-      canStatus ret = canReadStatus(*handle, &flags);
-
-      if (ret != canOK)
-        return false;
-
-      if ((flags & canSTAT_BUS_OFF) > 1)
-      {
-        close();
-        return false;
-      }
-      else
-      {
-        return true;
-      }
-    }
-    else
-    {
-      return false;
-    }
-    auto end = std::chrono::steady_clock::now();
-    std::cout << "isOpen(): " << (end - start).count() << std::endl;
-  }
+    return on_bus;
 }
 
 ReturnStatuses KvaserCan::close()
@@ -162,13 +130,15 @@ ReturnStatuses KvaserCan::close()
     return ReturnStatuses::CHANNEL_CLOSED;
 
   // Close the channel
-  if (canClose(*handle) != canOK)
-    return ReturnStatuses::CLOSE_FAILED;
+  canStatus ret = canClose(*handle);
 
   *handle = -1;
   on_bus = false;
 
-  return ReturnStatuses::OK;
+  if (ret != canOK)
+    return ReturnStatuses::CLOSE_FAILED;
+  else
+    return ReturnStatuses::OK;
 }
 
 ReturnStatuses KvaserCan::read(CanMsg *msg)
@@ -207,7 +177,9 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   KvaserCanUtils::setMsgFromFlags(msg, flags);
 
   auto end = std::chrono::steady_clock::now();
-  std::cout << "read(): " << (end - start).count() << std::endl;
+  auto diff = end - start;
+  std::cout << "read(): " << diff.count() << std::endl;
+
   switch (ret)
   {
     case canOK:
@@ -215,6 +187,7 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
       break;
     case canERR_NOTINITIALIZED:
       on_bus = false;
+      *handle = -1;
       return ReturnStatuses::CHANNEL_CLOSED;
       break;
     case canERR_NOMSG:
@@ -227,7 +200,7 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
 
 ReturnStatuses KvaserCan::registerReadCallback(std::function<void(void)> callable)
 {
-  if (!isOpen())
+  if (!on_bus)
   {
     return ReturnStatuses::CHANNEL_CLOSED;
   }
