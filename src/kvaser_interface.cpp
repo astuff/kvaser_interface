@@ -147,7 +147,6 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   {
     return ReturnStatuses::CHANNEL_CLOSED;
   }
-  auto start = std::chrono::steady_clock::now();
 
   // Make sure the incoming message is empty
   msg->id = 0;
@@ -175,10 +174,6 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   }
 
   KvaserCanUtils::setMsgFromFlags(msg, flags);
-
-  auto end = std::chrono::steady_clock::now();
-  auto diff = end - start;
-  std::cout << "read(): " << diff.count() << std::endl;
 
   switch (ret)
   {
