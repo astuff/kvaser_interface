@@ -118,35 +118,9 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
 bool KvaserCan::isOpen()
 {
   if (*handle < 0)
-  {
     return false;
-  }
   else
-  {
-    if (on_bus)
-    {
-      uint64_t flags;
-
-      canStatus ret = canReadStatus(*handle, &flags);
-
-      if (ret != canOK)
-        return false;
-
-      if ((flags & canSTAT_BUS_OFF) > 1)
-      {
-        close();
-        return false;
-      }
-      else
-      {
-        return true;
-      }
-    }
-    else
-    {
-      return false;
-    }
-  }
+    return on_bus;
 }
 
 ReturnStatuses KvaserCan::close()
@@ -155,13 +129,15 @@ ReturnStatuses KvaserCan::close()
     return ReturnStatuses::CHANNEL_CLOSED;
 
   // Close the channel
-  if (canClose(*handle) != canOK)
-    return ReturnStatuses::CLOSE_FAILED;
+  canStatus ret = canClose(*handle);
 
   *handle = -1;
   on_bus = false;
 
-  return ReturnStatuses::OK;
+  if (ret != canOK)
+    return ReturnStatuses::CLOSE_FAILED;
+  else
+    return ReturnStatuses::OK;
 }
 
 ReturnStatuses KvaserCan::read(CanMsg *msg)
@@ -182,18 +158,22 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   int64_t id_proxy = 0;
   uint32_t flags = 0;
   char data[64];
-  size_t bytes = 0;
 
   canStatus ret = canRead(*handle, &id_proxy, data, &msg->dlc, &flags, &msg->timestamp);
 
   msg->id = static_cast<uint32_t>(id_proxy);
-  bytes = KvaserCanUtils::dlcToSize(msg->dlc);
 
-  msg->data.reserve(bytes);
-
-  for (uint8_t i = 0; i < bytes; ++i)
+  // Only process payload if dlc != 0
+  if (msg->dlc != 0)
   {
-    msg->data.emplace_back(std::move(data[i]));
+    size_t bytes = KvaserCanUtils::dlcToSize(msg->dlc);
+
+    msg->data.reserve(bytes);
+
+    for (uint8_t i = 0; i < bytes; ++i)
+    {
+      msg->data.emplace_back(std::move(data[i]));
+    }
   }
 
   KvaserCanUtils::setMsgFromFlags(msg, flags);
@@ -205,6 +185,7 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
       break;
     case canERR_NOTINITIALIZED:
       on_bus = false;
+      *handle = -1;
       return ReturnStatuses::CHANNEL_CLOSED;
       break;
     case canERR_NOMSG:
@@ -217,7 +198,7 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
 
 ReturnStatuses KvaserCan::registerReadCallback(std::function<void(void)> callable)
 {
-  if (!isOpen())
+  if (!on_bus)
   {
     return ReturnStatuses::CHANNEL_CLOSED;
   }
