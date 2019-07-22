@@ -1,9 +1,9 @@
 /*
-* Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
-*
-* This file is part of the Kvaser ROS driver which is released under the MIT license.
-* See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
-*/
+ * Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
+ *
+ * This file is part of the Kvaser ROS driver which is released under the MIT license.
+ * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
+ */
 
 #include <thread>
 #include <mutex>
@@ -34,8 +34,8 @@ void can_read()
 
       if (ret != ReturnStatuses::OK)
       {
-        ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening reader: %d - %s",
-          static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+        ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening reader: %d - %s", static_cast<int>(ret),
+                           KvaserCanUtils::returnStatusDesc(ret).c_str());
         break;
       }
     }
@@ -46,18 +46,14 @@ void can_read()
 
       ret = can_reader.read(&msg);
 
-      if (ret  == ReturnStatuses::OK)
+      if (ret == ReturnStatuses::OK)
       {
         // Only publish if msg is not CAN FD,
         // a wakeup message, a transmit acknowledgement,
         // a transmit request, a delay notification,
         // or a failed single-shot.
-        if (!(msg.flags.fd_msg ||
-              msg.flags.wakeup_mode ||
-              msg.flags.tx_ack ||
-              msg.flags.tx_rq ||
-              msg.flags.msg_delayed ||
-              msg.flags.tx_nack))
+        if (!(msg.flags.fd_msg || msg.flags.wakeup_mode || msg.flags.tx_ack || msg.flags.tx_rq ||
+              msg.flags.msg_delayed || msg.flags.tx_nack))
         {
           can_msgs::Frame can_pub_msg;
           can_pub_msg.header.frame_id = "0";
@@ -74,8 +70,8 @@ void can_read()
       else
       {
         if (ret != ReturnStatuses::NO_MESSAGES_RECEIVED)
-          ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - Error reading CAN message: %d - %s",
-            static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+          ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - Error reading CAN message: %d - %s", static_cast<int>(ret),
+                            KvaserCanUtils::returnStatusDesc(ret).c_str());
 
         break;
       }
@@ -94,8 +90,8 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
 
     if (ret != ReturnStatuses::OK)
     {
-      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening writer: %d - %s",
-        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+      ROS_ERROR_THROTTLE(0.5, "Kvaser CAN Interface - Error opening writer: %d - %s", static_cast<int>(ret),
+                         KvaserCanUtils::returnStatusDesc(ret).c_str());
     }
   }
 
@@ -119,8 +115,8 @@ void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
 
     if (ret != ReturnStatuses::OK)
     {
-      ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s",
-        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+      ROS_WARN_THROTTLE(0.5, "Kvaser CAN Interface - CAN send error: %d - %s", static_cast<int>(ret),
+                        KvaserCanUtils::returnStatusDesc(ret).c_str());
     }
   }
 }
@@ -197,16 +193,16 @@ int main(int argc, char** argv)
     }
     else
     {
-      ROS_ERROR("Kvaser CAN Interface - Error registering reader callback: %d - %s",
-        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+      ROS_ERROR("Kvaser CAN Interface - Error registering reader callback: %d - %s", static_cast<int>(ret),
+                KvaserCanUtils::returnStatusDesc(ret).c_str());
       ros::shutdown();
       return -1;
     }
   }
   else
   {
-    ROS_ERROR("Kvaser CAN Interface - Error opening reader: %d - %s",
-      static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+    ROS_ERROR("Kvaser CAN Interface - Error opening reader: %d - %s", static_cast<int>(ret),
+              KvaserCanUtils::returnStatusDesc(ret).c_str());
     ros::shutdown();
     return -1;
   }
@@ -218,8 +214,8 @@ int main(int argc, char** argv)
     ret = can_reader.close();
 
     if (ret != ReturnStatuses::OK)
-      ROS_ERROR("Kvaser CAN Interface - Error closing reader: %d - %s",
-        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+      ROS_ERROR("Kvaser CAN Interface - Error closing reader: %d - %s", static_cast<int>(ret),
+                KvaserCanUtils::returnStatusDesc(ret).c_str());
   }
 
   if (can_writer.isOpen())
@@ -227,8 +223,8 @@ int main(int argc, char** argv)
     ret = can_writer.close();
 
     if (ret != ReturnStatuses::OK)
-      ROS_ERROR("Kvaser CAN Interface - Error closing writer: %d - %s",
-        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
+      ROS_ERROR("Kvaser CAN Interface - Error closing writer: %d - %s", static_cast<int>(ret),
+                KvaserCanUtils::returnStatusDesc(ret).c_str());
   }
 
   return 0;

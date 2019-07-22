@@ -1,9 +1,9 @@
 /*
-* Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
-*
-* This file is part of the Kvaser ROS driver which is released under the MIT license.
-* See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
-*/
+ * Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
+ *
+ * This file is part of the Kvaser ROS driver which is released under the MIT license.
+ * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
+ */
 
 #include "kvaser_interface/kvaser_interface.h"
 #include "kvaser_interface/cxxopts.h"
@@ -16,19 +16,17 @@
 #include <unistd.h>
 #include <signal.h>
 
+using AS::CAN::CanMsg;
+using AS::CAN::KvaserCan;
 using AS::CAN::KvaserCanUtils;
 using AS::CAN::KvaserChannel;
-using AS::CAN::KvaserCan;
 using AS::CAN::ReturnStatuses;
-using AS::CAN::CanMsg;
 
 KvaserCan kv_can;
 uint32_t channel_idx = 0;
 uint32_t bitrate = 500000;
 
-void shutdown(
-  const ReturnStatuses &ret = ReturnStatuses::OK,
-  const int &error_num = 0)
+void shutdown(const ReturnStatuses& ret = ReturnStatuses::OK, const int& error_num = 0)
 {
   if (ret != ReturnStatuses::OK || error_num != 0)
   {
@@ -63,8 +61,9 @@ void can_read()
       CanMsg msg;
       ret = kv_can.read(&msg);
 
-      unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
-        (std::chrono::system_clock::now().time_since_epoch()).count();
+      unix_timestamp_ms =
+          std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+              .count();
 
       if (msg.flags.error_frame)
       {
@@ -113,7 +112,7 @@ void can_read()
   }
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
   // Catch CTRL+C
   struct sigaction sigIntHandler;
@@ -124,20 +123,17 @@ int main(int argc, char ** argv)
   // Parse options
   cxxopts::Options options("canmonitor", "A simple tool for reading data from a CAN channel.");
 
-  options.add_options()
-    ("i, index", "Channel index", cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))
-    ("b, bitrate", "Bitrate", cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))
-    ("h, help", "Print help", cxxopts::value<bool>()->implicit_value("true")->default_value("false"));
+  options.add_options()("i, index", "Channel index",
+                        cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))(
+      "b, bitrate", "Bitrate", cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))(
+      "h, help", "Print help", cxxopts::value<bool>()->implicit_value("true")->default_value("false"));
 
   auto result = options.parse(argc, argv);
 
   channel_idx = result["index"].as<unsigned int>();
   bitrate = result["bitrate"].as<unsigned int>();
 
-  if (channel_idx > 300 ||
-      bitrate < 100 ||
-      bitrate > 8000000 ||
-      result["help"].as<bool>())
+  if (channel_idx > 300 || bitrate < 100 || bitrate > 8000000 || result["help"].as<bool>())
   {
     std::cout << std::endl;
     std::cout << options.help();
