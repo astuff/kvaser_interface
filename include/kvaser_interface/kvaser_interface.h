@@ -8,9 +8,12 @@
 #ifndef KVASER_INTERFACE_KVASER_INTERFACE_H
 #define KVASER_INTERFACE_KVASER_INTERFACE_H
 
-extern "C" {
+// clang-format off
+extern "C"
+{
 #include <canlib.h>
 }
+// clang-format on
 
 // C++ Includes
 #include <iostream>
