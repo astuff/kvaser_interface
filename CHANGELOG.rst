@@ -2,6 +2,26 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#45 <https://github.com/astuff/kvaser_interface/issues/45>`_ from astuff/fix/slow_response
+  Fix/slow response
+* Read optimization when dlc != 0.
+* Removing unecessary include.
+* Simplifying isOpen() for speed.
+* Merge pull request `#42 <https://github.com/astuff/kvaser_interface/issues/42>`_ from astuff/maint/launch_default_screen_output
+* Default launch file to output to screen.
+* Merge pull request `#40 <https://github.com/astuff/kvaser_interface/issues/40>`_ from astuff/maint/node_tests
+  Node-Level Testing
+* Removing unused reader in test.
+* CI: Forgot to update docker call with extra devices on Melodic.
+* Merge pull request `#39 <https://github.com/astuff/kvaser_interface/issues/39>`_ from astuff/fix/publishing_dlc_0
+  Empty (valid) messages not being published.
+* Merge pull request `#38 <https://github.com/astuff/kvaser_interface/issues/38>`_ from astuff/fix/dlc_mismatch
+* Was not publishing correct, empty messages. Fixed.
+* Msgs with dlc < 8 would fail. Fixed.
+* Contributors: Joshua Whitley, Sam Rustan
+
 4.0.3 (2019-04-26)
 ------------------
 * Fixing additional bug with setting flags.
