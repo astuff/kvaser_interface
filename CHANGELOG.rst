@@ -2,8 +2,8 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.1.0 (2019-09-10)
+------------------
 * Merge pull request `#45 <https://github.com/astuff/kvaser_interface/issues/45>`_ from astuff/fix/slow_response
   Fix/slow response
 * Read optimization when dlc != 0.
