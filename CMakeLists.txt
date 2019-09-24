@@ -1,98 +1,125 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(kvaser_interface)
 
-add_definitions(-std=c++11)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
 
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  can_msgs
-  roslint
-)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-catkin_package(
-  CATKIN_DEPENDS roscpp can_msgs
-  INCLUDE_DIRS include
-  LIBRARIES ros_${PROJECT_NAME}
-)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(can_msgs REQUIRED)
 
 include_directories(
   include
-  ${catkin_INCLUDE_DIRS}
+  ${rclcpp_INCLUDE_DIRS}
+  ${can_msgs_INCLUDE_DIRS}
 )
 
-add_library(ros_${PROJECT_NAME}
+link_directories(
+  ${rclcpp_LIB_DIRS}
+)
+
+set(node_plugins "")
+
+set(LIB_NAME "ros_${PROJECT_NAME}")
+
+add_library(${LIB_NAME} SHARED
   src/kvaser_interface.cpp
 )
 
-target_link_libraries(ros_${PROJECT_NAME}
+target_compile_definitions(${LIB_NAME}
+  PRIVATE "COMPOSITION_BUILDING_DLL")
+
+target_link_libraries(${LIB_NAME}
   canlib
-  ${catkin_LIBRARIES}
 )
 
 add_executable(kvaser_can_bridge
   src/kvaser_can_bridge.cpp
 )
 
+ament_target_dependencies(kvaser_can_bridge
+  "rclcpp"
+  "rclcpp_components"
+  "rclcpp_lifecycle"
+  "can_msgs"
+)
+
 target_link_libraries(kvaser_can_bridge
-  ros_${PROJECT_NAME}
-  ${catkin_LIBRARIES}
+  ${LIB_NAME}
 )
 
 add_executable(canmonitor
   tools/canmonitor.cpp
 )
 
+ament_target_dependencies(canmonitor
+  "rclcpp"
+  "can_msgs"
+)
+
 target_link_libraries(canmonitor
-  ros_${PROJECT_NAME}
+  ${LIB_NAME}
 )
 
 add_executable(list_channels
   tools/list_channels.cpp
 )
 
-target_link_libraries(list_channels
-  ros_${PROJECT_NAME}
+ament_target_dependencies(list_channels
+  "rclcpp"
+  "can_msgs"
 )
 
-set(ROSLINT_CPP_OPTS "--filter=-runtime/threadsafe_fn,-build/namespaces,-build/c++11")
-roslint_cpp()
-
-if(CATKIN_ENABLE_TESTING)
-  roslint_add_test()
-
-  find_package(catkin REQUIRED COMPONENTS rosunit)
-  catkin_add_gtest(${PROJECT_NAME}_tests
-    tests/${PROJECT_NAME}_tests.cpp)
-  target_link_libraries(${PROJECT_NAME}_tests
-    ros_${PROJECT_NAME}
-    ${catkin_LIBRARIES})
-
-  find_package(catkin REQUIRED COMPONENTS rostest)
-  add_rostest(tests/reader_writer_1000hz.test)
-
-  add_rostest_gtest(${PROJECT_NAME}_ros_tests
-    tests/can_bridge_tests.test
-    tests/${PROJECT_NAME}_ros_tests.cpp)
-  target_link_libraries(${PROJECT_NAME}_ros_tests
-    ros_${PROJECT_NAME}
-    ${catkin_LIBRARIES})
-endif()
+target_link_libraries(list_channels
+  ${LIB_NAME}
+)
 
 install(
   TARGETS
-  ros_${PROJECT_NAME}
+  ${LIB_NAME}
   kvaser_can_bridge
   canmonitor
   list_channels
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
 
-install(DIRECTORY include
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+install(DIRECTORY include/
+  DESTINATION include
 )
 
-install(DIRECTORY launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+install(DIRECTORY launch/
+  DESTINATION share/launch
 )
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(${PROJECT_NAME}_tests
+    tests/${PROJECT_NAME}_tests.cpp)
+  target_link_libraries(${PROJECT_NAME}_tests
+    ${LIB_NAME}
+  )
+
+#  find_package(catkin REQUIRED COMPONENTS rostest)
+#  add_rostest(tests/reader_writer_1000hz.test)
+
+#add_rostest_gtest(${PROJECT_NAME}_ros_tests
+#    tests/can_bridge_tests.test
+#    tests/${PROJECT_NAME}_ros_tests.cpp)
+#  target_link_libraries(${PROJECT_NAME}_ros_tests
+#    ros_${PROJECT_NAME}
+#    ${catkin_LIBRARIES})
+
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_package()
