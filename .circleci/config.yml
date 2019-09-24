@@ -32,7 +32,8 @@ jobs:
           name: Clone and Run AS Docker Image
           command: |
             docker pull autonomoustuff/docker-builds:dashing-ros-base
-            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 --device=/dev/kvvirtualcan2 --device=/dev/kvvirtualcan3 --device=/dev/kvvirtualcan4 --device=/dev/kvvirtualcan5 -v `pwd`:/ros_ws/src -w /ros_ws autonomoustuff/docker-builds:dashing-ros-base sh -c "sleep infinity"
+            cd ..
+            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 --device=/dev/kvvirtualcan2 --device=/dev/kvvirtualcan3 --device=/dev/kvvirtualcan4 --device=/dev/kvvirtualcan5 -v `pwd`:/ros_ws -w /ros_ws autonomoustuff/docker-builds:dashing-ros-base sh -c "sleep infinity"
       - run:
           name: Install Linuxcan in Docker
           command: |
@@ -42,15 +43,14 @@ jobs:
           name: Set Up ROS in Docker
           command: |
             docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
       - run:
           name: Build in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && catkin build"
+            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon build"
       - run:
           name: Run Tests in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
+            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon test && colcon test-result"
       - run:
           name: Shut Down Container
           command: |
