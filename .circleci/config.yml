@@ -19,6 +19,16 @@ jobs:
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
             sudo virtualcan.sh start
       - run:
+          name: Move Source
+          command: |
+            mkdir $CIRCLE_PROJECT_REPONAME
+            mv `find -maxdepth 1 -not -name . -not -name $CIRCLE_PROJECT_REPONAME` $CIRCLE_PROJECT_REPONAME/
+      - run:
+          name: Add Dependencies
+          command: |
+            git clone https://github.com/jwhitleyastuff/ros_canopen -b crystal-devel
+            git clone https://github.com/ros/diagnostics -b dashing
+      - run:
           name: Clone and Run AS Docker Image
           command: |
             docker pull autonomoustuff/docker-builds:dashing-ros-base
@@ -28,11 +38,6 @@ jobs:
           command: |
             docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux && apt update -qq"
             docker exec test /bin/bash -c "apt install -y kvaser-canlib-dev"
-      - run:
-          name: Add Dependencies
-          command: |
-            docker exec test /bin/bash -c "cd src && git clone https://github.com/jwhitleyastuff/ros_canopen -b crystal-devel"
-            docker exec test /bin/bash -c "cd src && git clone https://github.com/ros/diagnostics -b dashing"
       - run:
           name: Set Up ROS in Docker
           command: |
