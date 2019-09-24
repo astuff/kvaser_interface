@@ -31,16 +31,16 @@ jobs:
       - run:
           name: Set Up ROS in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
+            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
+            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && catkin init && catkin config --extend /opt/ros/\$ROS_DISTRO"
       - run:
           name: Build in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin build"
+            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && catkin build"
       - run:
           name: Run Tests in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
+            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && catkin run_tests -j1 && catkin_test_results"
       - run:
           name: Shut Down Container
           command: |
