@@ -29,6 +29,11 @@ jobs:
             docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux && apt update -qq"
             docker exec test /bin/bash -c "apt install -y kvaser-canlib-dev"
       - run:
+          name: Add Dependencies
+          command: |
+            docker exec test /bin/bash -c "cd src && git clone https://github.com/jwhitleyastuff/ros_canopen -b crystal-devel"
+            docker exec test /bin/bash -c "cd src && git clone https://github.com/ros/diagnostics -b dashing"
+      - run:
           name: Set Up ROS in Docker
           command: |
             docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
