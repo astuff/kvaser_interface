@@ -29,25 +29,41 @@ set(node_plugins "")
 
 set(LIB_NAME "ros_${PROJECT_NAME}")
 
+# kvaser_interface Library
 add_library(
   ${LIB_NAME} SHARED
   src/kvaser_interface.cpp
 )
-
 target_compile_definitions(
   ${LIB_NAME}
   PRIVATE "COMPOSITION_BUILDING_DLL"
 )
-
 target_link_libraries(${LIB_NAME}
   canlib
 )
 
+# kvaser_interface ROS Node
+add_library(
+  ${PROJECT_NAME}_node SHARED
+  src/${PROJECT_NAME}_node.cpp
+)
+ament_target_dependencies(
+  ${PROJECT_NAME}_node
+  "rclcpp"
+  "rclcpp_components"
+  "rclcpp_lifecycle"
+  "can_msgs"
+)
+target_link_libraries(
+  ${PROJECT_NAME}_node
+  ${LIB_NAME}
+)
+
+# CAN Bridge Node
 add_executable(
   kvaser_can_bridge
   src/kvaser_can_bridge.cpp
 )
-
 ament_target_dependencies(
   kvaser_can_bridge
   "rclcpp"
@@ -55,39 +71,26 @@ ament_target_dependencies(
   "rclcpp_lifecycle"
   "can_msgs"
 )
-
 target_link_libraries(
   kvaser_can_bridge
   ${LIB_NAME}
 )
 
+# canmonitor Tool
 add_executable(
   canmonitor
   tools/canmonitor.cpp
 )
-
-ament_target_dependencies(
-  canmonitor
-  "rclcpp"
-  "can_msgs"
-)
-
 target_link_libraries(
   canmonitor
   ${LIB_NAME}
 )
 
+# list_channels Tool
 add_executable(
   list_channels
   tools/list_channels.cpp
 )
-
-ament_target_dependencies(
-  list_channels
-  "rclcpp"
-  "can_msgs"
-)
-
 target_link_libraries(
   list_channels
   ${LIB_NAME}
@@ -96,12 +99,18 @@ target_link_libraries(
 install(
   TARGETS
   ${LIB_NAME}
-  kvaser_can_bridge
-  canmonitor
-  list_channels
+  ${PROJECT_NAME}_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
+)
+
+install(
+  TARGETS
+  kvaser_can_bridge
+  canmonitor
+  list_channels
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
@@ -111,10 +120,18 @@ install(
 
 install(
   DIRECTORY launch/
-  DESTINATION share/launch
+  DESTINATION share/${PROJECT_NAME}/launch
+)
+
+rclcpp_components_register_nodes(
+  ${PROJECT_NAME}_node
+  "AS::CAN::KvaserInterfaceNode"
 )
 
 if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(
     ${PROJECT_NAME}_tests
@@ -135,9 +152,6 @@ if(BUILD_TESTING)
 #  target_link_libraries(${PROJECT_NAME}_ros_tests
 #    ros_${PROJECT_NAME}
 #    ${catkin_LIBRARIES})
-
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_package()

@@ -73,7 +73,7 @@ void can_read()
               msg.flags.msg_delayed ||
               msg.flags.tx_nack))
         {
-          can_msgs::Frame can_pub_msg;
+          can_msgs::msg::Frame can_pub_msg;
           can_pub_msg.header.frame_id = "0";
           can_pub_msg.id = msg.id;
           can_pub_msg.dlc = msg.dlc;
@@ -97,7 +97,7 @@ void can_read()
   }
 }
 
-void can_rx_callback(const can_msgs::Frame::ConstPtr& ros_msg)
+void can_rx_callback(const can_msgs::msg::Frame::ConstPtr & ros_msg)
 {
   ReturnStatuses ret;
 
