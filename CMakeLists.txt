@@ -29,55 +29,67 @@ set(node_plugins "")
 
 set(LIB_NAME "ros_${PROJECT_NAME}")
 
-add_library(${LIB_NAME} SHARED
+add_library(
+  ${LIB_NAME} SHARED
   src/kvaser_interface.cpp
 )
 
-target_compile_definitions(${LIB_NAME}
-  PRIVATE "COMPOSITION_BUILDING_DLL")
+target_compile_definitions(
+  ${LIB_NAME}
+  PRIVATE "COMPOSITION_BUILDING_DLL"
+)
 
 target_link_libraries(${LIB_NAME}
   canlib
 )
 
-add_executable(kvaser_can_bridge
+add_executable(
+  kvaser_can_bridge
   src/kvaser_can_bridge.cpp
 )
 
-ament_target_dependencies(kvaser_can_bridge
+ament_target_dependencies(
+  kvaser_can_bridge
   "rclcpp"
   "rclcpp_components"
   "rclcpp_lifecycle"
   "can_msgs"
 )
 
-target_link_libraries(kvaser_can_bridge
+target_link_libraries(
+  kvaser_can_bridge
   ${LIB_NAME}
 )
 
-add_executable(canmonitor
+add_executable(
+  canmonitor
   tools/canmonitor.cpp
 )
 
-ament_target_dependencies(canmonitor
+ament_target_dependencies(
+  canmonitor
   "rclcpp"
   "can_msgs"
 )
 
-target_link_libraries(canmonitor
+target_link_libraries(
+  canmonitor
   ${LIB_NAME}
 )
 
-add_executable(list_channels
+add_executable(
+  list_channels
   tools/list_channels.cpp
 )
 
-ament_target_dependencies(list_channels
+ament_target_dependencies(
+  list_channels
   "rclcpp"
   "can_msgs"
 )
 
-target_link_libraries(list_channels
+target_link_libraries(
+  list_channels
   ${LIB_NAME}
 )
 
@@ -92,22 +104,28 @@ install(
   RUNTIME DESTINATION bin
 )
 
-install(DIRECTORY include/
+install(
+  DIRECTORY include/
   DESTINATION include
 )
 
-install(DIRECTORY launch/
+install(
+  DIRECTORY launch/
   DESTINATION share/launch
 )
 
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
-  ament_add_gtest(${PROJECT_NAME}_tests
-    tests/${PROJECT_NAME}_tests.cpp)
-  target_link_libraries(${PROJECT_NAME}_tests
+  ament_add_gtest(
+    ${PROJECT_NAME}_tests
+    tests/${PROJECT_NAME}_tests.cpp
+  )
+  target_link_libraries(
+    ${PROJECT_NAME}_tests
     ${LIB_NAME}
   )
 
+#  TODO(jwhitleyastuff): Use launch_testing for tests.
 #  find_package(catkin REQUIRED COMPONENTS rostest)
 #  add_rostest(tests/reader_writer_1000hz.test)
 
