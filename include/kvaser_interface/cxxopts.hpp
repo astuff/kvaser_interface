@@ -22,8 +22,8 @@ THE SOFTWARE.
 
 */
 
-#ifndef KVASER_INTERFACE_CXXOPTS_H
-#define KVASER_INTERFACE_CXXOPTS_H
+#ifndef KVASER_INTERFACE__CXXOPTS_HPP_
+#define KVASER_INTERFACE__CXXOPTS_HPP_
 
 #include <cstring>
 #include <cctype>
@@ -2001,4 +2001,4 @@ Options::group_help(const std::string& group) const
 
 }
 
-#endif  // KVASER_INTERFACE_CXXOPTS_H
+#endif  // KVASER_INTERFACE__CXXOPTS_HPP_

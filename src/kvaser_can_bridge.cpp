@@ -23,9 +23,10 @@
 #include <chrono>
 #include <algorithm>
 
-#include <ros/ros.h>
-#include <kvaser_interface/kvaser_interface.h>
-#include <can_msgs/Frame.h>
+#include <rclcpp/rclcpp.hpp>
+#include <can_msgs/msg/frame.hpp>
+
+#include <kvaser_interface/kvaser_interface.hpp>
 
 using namespace AS::CAN;
 

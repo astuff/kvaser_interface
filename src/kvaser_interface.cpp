@@ -33,34 +33,39 @@ KvaserCan *KvaserReadCbProxy::kvCanObj = nullptr;
 std::shared_ptr<CanHandle> KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
 
 KvaserCan::KvaserCan() :
-  handle(new CanHandle)
+  handle(new CanHandle, &KvaserCan::closeHandle)
 {
   *handle = -1;
   canInitializeLibrary();
 }
 
-KvaserCan::~KvaserCan()
+void KvaserCan::closeHandle(CanHandle * h)
 {
-  if (*handle > -1)
-    canClose(*handle);
+  if (*h > -1) {
+    canClose(*h);
+  }
+
+  delete h;
 }
 
-ReturnStatuses KvaserCan::open(const uint64_t &hardware_id,
-                               const uint32_t &circuit_id,
-                               const uint32_t &bitrate,
-                               const bool &echo_on)
+ReturnStatuses KvaserCan::open(
+  const uint64_t & hardware_id,
+  const uint32_t & circuit_id,
+  const uint32_t & bitrate,
+  const bool & echo_on)
 {
   auto channels = KvaserCanUtils::getChannels();
   uint32_t channel_index = 0;
   bool channel_found = false;
 
-  if (channels.size() < 1)
+  if (channels.size() < 1) {
     return ReturnStatuses::NO_CHANNELS_FOUND;
+  }
 
-  for (const auto &channel : channels)
-  {
-    if (hardware_id == channel->serial_no &&
-        circuit_id == channel->channel_no_on_card)
+  for (const auto &channel : channels) {
+    if (
+      hardware_id == channel->serial_no &&
+      circuit_id == channel->channel_no_on_card)
     {
       channel_index = channel->channel_idx;
       channel_found = true;
@@ -68,50 +73,61 @@ ReturnStatuses KvaserCan::open(const uint64_t &hardware_id,
     }
   }
 
-  if (channel_found)
+  if (channel_found) {
     return open(channel_index, bitrate, echo_on);
-  else
+  } else {
     return ReturnStatuses::BAD_PARAM;
+  }
 }
 
-ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
-                               const uint32_t &bitrate,
-                               const bool &echo_on)
+ReturnStatuses KvaserCan::open(
+  const uint32_t & channel_index,
+  const uint32_t & bitrate,
+  const bool & echo_on)
 {
-  if (!on_bus)
-  {
+  if (!on_bus) {
     int32_t numChan = -1;
     KvaserCanUtils::getChannelCount(&numChan);
 
-    if (numChan < 1)
+    if (numChan < 1) {
       return ReturnStatuses::NO_CHANNELS_FOUND;
+    }
 
     // Open channel
     *handle = canOpenChannel(channel_index, canOPEN_ACCEPT_VIRTUAL);
 
-    if (*handle < 0)
+    if (*handle < 0) {
       return ReturnStatuses::INIT_FAILED;
+    }
 
     // Set bit rate and other parameters
     int64_t freq;
 
-    switch (bitrate)
-    {
-      case 125000: freq = canBITRATE_125K; break;
-      case 250000: freq = canBITRATE_250K; break;
-      case 500000: freq = canBITRATE_500K; break;
-      case 1000000: freq = canBITRATE_1M; break;
-      default: return  ReturnStatuses::BAD_PARAM;
+    switch (bitrate) {
+      case 125000:
+        freq = canBITRATE_125K;
+        break;
+      case 250000:
+        freq = canBITRATE_250K;
+        break;
+      case 500000:
+        freq = canBITRATE_500K;
+        break;
+      case 1000000:
+        freq = canBITRATE_1M;
+        break;
+      default:
+        return ReturnStatuses::BAD_PARAM;
     }
 
-    if (canSetBusParams(*handle, freq, 0, 0, 0, 0, 0) < 0)
+    if (canSetBusParams(*handle, freq, 0, 0, 0, 0, 0) < 0) {
       return ReturnStatuses::BAD_PARAM;
+    }
 
     // Linuxcan defaults to echo on, so if you've opened the same can channel
     // from multiple interfaces they will receive the messages that each other
     // send.  Turn it off here if desired.
-    if (!echo_on)
-    {
+    if (!echo_on) {
       uint8_t off = 0;
       canIoCtl(*handle, canIOCTL_SET_LOCAL_TXECHO, &off, 1);
     }
@@ -119,8 +135,9 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
     // Set output control
     canSetBusOutputControl(*handle, canDRIVER_NORMAL);
 
-    if (canBusOn(*handle) < 0)
+    if (canBusOn(*handle) < 0) {
       return ReturnStatuses::INIT_FAILED;
+    }
 
     on_bus = true;
   }
@@ -130,16 +147,18 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
 
 bool KvaserCan::isOpen()
 {
-  if (*handle < 0)
+  if (*handle < 0) {
     return false;
-  else
+  } else {
     return on_bus;
+  }
 }
 
 ReturnStatuses KvaserCan::close()
 {
-  if (*handle < 0)
+  if (!on_bus) {
     return ReturnStatuses::CHANNEL_CLOSED;
+  }
 
   // Close the channel
   canStatus ret = canClose(*handle);
@@ -147,16 +166,16 @@ ReturnStatuses KvaserCan::close()
   *handle = -1;
   on_bus = false;
 
-  if (ret != canOK)
+  if (ret != canOK) {
     return ReturnStatuses::CLOSE_FAILED;
-  else
+  } else {
     return ReturnStatuses::OK;
+  }
 }
 
-ReturnStatuses KvaserCan::read(CanMsg *msg)
+ReturnStatuses KvaserCan::read(CanMsg * msg)
 {
-  if (*handle < 0)
-  {
+  if (!on_bus) {
     return ReturnStatuses::CHANNEL_CLOSED;
   }
 
@@ -177,22 +196,19 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
   msg->id = static_cast<uint32_t>(id_proxy);
 
   // Only process payload if dlc != 0
-  if (msg->dlc != 0)
-  {
+  if (msg->dlc != 0) {
     size_t bytes = KvaserCanUtils::dlcToSize(msg->dlc);
 
     msg->data.reserve(bytes);
 
-    for (uint8_t i = 0; i < bytes; ++i)
-    {
+    for (uint8_t i = 0; i < bytes; ++i) {
       msg->data.emplace_back(std::move(data[i]));
     }
   }
 
   KvaserCanUtils::setMsgFromFlags(msg, flags);
 
-  switch (ret)
-  {
+  switch (ret) {
     case canOK:
       return ReturnStatuses::OK;
       break;
@@ -211,17 +227,13 @@ ReturnStatuses KvaserCan::read(CanMsg *msg)
 
 ReturnStatuses KvaserCan::registerReadCallback(std::function<void(void)> callable)
 {
-  if (!on_bus)
-  {
+  if (!on_bus) {
     return ReturnStatuses::CHANNEL_CLOSED;
-  }
-  else
-  {
+  } else {
     readFunc = callable;
     auto ret = KvaserReadCbProxy::registerCb(this, handle);
 
-    if (ret != ReturnStatuses::OK)
-    {
+    if (ret != ReturnStatuses::OK) {
       readFunc = nullptr;
     }
 
@@ -229,16 +241,18 @@ ReturnStatuses KvaserCan::registerReadCallback(std::function<void(void)> callabl
   }
 }
 
-ReturnStatuses KvaserCan::write(CanMsg &&msg)
+ReturnStatuses KvaserCan::write(CanMsg && msg)
 {
-  if (*handle < 0)
+  if (!on_bus) {
     return ReturnStatuses::CHANNEL_CLOSED;
+  }
 
   // DLC to Payload Size Check
   auto payload_size = KvaserCanUtils::dlcToSize(msg.dlc);
 
-  if (payload_size != msg.data.size())
+  if (payload_size != msg.data.size()) {
     return ReturnStatuses::DLC_PAYLOAD_MISMATCH;
+  }
 
   uint32_t flags = 0;
   KvaserCanUtils::setFlagsFromMsg(msg, &flags);
@@ -248,64 +262,59 @@ ReturnStatuses KvaserCan::write(CanMsg &&msg)
   return (ret == canOK) ? ReturnStatuses::OK : ReturnStatuses::WRITE_FAILED;
 }
 
-ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::shared_ptr<CanHandle> &hdl)
+ReturnStatuses KvaserReadCbProxy::registerCb(
+  KvaserCan * canObj, const std::shared_ptr<CanHandle> & hdl)
 {
   handle = std::shared_ptr<CanHandle>(hdl);
 
-  if (!canObj->isOpen())
+  if (!canObj->isOpen()) {
     return ReturnStatuses::CHANNEL_CLOSED;
-  else
-  {
+  } else {
     kvCanObj = canObj;
 
     auto stat = canSetNotify(
       *(hdl),
       &KvaserReadCbProxy::proxyCallback,
       canNOTIFY_RX,
-      reinterpret_cast<char*>(0));
+      reinterpret_cast<char *>(0));
 
-    if (stat == canOK)
-    {
+    if (stat == canOK) {
       return ReturnStatuses::OK;
-    }
-    else
-    {
+    } else {
       kvCanObj = nullptr;
       return ReturnStatuses::BAD_PARAM;
     }
   }
 }
 
-void KvaserReadCbProxy::proxyCallback(canNotifyData *data)
+void KvaserReadCbProxy::proxyCallback(canNotifyData * data)
 {
   kvCanObj->readFunc();
 }
 
-ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t &canlibStat)
+ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t & canlibStat)
 {
-  switch (canlibStat)
-  {
+  switch (canlibStat) {
     case canOK:
       return ReturnStatuses::OK;
+      break;
     case canERR_PARAM:
       return ReturnStatuses::BAD_PARAM;
+      break;
     case canERR_NOTFOUND:
       return ReturnStatuses::NO_CHANNELS_FOUND;
+      break;
     default:
       return ReturnStatuses::INIT_FAILED;
   }
 }
 
-size_t KvaserCanUtils::dlcToSize(const uint8_t &dlc)
+size_t KvaserCanUtils::dlcToSize(const uint8_t & dlc)
 {
-  if (dlc < 9)
-  {
+  if (dlc < 9) {
     return dlc;
-  }
-  else
-  {
-    switch (dlc)
-    {
+  } else {
+    switch (dlc) {
       case 9:
         return 12;
         break;
@@ -333,16 +342,12 @@ size_t KvaserCanUtils::dlcToSize(const uint8_t &dlc)
   }
 }
 
-uint8_t KvaserCanUtils::sizeToDlc(const size_t &size)
+uint8_t KvaserCanUtils::sizeToDlc(const size_t & size)
 {
-  if (size < 9)
-  {
+  if (size < 9) {
     return size;
-  }
-  else
-  {
-    switch (size)
-    {
+  } else {
+    switch (size) {
       case 12:
         return 9;
         break;
@@ -370,12 +375,13 @@ uint8_t KvaserCanUtils::sizeToDlc(const size_t &size)
   }
 }
 
-void KvaserCanUtils::getChannelCount(int32_t *numChan)
+void KvaserCanUtils::getChannelCount(int32_t * numChan)
 {
   auto stat = canGetNumberOfChannels(numChan);
 
-  if (stat != canOK)
+  if (stat != canOK) {
     *numChan = -1;
+  }
 }
 
 std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
@@ -384,18 +390,18 @@ std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
 
   std::vector<std::shared_ptr<KvaserCard>> cards;
 
-  for (const auto &channel : channels)
-  {
+  for (const auto &channel : channels) {
     bool found = false;
 
-    for (const auto &card : cards)
-    {
-      if (card->serial_no == channel->serial_no)
+    for (const auto &card : cards) {
+      if (card->serial_no == channel->serial_no) {
         found = true;
+      }
     }
 
-    if (!found)
+    if (!found) {
       cards.emplace_back(std::dynamic_pointer_cast<KvaserCard>(std::move(channel)));
+    }
   }
 
   return cards;
@@ -408,10 +414,8 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
   KvaserCanUtils::getChannelCount(&numChan);
 
   // Sanity checks before continuing
-  if (numChan > -1 && numChan < 300)
-  {
-    for (auto i = 0; i < numChan; ++i)
-    {
+  if (numChan > -1 && numChan < 300) {
+    for (auto i = 0; i < numChan; ++i) {
       KvaserChannel chan;
       int stat = 0;
 
@@ -427,91 +431,88 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
       char driver_name[256];
       uint16_t driver_ver[4];
 
-      memset(dev_name, 0, sizeof(dev_name));
-      memset(driver_name, 0, sizeof(driver_name));
+      std::memset(dev_name, 0, sizeof(dev_name));
+      std::memset(driver_name, 0, sizeof(driver_name));
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial));
 
-      if (stat == canOK)
+      if (stat == canOK) {
         chan.serial_no = serial;
-      else
+      } else {
         chan.all_data_valid = false;
+      }
 
       stat = canGetChannelData(i, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_no, sizeof(channel_no));
 
-      if (stat == canOK)
+      if (stat == canOK) {
         chan.channel_no_on_card = channel_no;
-      else
+      } else {
         chan.all_data_valid = false;
+      }
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_TYPE, &card_type, sizeof(card_type));
 
-      if (stat == canOK)
+      if (stat == canOK) {
         chan.hw_type = static_cast<HardwareType>(card_type);
-      else
+      } else {
         chan.all_data_valid = false;
+      }
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_FIRMWARE_REV, &firmware_rev, sizeof(firmware_rev));
 
-      if (stat == canOK)
-      {
+      if (stat == canOK) {
         chan.firmware_rev_maj = firmware_rev[3];
         chan.firmware_rev_min = firmware_rev[2];
         chan.firmware_rev_rel = firmware_rev[1];
         chan.firmware_rev_bld = firmware_rev[0];
-      }
-      else
-      {
+      } else {
         chan.all_data_valid = false;
       }
 
       stat = canGetChannelData(i, canCHANNELDATA_MAX_BITRATE, &max_bitrate, sizeof(max_bitrate));
 
-      if (stat == canOK)
+      if (stat == canOK) {
         chan.max_bitrate = max_bitrate;
-      else
+      } else {
         chan.all_data_valid = false;
+      }
 
       stat = canGetChannelData(i, canCHANNELDATA_DEVDESCR_ASCII, &dev_name, sizeof(dev_name));
 
-      if (stat == canOK)
+      if (stat == canOK) {
         chan.dev_name = std::string(dev_name);
-      else
+      } else {
         chan.all_data_valid = false;
+      }
 
       stat = canGetChannelData(i, canCHANNELDATA_CARD_UPC_NO, &upc_no, sizeof(upc_no));
 
-      if (stat == canOK)
-      {
+      if (stat == canOK) {
         std::ostringstream oss;
         oss << std::hex << (upc_no[1] >> 12) << "-";
         oss << (((upc_no[1] & 0xfff) << 8) | ((upc_no[0] >> 24) & 0xff)) << "-";
         oss << std::setfill('0') << std::setw(5) << ((upc_no[0] >> 4) & 0xfffff) << "-";
         oss << (upc_no[0] & 0x0f);
         chan.upc_no = oss.str();
-      }
-      else
-      {
+      } else {
         chan.all_data_valid = false;
       }
 
       stat = canGetChannelData(i, canCHANNELDATA_DRIVER_NAME, &driver_name, sizeof(driver_name));
 
-      if (stat == canOK)
+      if (stat == canOK) {
         chan.driver_name = std::string(driver_name);
-      else
+      } else {
         chan.all_data_valid = false;
+      }
 
       stat = canGetChannelData(i, canCHANNELDATA_DLL_FILE_VERSION, &driver_ver, sizeof(driver_ver));
 
-      if (stat == canOK)
-      {
+      if (stat == canOK) {
         chan.driver_ver_maj = driver_ver[3];
         chan.driver_ver_min = driver_ver[2];
         chan.driver_ver_bld = driver_ver[1];
-      }
-      else
-      {
+      } else {
         chan.all_data_valid = false;
       }
 
@@ -522,46 +523,47 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
   return channels;
 }
 
-std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannelsOnCard(const uint64_t &serialNo)
+std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannelsOnCard(const uint64_t & serialNo)
 {
   std::vector<std::shared_ptr<KvaserChannel>> channelsOnCard;
 
   auto channels = getChannels();
 
-  for (const auto &channel : channels)
-  {
-    if (channel->serial_no == serialNo)
+  for (const auto &channel : channels) {
+    if (channel->serial_no == serialNo) {
       channelsOnCard.emplace_back(std::move(channel));
+    }
   }
 
   return channelsOnCard;
 }
 
-std::string KvaserCanUtils::returnStatusDesc(const ReturnStatuses& ret)
+std::string KvaserCanUtils::returnStatusDesc(const ReturnStatuses & ret)
 {
   std::string status_string;
 
-  if (ret == ReturnStatuses::INIT_FAILED)
+  if (ret == ReturnStatuses::INIT_FAILED) {
     status_string = "Initialization of the CAN interface failed.";
-  else if (ret == ReturnStatuses::BAD_PARAM)
+  } else if (ret == ReturnStatuses::BAD_PARAM) {
     status_string = "A bad parameter was provided to the CAN interface during initalization.";
-  else if (ret == ReturnStatuses::NO_CHANNELS_FOUND)
+  } else if (ret == ReturnStatuses::NO_CHANNELS_FOUND) {
     status_string = "No available CAN channels were found.";
-  else if (ret == ReturnStatuses::CHANNEL_CLOSED)
+  } else if (ret == ReturnStatuses::CHANNEL_CLOSED) {
     status_string = "CAN channel is not currently open.";
-  else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED)
+  } else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED) {
     status_string = "No messages were received on the interface.";
-  else if (ret == ReturnStatuses::READ_FAILED)
+  } else if (ret == ReturnStatuses::READ_FAILED) {
     status_string = "A read operation failed on the CAN interface.";
-  else if (ret == ReturnStatuses::WRITE_FAILED)
+  } else if (ret == ReturnStatuses::WRITE_FAILED) {
     status_string = "A write operation failed on the CAN interface.";
-  else if (ret == ReturnStatuses::CLOSE_FAILED)
+  } else if (ret == ReturnStatuses::CLOSE_FAILED) {
     status_string = "Closing the CAN interface failed.";
+  } 
 
   return status_string;
 }
 
-void KvaserCanUtils::setMsgFromFlags(CanMsg *msg, const uint32_t &flags)
+void KvaserCanUtils::setMsgFromFlags(CanMsg * msg, const uint32_t & flags)
 {
   // Regular CAN message flags
   msg->flags.rtr = ((flags & canMSG_RTR) > 0);
@@ -596,7 +598,7 @@ void KvaserCanUtils::setMsgFromFlags(CanMsg *msg, const uint32_t &flags)
   msg->error_flags.any_rx_err = ((flags & canMSGERR_BUSERR) > 0);
 }
 
-void KvaserCanUtils::setFlagsFromMsg(const CanMsg &msg, uint32_t *flags)
+void KvaserCanUtils::setFlagsFromMsg(const CanMsg & msg, uint32_t * flags)
 {
   // Regular CAN message flags
   msg.flags.rtr ? *flags |= canMSG_RTR : *flags &= ~canMSG_RTR;
