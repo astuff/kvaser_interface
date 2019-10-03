@@ -39,7 +39,8 @@ namespace AS
 namespace CAN
 {
 
-/// \brief KvaserReaderNode class which can pass messages from Kvaser hardware or virtual channels
+/// \brief KvaserReaderNode class which can pass messages
+/// from Kvaser hardware or virtual channels
 class KvaserReaderNode final
   : public lc::LifecycleNode
 {

@@ -41,12 +41,12 @@ TEST(ROSKvaserInterface, MessageContents)
   ASSERT_FALSE(rcvd_msgs[0]->is_extended) << "Got unexpected is_extended value on msg 1.";
   ASSERT_FALSE(rcvd_msgs[0]->is_error) << "Got unexpected is_error value on msg 1.";
 
-  for (auto i = 0; i < rcvd_msgs[0]->data.size(); ++i)
-  {
-    if (i % 2 == 0)
+  for (auto i = 0; i < rcvd_msgs[0]->data.size(); ++i) {
+    if (i % 2 == 0) {
       ASSERT_EQ(rcvd_msgs[0]->data[i], 0x55) << "Got unexpected payload value on msg 1, byte " << i;
-    else
+    } else {
       ASSERT_EQ(rcvd_msgs[0]->data[i], 0xAA) << "Got unexpected payload value on msg 1, byte " << i;
+    }
   }
 
   // MSG 2
@@ -56,8 +56,7 @@ TEST(ROSKvaserInterface, MessageContents)
   ASSERT_FALSE(rcvd_msgs[1]->is_extended) << "Got unexpected is_extended value on msg 2.";
   ASSERT_FALSE(rcvd_msgs[1]->is_error) << "Got unexpected is_error value on msg 2.";
 
-  for (auto i = 0; i < rcvd_msgs[1]->data.size(); ++i)
-  {
+  for (auto i = 0; i < rcvd_msgs[1]->data.size(); ++i) {
     ASSERT_EQ(rcvd_msgs[1]->data[i], 0) << "Got unexpected payload value on msg 2, byte " << i;
   }
 
@@ -68,12 +67,12 @@ TEST(ROSKvaserInterface, MessageContents)
   ASSERT_TRUE(rcvd_msgs[2]->is_extended) << "Got unexpected is_extended value on msg 3.";
   ASSERT_FALSE(rcvd_msgs[2]->is_error) << "Got unexpected is_error value on msg 3.";
 
-  for (auto i = 0; i < rcvd_msgs[2]->data.size(); ++i)
-  {
-    if (i % 2 == 0)
+  for (auto i = 0; i < rcvd_msgs[2]->data.size(); ++i) {
+    if (i % 2 == 0) {
       ASSERT_EQ(rcvd_msgs[2]->data[i], 0x55) << "Got unexpected payload value on msg 3, byte " << i;
-    else
+    } else {
       ASSERT_EQ(rcvd_msgs[2]->data[i], 0xAA) << "Got unexpected payload value on msg 3, byte " << i;
+    }
   }
 
   // MSG 4
@@ -83,21 +82,21 @@ TEST(ROSKvaserInterface, MessageContents)
   ASSERT_TRUE(rcvd_msgs[3]->is_extended) << "Got unexpected is_extended value on msg 4.";
   ASSERT_FALSE(rcvd_msgs[3]->is_error) << "Got unexpected is_error value on msg 4.";
 
-  for (auto i = 0; i < rcvd_msgs[3]->data.size(); ++i)
-  {
-    if (i % 2 == 0)
+  for (auto i = 0; i < rcvd_msgs[3]->data.size(); ++i) {
+    if (i % 2 == 0) {
       ASSERT_EQ(rcvd_msgs[3]->data[i], 0x55) << "Got unexpected payload value on msg 4, byte " << i;
-    else
+    } else {
       ASSERT_EQ(rcvd_msgs[3]->data[i], 0xAA) << "Got unexpected payload value on msg 4, byte " << i;
+    }
   }
 }
 
-void reader_callback(const can_msgs::Frame::ConstPtr& msg)
+void reader_callback(const can_msgs::Frame::ConstPtr & msg)
 {
   rcvd_msgs.push_back(msg);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char ** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "Kvaser Interface Testing Node");
@@ -107,13 +106,14 @@ int main(int argc, char** argv)
   auto msg_sub = nh.subscribe("/reader3/can_tx", 20, reader_callback);
 
   // Wait until reader and writer are ready
-  while (true)
-  {
+  while (true) {
     if (msg_pub.getNumSubscribers() < 1 &&
-        msg_sub.getNumPublishers() < 1)
+      msg_sub.getNumPublishers() < 1)
+    {
       ros::Duration(0.1).sleep();
-    else
+    } else {
       break;
+    }
   }
 
   can_msgs::Frame can_msg;
@@ -128,8 +128,7 @@ int main(int argc, char** argv)
   can_msg.id = 0x555;
   can_msg.dlc = 8;
 
-  for (auto i = 0; i < can_msg.dlc; ++i)
-  {
+  for (auto i = 0; i < can_msg.dlc; ++i) {
     can_msg.data[i] = (i % 2 == 0) ? 0x55 : 0xAA;
   }
 
@@ -170,8 +169,7 @@ int main(int argc, char** argv)
   auto later = ros::Time::now() + ros::Duration(3.0);
 
   // Spin for 3 seconds, then run tests
-  while (later > ros::Time::now())
-  {
+  while (later > ros::Time::now()) {
     ros::spinOnce();
     ros::Duration(0.1).sleep();
   }

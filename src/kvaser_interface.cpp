@@ -34,11 +34,11 @@ namespace AS
 namespace CAN
 {
 
-KvaserCan *KvaserReadCbProxy::kvCanObj = nullptr;
+KvaserCan * KvaserReadCbProxy::kvCanObj = nullptr;
 std::shared_ptr<CanHandle> KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
 
-KvaserCan::KvaserCan() :
-  handle(new CanHandle, &KvaserCan::closeHandle)
+KvaserCan::KvaserCan()
+: handle(new CanHandle, &KvaserCan::closeHandle)
 {
   *handle = -1;
   canInitializeLibrary();
@@ -67,7 +67,7 @@ ReturnStatuses KvaserCan::open(
     return ReturnStatuses::NO_CHANNELS_FOUND;
   }
 
-  for (const auto &channel : channels) {
+  for (const auto & channel : channels) {
     if (
       hardware_id == channel->serial_no &&
       circuit_id == channel->channel_no_on_card)
@@ -396,10 +396,10 @@ std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
 
   std::vector<std::shared_ptr<KvaserCard>> cards;
 
-  for (const auto &channel : channels) {
+  for (const auto & channel : channels) {
     bool found = false;
 
-    for (const auto &card : cards) {
+    for (const auto & card : cards) {
       if (card->serial_no == channel->serial_no) {
         found = true;
       }
@@ -537,7 +537,7 @@ KvaserCanUtils::getChannelsOnCard(const uint64_t & serialNo)
 
   auto channels = getChannels();
 
-  for (const auto &channel : channels) {
+  for (const auto & channel : channels) {
     if (channel->serial_no == serialNo) {
       channelsOnCard.emplace_back(std::move(channel));
     }

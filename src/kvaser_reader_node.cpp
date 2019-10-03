@@ -55,8 +55,8 @@ LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
   (void)state;
   ReturnStatuses ret;
 
-  if ((ret = can_reader_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_))
-    != ReturnStatuses::OK)
+  if ((ret = can_reader_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) !=
+    ReturnStatuses::OK)
   {
     RCLCPP_ERROR(this->get_logger(), "Failed to open CAN reader.");
     return LNI::CallbackReturn::FAILURE;
@@ -109,11 +109,12 @@ void KvaserReaderNode::read()
       // a transmit request, a delay notification,
       // or a failed single-shot.
       if (!(msg.flags.fd_msg ||
-            msg.flags.wakeup_mode ||
-            msg.flags.tx_ack ||
-            msg.flags.tx_rq ||
-            msg.flags.msg_delayed ||
-            msg.flags.tx_nack)) {
+        msg.flags.wakeup_mode ||
+        msg.flags.tx_ack ||
+        msg.flags.tx_rq ||
+        msg.flags.msg_delayed ||
+        msg.flags.tx_nack))
+      {
         auto ros_msg = KvaserRosUtils::to_ros_msg(std::move(msg));
         auto ros_msg_ptr = std::unique_ptr<can_msgs::msg::Frame>(&ros_msg);
         frames_pub_->publish(std::move(ros_msg_ptr));

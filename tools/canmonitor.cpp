@@ -41,11 +41,10 @@ uint32_t channel_idx = 0;
 uint32_t bitrate = 500000;
 
 void shutdown(
-  const ReturnStatuses &ret = ReturnStatuses::OK,
-  const int &error_num = 0)
+  const ReturnStatuses & ret = ReturnStatuses::OK,
+  const int & error_num = 0)
 {
-  if (ret != ReturnStatuses::OK || error_num != 0)
-  {
+  if (ret != ReturnStatuses::OK || error_num != 0) {
     std::cerr << static_cast<int>(ret);
     std::cerr << " - " << KvaserCanUtils::returnStatusDesc(ret).c_str();
     std::cerr << std::endl;
@@ -69,16 +68,14 @@ void can_read()
   ret = kv_can.open(channel_idx, bitrate);
 
   // Read CAN data if channel is OK
-  if (ret == ReturnStatuses::OK)
-  {
+  if (ret == ReturnStatuses::OK) {
     // Loop until ReturnStatus is NO_MESSAGES_RECEIVED
-    while (true)
-    {
+    while (true) {
       CanMsg msg;
       ret = kv_can.read(&msg);
 
-      unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>
-        (std::chrono::system_clock::now().time_since_epoch()).count();
+      unix_timestamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
 
       if (msg.flags.error_frame) {
         std::cout << "[" << std::dec << unix_timestamp_ms << "] ";
@@ -89,8 +86,7 @@ void can_read()
         std::cout << "ID 0x" << std::hex << std::uppercase << msg.id << ":";
         std::cout << std::internal << std::setfill('0');
 
-        for (const auto byte : msg.data)
-        {
+        for (const auto byte : msg.data) {
           std::cout << " " << std::hex << std::setw(2);
           std::cout << std::uppercase << static_cast<unsigned int>(byte);
         }
@@ -129,13 +125,12 @@ int main(int argc, char ** argv)
   // Parse options
   cxxopts::Options options("canmonitor", "A simple tool for reading data from a CAN channel.");
 
-  options.add_options()
-    ("i, index", "Channel index",
-       cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))
-    ("b, bitrate", "Bitrate",
-       cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))
-    ("h, help", "Print help",
-       cxxopts::value<bool>()->implicit_value("true")->default_value("false"));
+  options.add_options()("i, index", "Channel index",
+    cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))("b, bitrate",
+    "Bitrate",
+    cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))("h",
+    "help", "Print help",
+    cxxopts::value<bool>()->implicit_value("true")->default_value("false"));
 
   auto result = options.parse(argc, argv);
 
@@ -143,9 +138,9 @@ int main(int argc, char ** argv)
   bitrate = result["bitrate"].as<unsigned int>();
 
   if (channel_idx > 300 ||
-      bitrate < 100 ||
-      bitrate > 8000000 ||
-      result["help"].as<bool>())
+    bitrate < 100 ||
+    bitrate > 8000000 ||
+    result["help"].as<bool>())
   {
     std::cout << std::endl;
     std::cout << options.help();

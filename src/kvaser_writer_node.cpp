@@ -56,15 +56,15 @@ LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
   (void)state;
   ReturnStatuses ret;
 
-  if ((ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_))
-    != ReturnStatuses::OK)
+  if ((ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) !=
+    ReturnStatuses::OK)
   {
     RCLCPP_ERROR(this->get_logger(), "Failed to open CAN writer.");
     return LNI::CallbackReturn::FAILURE;
   }
 
-  frames_sub_ = this->create_subscription<can_msgs::msg::Frame>("can_rx", 500,
-    std::bind(&KvaserWriterNode::frame_callback, this, std::placeholders::_1));
+  frames_sub_ = this->create_subscription<can_msgs::msg::Frame>(
+    "can_rx", 500, std::bind(&KvaserWriterNode::frame_callback, this, std::placeholders::_1));
 
   return LNI::CallbackReturn::SUCCESS;
 }

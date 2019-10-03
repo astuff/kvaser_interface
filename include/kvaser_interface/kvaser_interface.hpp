@@ -133,7 +133,7 @@ public:
 
 bool operator==(const MsgFlags & lhs, const MsgFlags & rhs)
 {
-  return (
+  return
     lhs.rtr == rhs.rtr &&
     lhs.std_id == rhs.std_id &&
     lhs.ext_id == rhs.ext_id &&
@@ -148,7 +148,7 @@ bool operator==(const MsgFlags & lhs, const MsgFlags & rhs)
     lhs.arb_lost == rhs.arb_lost &&
     lhs.fd_msg == rhs.fd_msg &&
     lhs.fd_bitrate_switch == rhs.fd_bitrate_switch &&
-    lhs.fd_sndr_err_pass_md == rhs.fd_sndr_err_pass_md);
+    lhs.fd_sndr_err_pass_md == rhs.fd_sndr_err_pass_md;
 }
 
 class MsgErrFlags
@@ -186,7 +186,7 @@ public:
 
 bool operator==(const MsgErrFlags & lhs, const MsgErrFlags & rhs)
 {
-  return (
+  return
     lhs.has_err == rhs.has_err &&
     lhs.hw_overrun_err == rhs.hw_overrun_err &&
     lhs.sw_overrun_err == rhs.sw_overrun_err &&
@@ -197,7 +197,7 @@ bool operator==(const MsgErrFlags & lhs, const MsgErrFlags & rhs)
     lhs.bit1_err == rhs.bit1_err &&
     lhs.any_overrun_err == rhs.any_overrun_err &&
     lhs.any_bit_err == rhs.any_bit_err &&
-    lhs.any_rx_err == rhs.any_rx_err);
+    lhs.any_rx_err == rhs.any_rx_err;
 }
 
 class CanMsg
@@ -205,13 +205,13 @@ class CanMsg
 public:
   inline bool operator==(const CanMsg & other)
   {
-    return (
+    return
       id == other.id &&
       dlc == other.dlc &&
       flags == other.flags &&
       error_flags == other.error_flags &&
       data == other.data &&
-      timestamp == other.timestamp);
+      timestamp == other.timestamp;
   }
 
   uint32_t id = 0;
@@ -224,13 +224,13 @@ public:
 
 bool operator==(const CanMsg & lhs, const CanMsg & rhs)
 {
-  return (
+  return
     lhs.id == rhs.id &&
     lhs.dlc == rhs.dlc &&
     lhs.flags == rhs.flags &&
     lhs.error_flags == rhs.error_flags &&
     lhs.data == rhs.data &&
-    lhs.timestamp == rhs.timestamp);
+    lhs.timestamp == rhs.timestamp;
 }
 
 struct KvaserCard
@@ -251,7 +251,7 @@ struct KvaserCard
 };
 
 class KvaserChannel
-: public KvaserCard
+  : public KvaserCard
 {
 public:
   KvaserChannel()
@@ -271,9 +271,9 @@ public:
   // Moving and copying not allowed because of
   // state associated with handle.
   KvaserCan(KvaserCan && p) = delete;
-  KvaserCan &operator=(KvaserCan && p) = delete;
+  KvaserCan & operator=(KvaserCan && p) = delete;
   KvaserCan(const KvaserCan &) = delete;
-  KvaserCan &operator=(const KvaserCan &) = delete;
+  KvaserCan & operator=(const KvaserCan &) = delete;
 
   // Custom deleter for CanHandle smart pointer
   static void closeHandle(CanHandle * h);
@@ -298,13 +298,13 @@ public:
 
   // Read a message
   ReturnStatuses read(CanMsg * msg);
-  ReturnStatuses registerReadCallback(std::function<void (void)> callable);
+  ReturnStatuses registerReadCallback(std::function<void(void)> callable);
 
   // Send a message
   ReturnStatuses write(CanMsg && msg);
 
   // Read callback function
-  std::function<void (void)> readFunc;
+  std::function<void(void)> readFunc;
 
 private:
   std::shared_ptr<CanHandle> handle;
