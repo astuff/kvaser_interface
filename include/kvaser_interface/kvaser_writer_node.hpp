@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef KVASER_INTERFACE__KVASER_INTERFACE_NODE_HPP_
-#define KVASER_INTERFACE__KVASER_INTERFACE_NODE_HPP_
+#ifndef KVASER_INTERFACE__KVASER_WRITER_NODE_HPP_
+#define KVASER_INTERFACE__KVASER_WRITER_NODE_HPP_
 
 #include "kvaser_interface/kvaser_interface.hpp"
 
@@ -39,41 +39,31 @@ namespace AS
 namespace CAN
 {
 
-/// \brief KvaserInterfaceNode class which can pass messages to and from Kvaser hardware or virtual channels
-class KvaserInterfaceNode final
+/// \brief KvaserWriterNode class which can pass messages to Kvaser hardware or virtual channels
+class KvaserWriterNode final
   : public lc::LifecycleNode
 {
 public:
   /// \brief Default constructor
-  KvaserInterfaceNode(rclcpp::NodeOptions options);
+  KvaserWriterNode(rclcpp::NodeOptions options);
   
   /// \brief Callback from transition to "configuring" state.
   /// \param[in] state The current state that the node is in.
   LNI::CallbackReturn on_configure(const lc::State & state);
 
-  /// \brief Callback from transition to "activating" state.
+  /// \brief Callback from transition to "cleanup" state.
   /// \param[in] state The current state that the node is in.
-  LNI::CallbackReturn on_activate(const lc::State & state);
+  LNI::CallbackReturn on_cleanup(const lc::State & state);
 
 private:
   uint8_t hardware_id_, circuit_id_;
   uint32_t bit_rate_;
   bool enable_echo_;
-  bool sub_frames_, pub_frames_;
-  std::shared_ptr<lc::LifecyclePublisher<can_msgs::msg::Frame>> frames_pub_;
   std::shared_ptr<rclcpp::Subscription<can_msgs::msg::Frame>> frames_sub_;
-  KvaserCan can_reader_, can_writer_;
+  KvaserCan can_writer_;
   void frame_callback(const can_msgs::msg::Frame::SharedPtr msg);
-};  // class KvaserInterfaceNode
-
-/// \brief KvaserRosUtils class which provides tools for converting from KvaserInterface classes to ROS msgs.
-class KvaserRosUtils final
-{
-public:
-  static std::unique_ptr<can_msgs::msg::Frame> to_ros_msg(const CanMsg & msg);
-  static std::unique_ptr<CanMsg> from_ros_msg(const can_msgs::msg::Frame & msg);
-};
+};  // class KvaserWriterNode
 }  // namespace CAN
 }  // namespace AS
 
-#endif  // KVASER_INTERFACE__KVASER_INTERFACE_NODE_HPP_
+#endif  // KVASER_INTERFACE__KVASER_WRITER_NODE_HPP_

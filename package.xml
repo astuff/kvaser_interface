@@ -19,6 +19,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>can_msgs</depend>
+  <depend>lifecycle_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

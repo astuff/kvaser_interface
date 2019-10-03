@@ -14,11 +14,10 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(can_msgs REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
 
 include_directories(
   include
-  ${rclcpp_INCLUDE_DIRS}
-  ${can_msgs_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -42,20 +41,38 @@ target_link_libraries(${LIB_NAME}
   canlib
 )
 
-# kvaser_interface ROS Node
+# kvaser_reader ROS Node
 add_library(
-  ${PROJECT_NAME}_node SHARED
-  src/${PROJECT_NAME}_node.cpp
+  kvaser_reader_node SHARED
+  src/kvaser_reader_node.cpp
 )
 ament_target_dependencies(
-  ${PROJECT_NAME}_node
+  kvaser_reader_node
   "rclcpp"
   "rclcpp_components"
   "rclcpp_lifecycle"
   "can_msgs"
 )
 target_link_libraries(
-  ${PROJECT_NAME}_node
+  kvaser_reader_node
+  ${LIB_NAME}
+)
+
+# kvaser_writer ROS Node
+add_library(
+  kvaser_writer_node SHARED
+  src/kvaser_writer_node.cpp
+)
+ament_target_dependencies(
+  kvaser_writer_node
+  "rclcpp"
+  "rclcpp_components"
+  "rclcpp_lifecycle"
+  "can_msgs"
+  "lifecycle_msgs"
+)
+target_link_libraries(
+  kvaser_writer_node
   ${LIB_NAME}
 )
 
@@ -99,7 +116,8 @@ target_link_libraries(
 install(
   TARGETS
   ${LIB_NAME}
-  ${PROJECT_NAME}_node
+  kvaser_reader_node
+  kvaser_writer_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -124,8 +142,13 @@ install(
 )
 
 rclcpp_components_register_nodes(
-  ${PROJECT_NAME}_node
-  "AS::CAN::KvaserInterfaceNode"
+  kvaser_reader_node
+  "AS::CAN::KvaserReaderNode"
+)
+
+rclcpp_components_register_nodes(
+  kvaser_writer_node
+  "AS::CAN::KvaserWriterNode"
 )
 
 if(BUILD_TESTING)
