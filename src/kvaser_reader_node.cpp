@@ -23,7 +23,7 @@ namespace CAN
 {
 
 KvaserReaderNode::KvaserReaderNode(rclcpp::NodeOptions options)
-: lc::LifecycleNode("kvaser_interface_node", options)
+: lc::LifecycleNode("kvaser_reader_node", options)
 {
   hardware_id_ = this->declare_parameter("hardware_id", 12345);
   circuit_id_ = this->declare_parameter("circuit_id", 0);
