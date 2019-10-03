@@ -6,10 +6,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -19,12 +19,14 @@
 // THE SOFTWARE.
 
 #include "kvaser_interface/kvaser_writer_node.hpp"
-#include "kvaser_interface/ros_utils.hpp"
+
+#include <lifecycle_msgs/msg/state.hpp>
 
 #include <memory>
 #include <string>
+#include <utility>
 
-#include <lifecycle_msgs/msg/state.hpp>
+#include "kvaser_interface/ros_utils.hpp"
 
 namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
@@ -54,7 +56,9 @@ LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
   (void)state;
   ReturnStatuses ret;
 
-  if ((ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) != ReturnStatuses::OK) {
+  if ((ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_))
+    != ReturnStatuses::OK)
+  {
     RCLCPP_ERROR(this->get_logger(), "Failed to open CAN writer.");
     return LNI::CallbackReturn::FAILURE;
   }

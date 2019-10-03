@@ -4,13 +4,10 @@
   <name>kvaser_interface</name>
   <version>0.0.1</version>
   <description>Kvaser CAN interface for ROS2 device drivers.</description>
-  <license>MIT</license>
-
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
-
+  <license>MIT</license>
   <url type="bugtracker">https://github.com/astuff/kvaser_interface/issues</url>
   <url type="repository">https://github.com/astuff/kvaser_interface</url>
-
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
 

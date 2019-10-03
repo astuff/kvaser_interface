@@ -6,10 +6,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -18,18 +18,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef KVASER_INTERFACE__KVASER_READER_HPP_
-#define KVASER_INTERFACE__KVASER_READER_HPP_
-
-#include "kvaser_interface/kvaser_interface.hpp"
-
-#include <memory>
-#include <string>
+#ifndef KVASER_INTERFACE__KVASER_READER_NODE_HPP_
+#define KVASER_INTERFACE__KVASER_READER_NODE_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <can_msgs/msg/frame.hpp>
+
+#include <memory>
+#include <string>
+
+#include "kvaser_interface/kvaser_interface.hpp"
 
 namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
@@ -45,8 +45,8 @@ class KvaserReaderNode final
 {
 public:
   /// \brief Default constructor
-  KvaserReaderNode(rclcpp::NodeOptions options);
-  
+  explicit KvaserReaderNode(rclcpp::NodeOptions options);
+
   /// \brief Callback from transition to "configuring" state.
   /// \param[in] state The current state that the node is in.
   LNI::CallbackReturn on_configure(const lc::State & state);
@@ -77,4 +77,4 @@ private:
 }  // namespace CAN
 }  // namespace AS
 
-#endif  // KVASER_INTERFACE__KVASER_READER_HPP_
+#endif  // KVASER_INTERFACE__KVASER_READER_NODE_HPP_

@@ -6,10 +6,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -20,14 +20,19 @@
 
 #include <kvaser_interface/kvaser_interface.hpp>
 
-#include <string>
-#include <vector>
-#include <cstring>
-#include <sstream>
 #include <algorithm>
+#include <cstring>
 #include <iomanip>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
-using namespace AS::CAN;
+namespace AS
+{
+namespace CAN
+{
 
 KvaserCan *KvaserReadCbProxy::kvCanObj = nullptr;
 std::shared_ptr<CanHandle> KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
@@ -459,7 +464,8 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
         chan.all_data_valid = false;
       }
 
-      stat = canGetChannelData(i, canCHANNELDATA_CARD_FIRMWARE_REV, &firmware_rev, sizeof(firmware_rev));
+      stat = canGetChannelData(
+        i, canCHANNELDATA_CARD_FIRMWARE_REV, &firmware_rev, sizeof(firmware_rev));
 
       if (stat == canOK) {
         chan.firmware_rev_maj = firmware_rev[3];
@@ -524,7 +530,8 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
   return channels;
 }
 
-std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannelsOnCard(const uint64_t & serialNo)
+std::vector<std::shared_ptr<KvaserChannel>>
+KvaserCanUtils::getChannelsOnCard(const uint64_t & serialNo)
 {
   std::vector<std::shared_ptr<KvaserChannel>> channelsOnCard;
 
@@ -559,7 +566,7 @@ std::string KvaserCanUtils::returnStatusDesc(const ReturnStatuses & ret)
     status_string = "A write operation failed on the CAN interface.";
   } else if (ret == ReturnStatuses::CLOSE_FAILED) {
     status_string = "Closing the CAN interface failed.";
-  } 
+  }
 
   return status_string;
 }
@@ -629,3 +636,6 @@ void KvaserCanUtils::setFlagsFromMsg(const CanMsg & msg, uint32_t * flags)
   msg.error_flags.bit0_err ? *flags |= canMSGERR_BIT0 : *flags &= ~canMSGERR_BIT0;
   msg.error_flags.bit1_err ? *flags |= canMSGERR_BIT1 : *flags &= ~canMSGERR_BIT1;
 }
+
+}  // namespace CAN
+}  // namespace AS
