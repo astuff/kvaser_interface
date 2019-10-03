@@ -289,6 +289,7 @@ ReturnStatuses KvaserReadCbProxy::registerCb(
 
 void KvaserReadCbProxy::proxyCallback(canNotifyData * data)
 {
+  (void)data;
   kvCanObj->readFunc();
 }
 

@@ -90,7 +90,8 @@ ament_target_dependencies(
 )
 target_link_libraries(
   kvaser_can_bridge
-  ${LIB_NAME}
+  kvaser_reader_node
+  kvaser_writer_node
 )
 
 # canmonitor Tool

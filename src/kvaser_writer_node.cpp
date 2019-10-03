@@ -30,6 +30,11 @@ KvaserWriterNode::KvaserWriterNode(rclcpp::NodeOptions options)
   circuit_id_ = this->declare_parameter("circuit_id", 0);
   bit_rate_ = this->declare_parameter("bit_rate", 500000);
   enable_echo_ = this->declare_parameter("enable_echo", false);
+
+  RCLCPP_INFO(this->get_logger(), "Got hardware ID: %d", hardware_id_);
+  RCLCPP_INFO(this->get_logger(), "Got circuit ID: %d", circuit_id_);
+  RCLCPP_INFO(this->get_logger(), "Got bit rate: %d", bit_rate_);
+  RCLCPP_INFO(this->get_logger(), "Message echo is %s", enable_echo_ ? "enabled" : "disabled");
 }
 
 LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
@@ -58,6 +63,11 @@ LNI::CallbackReturn KvaserWriterNode::on_cleanup(const lc::State & state)
 void KvaserWriterNode::frame_callback(const can_msgs::msg::Frame::SharedPtr msg)
 {
   if (this->get_current_state().id() == State::PRIMARY_STATE_ACTIVE) {
+    if (!can_writer_.isOpen()) {
+      RCLCPP_ERROR(this->get_logger(), "Tried to write CAN message but writer was closed.");
+      return;
+    }
+
     auto can_msg = KvaserRosUtils::from_ros_msg(*msg);
     can_writer_.write(std::move(can_msg));
   } else {

@@ -63,11 +63,15 @@ public:
   /// \param[in] state The current state that the node is in.
   LNI::CallbackReturn on_cleanup(const lc::State & state);
 
+  /// \brief Callback for reading from hardware interface on timer tick.
+  void read();
+
 private:
   uint8_t hardware_id_, circuit_id_;
   uint32_t bit_rate_;
   bool enable_echo_;
   std::shared_ptr<lc::LifecyclePublisher<can_msgs::msg::Frame>> frames_pub_;
+  std::shared_ptr<rclcpp::TimerBase> read_timer_;
   KvaserCan can_reader_;
 };  // class KvaserReaderNode
 }  // namespace CAN

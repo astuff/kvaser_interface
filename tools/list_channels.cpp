@@ -28,6 +28,9 @@ using AS::CAN::KvaserChannel;
 
 int main(int argc, char ** argv)
 {
+  (void)argc;
+  (void)argv;
+
   auto cards = KvaserCanUtils::getCards();
 
   if (cards.size() > 0)

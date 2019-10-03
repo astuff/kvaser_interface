@@ -9,11 +9,13 @@
 #include "kvaser_interface/kvaser_reader_node.hpp"
 #include "kvaser_interface/ros_utils.hpp"
 
+#include <chrono>
 #include <memory>
 #include <string>
 
 namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
+using namespace std::chrono_literals;
 
 namespace AS
 {
@@ -27,6 +29,11 @@ KvaserReaderNode::KvaserReaderNode(rclcpp::NodeOptions options)
   circuit_id_ = this->declare_parameter("circuit_id", 0);
   bit_rate_ = this->declare_parameter("bit_rate", 500000);
   enable_echo_ = this->declare_parameter("enable_echo", false);
+
+  RCLCPP_INFO(this->get_logger(), "Got hardware ID: %d", hardware_id_);
+  RCLCPP_INFO(this->get_logger(), "Got circuit ID: %d", circuit_id_);
+  RCLCPP_INFO(this->get_logger(), "Got bit rate: %d", bit_rate_);
+  RCLCPP_INFO(this->get_logger(), "Message echo is %s", enable_echo_ ? "enabled" : "disabled");
 }
 
 LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
@@ -40,6 +47,7 @@ LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
   }
 
   frames_pub_ = this->create_publisher<can_msgs::msg::Frame>("can_tx", 500);
+  read_timer_ = this->create_wall_timer(10ms, std::bind(&KvaserReaderNode::read, this));
 
   return LNI::CallbackReturn::SUCCESS;
 }
@@ -61,8 +69,44 @@ LNI::CallbackReturn KvaserReaderNode::on_deactivate(const lc::State & state)
 LNI::CallbackReturn KvaserReaderNode::on_cleanup(const lc::State & state)
 {
   (void)state;
+  read_timer_.reset();
   frames_pub_.reset();
   return LNI::CallbackReturn::SUCCESS;
+}
+
+void KvaserReaderNode::read()
+{
+  ReturnStatuses ret;
+
+  while (true) {
+    if (!can_reader_.isOpen()) {
+      RCLCPP_ERROR(this->get_logger(), "Tried to read CAN message but reader was closed.");
+      return;
+    }
+
+    CanMsg msg;
+    ret = can_reader_.read(&msg);
+
+    if (ret == ReturnStatuses::OK) {
+      // Only publish if msg is not CAN FD,
+      // a wakeup message, a transmit acknowledgement,
+      // a transmit request, a delay notification,
+      // or a failed single-shot.
+      if (!(msg.flags.fd_msg ||
+            msg.flags.wakeup_mode ||
+            msg.flags.tx_ack ||
+            msg.flags.tx_rq ||
+            msg.flags.msg_delayed ||
+            msg.flags.tx_nack)) {
+        auto ros_msg = KvaserRosUtils::to_ros_msg(std::move(msg));
+        auto ros_msg_ptr = std::unique_ptr<can_msgs::msg::Frame>(&ros_msg);
+        frames_pub_->publish(std::move(ros_msg_ptr));
+      }
+    } else if (ret != ReturnStatuses::NO_MESSAGES_RECEIVED) {
+      RCLCPP_WARN(this->get_logger(), "Error reading CAN message: %d - %s",
+        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret));
+    }
+  }
 }
 
 }  // namespace CAN

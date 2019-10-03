@@ -30,18 +30,22 @@ using AS::CAN::ReturnStatuses;
 
 TEST(KvaserCanUtils, getChannels)
 {
+  size_t num_channels = 6;
+  size_t num_cards = 3;
+  size_t num_chans_on_card = 2;
+
   int32_t chan_count = -1;
   KvaserCanUtils::getChannelCount(&chan_count);
-  ASSERT_EQ(chan_count, 6);
+  ASSERT_EQ(chan_count, static_cast<int32_t>(num_channels));
 
   auto chans = KvaserCanUtils::getChannels();
-  ASSERT_EQ(chans.size(), 6);
+  ASSERT_EQ(chans.size(), num_channels);
 
   auto cards = KvaserCanUtils::getCards();
-  ASSERT_EQ(cards.size(), 3);
+  ASSERT_EQ(cards.size(), num_cards);
 
   chans = KvaserCanUtils::getChannelsOnCard(1);
-  ASSERT_EQ(chans.size(), 2);
+  ASSERT_EQ(chans.size(), num_chans_on_card);
 }
 
 TEST(KvaserCanUtils, setFlags)
@@ -112,40 +116,42 @@ TEST(KvaserCanUtils, setFlags)
   // Set all flags in int to true
   KvaserCanUtils::setFlagsFromMsg(msg, &flags);
 
+  uint32_t zero = 0;
+
   // Check information flags
-  ASSERT_GT((flags & canMSG_RTR), 0);
-  ASSERT_GT((flags & canMSG_STD), 0);
-  ASSERT_GT((flags & canMSG_EXT), 0);
-  ASSERT_GT((flags & canMSG_WAKEUP), 0);
-  ASSERT_GT((flags & canMSG_NERR), 0);
-  ASSERT_GT((flags & canMSG_ERROR_FRAME), 0);
-  ASSERT_GT((flags & canMSG_TXACK), 0);
-  ASSERT_GT((flags & canMSG_TXRQ), 0);
-  ASSERT_GT((flags & canMSG_DELAY_MSG), 0);
-  ASSERT_GT((flags & canMSG_SINGLE_SHOT), 0);
-  ASSERT_GT((flags & canMSG_TXNACK), 0);
-  ASSERT_GT((flags & canMSG_ABL), 0);
+  ASSERT_GT((flags & canMSG_RTR), zero);
+  ASSERT_GT((flags & canMSG_STD), zero);
+  ASSERT_GT((flags & canMSG_EXT), zero);
+  ASSERT_GT((flags & canMSG_WAKEUP), zero);
+  ASSERT_GT((flags & canMSG_NERR), zero);
+  ASSERT_GT((flags & canMSG_ERROR_FRAME), zero);
+  ASSERT_GT((flags & canMSG_TXACK), zero);
+  ASSERT_GT((flags & canMSG_TXRQ), zero);
+  ASSERT_GT((flags & canMSG_DELAY_MSG), zero);
+  ASSERT_GT((flags & canMSG_SINGLE_SHOT), zero);
+  ASSERT_GT((flags & canMSG_TXNACK), zero);
+  ASSERT_GT((flags & canMSG_ABL), zero);
 
   // Check CAN FD flags
-  ASSERT_GT((flags & canFDMSG_FDF), 0);
-  ASSERT_GT((flags & canFDMSG_BRS), 0);
-  ASSERT_GT((flags & canFDMSG_ESI), 0);
+  ASSERT_GT((flags & canFDMSG_FDF), zero);
+  ASSERT_GT((flags & canFDMSG_BRS), zero);
+  ASSERT_GT((flags & canFDMSG_ESI), zero);
 
   // Check error flags
-  ASSERT_GT((flags & canMSGERR_HW_OVERRUN), 0);
-  ASSERT_GT((flags & canMSGERR_SW_OVERRUN), 0);
-  ASSERT_GT((flags & canMSGERR_STUFF), 0);
-  ASSERT_GT((flags & canMSGERR_FORM), 0);
-  ASSERT_GT((flags & canMSGERR_CRC), 0);
-  ASSERT_GT((flags & canMSGERR_BIT0), 0);
-  ASSERT_GT((flags & canMSGERR_BIT1), 0);
+  ASSERT_GT((flags & canMSGERR_HW_OVERRUN), zero);
+  ASSERT_GT((flags & canMSGERR_SW_OVERRUN), zero);
+  ASSERT_GT((flags & canMSGERR_STUFF), zero);
+  ASSERT_GT((flags & canMSGERR_FORM), zero);
+  ASSERT_GT((flags & canMSGERR_CRC), zero);
+  ASSERT_GT((flags & canMSGERR_BIT0), zero);
+  ASSERT_GT((flags & canMSGERR_BIT1), zero);
 
   // Set all flags in msg to false
   KvaserCanUtils::setMsgFromFlags(&msg, 0x00000000);
 
   // Set all flags in int to false
   KvaserCanUtils::setFlagsFromMsg(msg, &flags);
-  ASSERT_EQ(flags, 0x00000000);
+  ASSERT_EQ(flags, static_cast<uint32_t>(0x00000000));
 }
 
 void dummyCb()
