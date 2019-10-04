@@ -59,7 +59,8 @@ LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
   if ((ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) !=
     ReturnStatuses::OK)
   {
-    RCLCPP_ERROR(this->get_logger(), "Failed to open CAN writer.");
+    RCLCPP_WARN(this->get_logger(), "Error opening CAN writer: %d - %s",
+      static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     return LNI::CallbackReturn::FAILURE;
   }
 

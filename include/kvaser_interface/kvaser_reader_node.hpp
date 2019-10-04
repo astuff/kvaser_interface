@@ -68,7 +68,8 @@ public:
   void read();
 
 private:
-  uint8_t hardware_id_, circuit_id_;
+  uint64_t hardware_id_;
+  uint8_t circuit_id_;
   uint32_t bit_rate_;
   bool enable_echo_;
   std::shared_ptr<lc::LifecyclePublisher<can_msgs::msg::Frame>> frames_pub_;

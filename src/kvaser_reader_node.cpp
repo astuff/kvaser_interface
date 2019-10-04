@@ -58,7 +58,8 @@ LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
   if ((ret = can_reader_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) !=
     ReturnStatuses::OK)
   {
-    RCLCPP_ERROR(this->get_logger(), "Failed to open CAN reader.");
+    RCLCPP_WARN(this->get_logger(), "Error opening CAN reader: %d - %s",
+      static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     return LNI::CallbackReturn::FAILURE;
   }
 
@@ -119,7 +120,9 @@ void KvaserReaderNode::read()
         auto ros_msg_ptr = std::unique_ptr<can_msgs::msg::Frame>(&ros_msg);
         frames_pub_->publish(std::move(ros_msg_ptr));
       }
-    } else if (ret != ReturnStatuses::NO_MESSAGES_RECEIVED) {
+    } else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED) {
+      break;
+    } else {
       RCLCPP_WARN(this->get_logger(), "Error reading CAN message: %d - %s",
         static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret));
     }

@@ -56,7 +56,8 @@ public:
   LNI::CallbackReturn on_cleanup(const lc::State & state);
 
 private:
-  uint8_t hardware_id_, circuit_id_;
+  uint64_t hardware_id_;
+  uint8_t circuit_id_;
   uint32_t bit_rate_;
   bool enable_echo_;
   std::shared_ptr<rclcpp::Subscription<can_msgs::msg::Frame>> frames_sub_;
