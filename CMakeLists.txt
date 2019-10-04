@@ -153,8 +153,33 @@ rclcpp_components_register_nodes(
 )
 
 if(BUILD_TESTING)
+  list(APPEND AMENT_LINT_AUTO_EXCLUDE
+    ament_cmake_cpplint
+    ament_cmake_uncrustify
+  )
+
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+
+  # Remove cxxopts.hpp from linter tests
+  file(GLOB_RECURSE SOURCE_FILES
+    "*.cpp"
+    "*.hpp"
+  )
+
+  find_package(ament_cmake_cpplint)
+  find_package(ament_cmake_uncrustify)
+
+  get_filename_component(
+    CXXOPTS_ABS
+    "include/kvaser_interface/cxxopts.hpp"
+    ABSOLUTE
+  )
+
+  list(REMOVE_ITEM SOURCE_FILES ${CXXOPTS_ABS})
+
+  ament_cpplint(${SOURCE_FILES})
+  ament_uncrustify(${SOURCE_FILES})
 
   find_package(ament_cmake_gtest REQUIRED)
   ament_add_gtest(
