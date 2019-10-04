@@ -55,10 +55,12 @@ LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
   (void)state;
   ReturnStatuses ret;
 
-  if ((ret = can_reader_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) !=
+  if ((ret = can_reader_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) ==
     ReturnStatuses::OK)
   {
-    RCLCPP_WARN(this->get_logger(), "Error opening CAN reader: %d - %s",
+    RCLCPP_DEBUG(this->get_logger(), "Reader successfully configured.");
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Error opening CAN reader: %d - %s",
       static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     return LNI::CallbackReturn::FAILURE;
   }
@@ -73,6 +75,7 @@ LNI::CallbackReturn KvaserReaderNode::on_activate(const lc::State & state)
 {
   (void)state;
   frames_pub_->on_activate();
+  RCLCPP_DEBUG(this->get_logger(), "Reader activated.");
   return LNI::CallbackReturn::SUCCESS;
 }
 
@@ -80,6 +83,7 @@ LNI::CallbackReturn KvaserReaderNode::on_deactivate(const lc::State & state)
 {
   (void)state;
   frames_pub_->on_deactivate();
+  RCLCPP_DEBUG(this->get_logger(), "Reader deactivated.");
   return LNI::CallbackReturn::SUCCESS;
 }
 
@@ -88,6 +92,14 @@ LNI::CallbackReturn KvaserReaderNode::on_cleanup(const lc::State & state)
   (void)state;
   read_timer_.reset();
   frames_pub_.reset();
+  RCLCPP_DEBUG(this->get_logger(), "Reader cleaned up.");
+  return LNI::CallbackReturn::SUCCESS;
+}
+
+LNI::CallbackReturn KvaserReaderNode::on_shutdown(const lc::State & state)
+{
+  (void)state;
+  RCLCPP_DEBUG(this->get_logger(), "Reader shutting down.");
   return LNI::CallbackReturn::SUCCESS;
 }
 

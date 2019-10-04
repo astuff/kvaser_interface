@@ -49,11 +49,23 @@ public:
 
   /// \brief Callback from transition to "configuring" state.
   /// \param[in] state The current state that the node is in.
-  LNI::CallbackReturn on_configure(const lc::State & state);
+  LNI::CallbackReturn on_configure(const lc::State & state) override;
 
-  /// \brief Callback from transition to "cleanup" state.
+  /// \brief Callback from transition to "activated" state.
   /// \param[in] state The current state that the node is in.
-  LNI::CallbackReturn on_cleanup(const lc::State & state);
+  LNI::CallbackReturn on_activate(const lc::State & state) override;
+
+  /// \brief Callback from transition to "deactivating" state.
+  /// \param[in] state The current state that the node is in.
+  LNI::CallbackReturn on_deactivate(const lc::State & state) override;
+
+  /// \brief Callback from transition to "unconfigured" state.
+  /// \param[in] state The current state that the node is in.
+  LNI::CallbackReturn on_cleanup(const lc::State & state) override;
+
+  /// \brief Callback from transition to "shutdown" state.
+  /// \param[in] state The current state that the node is in.
+  LNI::CallbackReturn on_shutdown(const lc::State & state) override;
 
 private:
   uint64_t hardware_id_;

@@ -56,10 +56,11 @@ LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
   (void)state;
   ReturnStatuses ret;
 
-  if ((ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) !=
-    ReturnStatuses::OK)
-  {
-    RCLCPP_WARN(this->get_logger(), "Error opening CAN writer: %d - %s",
+  if ((ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) ==
+    ReturnStatuses::OK) {
+    RCLCPP_DEBUG(this->get_logger(), "Writer successfully configured.");
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Error opening CAN writer: %d - %s",
       static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     return LNI::CallbackReturn::FAILURE;
   }
@@ -70,10 +71,32 @@ LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
   return LNI::CallbackReturn::SUCCESS;
 }
 
+LNI::CallbackReturn KvaserWriterNode::on_activate(const lc::State & state)
+{
+  (void)state;
+  RCLCPP_DEBUG(this->get_logger(), "Writer activated.");
+  return LNI::CallbackReturn::SUCCESS;
+}
+
+LNI::CallbackReturn KvaserWriterNode::on_deactivate(const lc::State & state)
+{
+  (void)state;
+  RCLCPP_DEBUG(this->get_logger(), "Writer deactivated.");
+  return LNI::CallbackReturn::SUCCESS;
+}
+
 LNI::CallbackReturn KvaserWriterNode::on_cleanup(const lc::State & state)
 {
   (void)state;
   frames_sub_.reset();
+  RCLCPP_DEBUG(this->get_logger(), "Writer cleaned up.");
+  return LNI::CallbackReturn::SUCCESS;
+}
+
+LNI::CallbackReturn KvaserWriterNode::on_shutdown(const lc::State & state)
+{
+  (void)state;
+  RCLCPP_DEBUG(this->get_logger(), "Writer shutting down.");
   return LNI::CallbackReturn::SUCCESS;
 }
 

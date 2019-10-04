@@ -32,6 +32,9 @@ using lifecycle_msgs::msg::Transition;
 
 int main(int argc, char ** argv)
 {
+  // Force flush of the stdout buffer.
+  setvbuf(stdout, NULL, _IONBF, BUFSIZ);
+
   bool reader_started = false;
   bool writer_started = false;
 
