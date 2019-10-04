@@ -20,10 +20,6 @@ include_directories(
   include
 )
 
-link_directories(
-  ${rclcpp_LIB_DIRS}
-)
-
 set(node_plugins "")
 
 set(LIB_NAME "ros_${PROJECT_NAME}")
@@ -76,6 +72,16 @@ target_link_libraries(
   ${LIB_NAME}
 )
 
+rclcpp_components_register_nodes(
+  kvaser_reader_node
+  "AS::CAN::KvaserReaderNode"
+)
+
+rclcpp_components_register_nodes(
+  kvaser_writer_node
+  "AS::CAN::KvaserWriterNode"
+)
+
 # CAN Bridge Node
 add_executable(
   kvaser_can_bridge
@@ -114,42 +120,16 @@ target_link_libraries(
   ${LIB_NAME}
 )
 
-install(
-  TARGETS
+ament_export_include_directories(include)
+ament_export_interfaces(
+  export_${LIB_NAME} HAS_LIBRARY_TARGET
+  export_kvaser_reader_node HAS_LIBRARY_TARGET
+  export_kvaser_writer_node HAS_LIBRARY_TARGET
+)
+ament_export_libraries(
   ${LIB_NAME}
   kvaser_reader_node
   kvaser_writer_node
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
-
-install(
-  TARGETS
-  kvaser_can_bridge
-  canmonitor
-  list_channels
-  DESTINATION lib/${PROJECT_NAME}
-)
-
-install(
-  DIRECTORY include/
-  DESTINATION include
-)
-
-install(
-  DIRECTORY launch/
-  DESTINATION share/${PROJECT_NAME}/launch
-)
-
-rclcpp_components_register_nodes(
-  kvaser_reader_node
-  "AS::CAN::KvaserReaderNode"
-)
-
-rclcpp_components_register_nodes(
-  kvaser_writer_node
-  "AS::CAN::KvaserWriterNode"
 )
 
 if(BUILD_TESTING)
@@ -204,3 +184,45 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
+
+install(
+  TARGETS ${LIB_NAME}
+  EXPORT export_${LIB_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(
+  TARGETS kvaser_reader_node
+  EXPORT export_kvaser_reader_node
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(
+  TARGETS kvaser_writer_node
+  EXPORT export_kvaser_writer_node
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
+
+install(
+  TARGETS
+  kvaser_can_bridge
+  canmonitor
+  list_channels
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+)
+
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/
+)
