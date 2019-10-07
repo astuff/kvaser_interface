@@ -66,7 +66,7 @@ LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
   }
 
   frames_pub_ = this->create_publisher<can_msgs::msg::Frame>("can_tx", 500);
-  read_timer_ = this->create_wall_timer(10ms, std::bind(&KvaserReaderNode::read, this));
+  can_reader_.registerReadCallback(std::bind(&KvaserReaderNode::read, this));
 
   return LNI::CallbackReturn::SUCCESS;
 }
@@ -90,7 +90,6 @@ LNI::CallbackReturn KvaserReaderNode::on_deactivate(const lc::State & state)
 LNI::CallbackReturn KvaserReaderNode::on_cleanup(const lc::State & state)
 {
   (void)state;
-  read_timer_.reset();
   frames_pub_.reset();
   RCLCPP_DEBUG(this->get_logger(), "Reader cleaned up.");
   return LNI::CallbackReturn::SUCCESS;
@@ -129,8 +128,7 @@ void KvaserReaderNode::read()
         msg.flags.tx_nack))
       {
         auto ros_msg = KvaserRosUtils::to_ros_msg(std::move(msg));
-        auto ros_msg_ptr = std::unique_ptr<can_msgs::msg::Frame>(&ros_msg);
-        frames_pub_->publish(std::move(ros_msg_ptr));
+        frames_pub_->publish(std::move(ros_msg));
       }
     } else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED) {
       break;

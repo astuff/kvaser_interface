@@ -77,7 +77,6 @@ private:
   uint32_t bit_rate_;
   bool enable_echo_;
   std::shared_ptr<lc::LifecyclePublisher<can_msgs::msg::Frame>> frames_pub_;
-  std::shared_ptr<rclcpp::TimerBase> read_timer_;
   KvaserCan can_reader_;
 };  // class KvaserReaderNode
 }  // namespace CAN
