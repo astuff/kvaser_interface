@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Run Tests in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon test && colcon test-result"
+            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon test --packages-select kvaser_interface && colcon test-result"
       - run:
           name: Shut Down Container
           command: |
