@@ -15,6 +15,7 @@
 
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
+  <depend>rclcpp_lifecycle</depend>
   <depend>can_msgs</depend>
   <depend>lifecycle_msgs</depend>
 

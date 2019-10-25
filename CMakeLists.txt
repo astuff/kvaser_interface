@@ -20,8 +20,6 @@ include_directories(
   include
 )
 
-set(node_plugins "")
-
 set(LIB_NAME "ros_${PROJECT_NAME}")
 
 # kvaser_interface Library
