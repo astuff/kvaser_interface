@@ -30,11 +30,11 @@
 #include "kvaser_interface/cxxopts.hpp"
 #include "kvaser_interface/kvaser_interface.hpp"
 
-using AS::CAN::KvaserCanUtils;
-using AS::CAN::KvaserChannel;
-using AS::CAN::KvaserCan;
-using AS::CAN::ReturnStatuses;
-using AS::CAN::CanMsg;
+using kvaser_interface::KvaserCanUtils;
+using kvaser_interface::KvaserChannel;
+using kvaser_interface::KvaserCan;
+using kvaser_interface::ReturnStatuses;
+using kvaser_interface::CanMsg;
 
 KvaserCan kv_can;
 uint32_t channel_idx = 0;

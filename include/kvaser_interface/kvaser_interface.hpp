@@ -33,9 +33,7 @@ extern "C"
 #include <vector>
 #include <functional>
 
-namespace AS
-{
-namespace CAN
+namespace kvaser_interface
 {
 
 enum class ReturnStatuses
@@ -346,7 +344,6 @@ public:
   static void setFlagsFromMsg(const CanMsg & msg, uint32_t * flags);
 };
 
-}  // namespace CAN
-}  // namespace AS
+}  // namespace kvaser_interface
 
 #endif  // KVASER_INTERFACE__KVASER_INTERFACE_HPP_

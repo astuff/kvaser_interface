@@ -32,9 +32,7 @@ namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
 using lifecycle_msgs::msg::State;
 
-namespace AS
-{
-namespace CAN
+namespace kvaser_interface
 {
 
 KvaserWriterNode::KvaserWriterNode(rclcpp::NodeOptions options)
@@ -116,7 +114,6 @@ void KvaserWriterNode::frame_callback(const can_msgs::msg::Frame::SharedPtr msg)
   }
 }
 
-}  // namespace CAN
-}  // namespace AS
+}  // namespace kvaser_interface
 
-RCLCPP_COMPONENTS_REGISTER_NODE(AS::CAN::KvaserWriterNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(kvaser_interface::KvaserWriterNode)

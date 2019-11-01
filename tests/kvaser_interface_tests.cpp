@@ -25,10 +25,10 @@
 
 #include <utility>
 
-using AS::CAN::CanMsg;
-using AS::CAN::KvaserCan;
-using AS::CAN::KvaserCanUtils;
-using AS::CAN::ReturnStatuses;
+using kvaser_interface::CanMsg;
+using kvaser_interface::KvaserCan;
+using kvaser_interface::KvaserCanUtils;
+using kvaser_interface::ReturnStatuses;
 
 TEST(KvaserCanUtils, getChannels)
 {

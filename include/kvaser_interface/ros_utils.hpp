@@ -29,9 +29,7 @@
 
 #include "kvaser_interface/kvaser_interface.hpp"
 
-namespace AS
-{
-namespace CAN
+namespace kvaser_interface
 {
 
 /// \brief KvaserRosUtils class which provides tools
@@ -81,6 +79,7 @@ public:
     return can_msg;
   }
 };
-}  // namespace CAN
-}  // namespace AS
+
+}  // namespace kvaser_interface
+
 #endif  // KVASER_INTERFACE__ROS_UTILS_HPP_

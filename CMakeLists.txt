@@ -72,12 +72,12 @@ target_link_libraries(
 
 rclcpp_components_register_nodes(
   kvaser_reader_node
-  "AS::CAN::KvaserReaderNode"
+  "kvaser_interface::KvaserReaderNode"
 )
 
 rclcpp_components_register_nodes(
   kvaser_writer_node
-  "AS::CAN::KvaserWriterNode"
+  "kvaser_interface::KvaserWriterNode"
 )
 
 # CAN Bridge Node

@@ -34,9 +34,7 @@
 namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
 
-namespace AS
-{
-namespace CAN
+namespace kvaser_interface
 {
 
 /// \brief KvaserWriterNode class which can pass messages to Kvaser hardware or virtual channels
@@ -76,7 +74,7 @@ private:
   KvaserCan can_writer_;
   void frame_callback(const can_msgs::msg::Frame::SharedPtr msg);
 };  // class KvaserWriterNode
-}  // namespace CAN
-}  // namespace AS
+
+}  // namespace kvaser_interface
 
 #endif  // KVASER_INTERFACE__KVASER_WRITER_NODE_HPP_

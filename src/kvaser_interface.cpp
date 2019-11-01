@@ -29,9 +29,7 @@
 #include <utility>
 #include <vector>
 
-namespace AS
-{
-namespace CAN
+namespace kvaser_interface
 {
 
 KvaserCan * KvaserReadCbProxy::kvCanObj = nullptr;
@@ -637,5 +635,4 @@ void KvaserCanUtils::setFlagsFromMsg(const CanMsg & msg, uint32_t * flags)
   msg.error_flags.bit1_err ? *flags |= canMSGERR_BIT1 : *flags &= ~canMSGERR_BIT1;
 }
 
-}  // namespace CAN
-}  // namespace AS
+}  // namespace kvaser_interface

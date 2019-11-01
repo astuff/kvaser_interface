@@ -31,9 +31,7 @@ namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
 using namespace std::chrono_literals;
 
-namespace AS
-{
-namespace CAN
+namespace kvaser_interface
 {
 
 KvaserReaderNode::KvaserReaderNode(rclcpp::NodeOptions options)
@@ -139,7 +137,6 @@ void KvaserReaderNode::read()
   }
 }
 
-}  // namespace CAN
-}  // namespace AS
+}  // namespace kvaser_interface
 
-RCLCPP_COMPONENTS_REGISTER_NODE(AS::CAN::KvaserReaderNode)
+RCLCPP_COMPONENTS_REGISTER_NODE(kvaser_interface::KvaserReaderNode)

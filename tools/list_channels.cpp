@@ -23,8 +23,8 @@
 
 #include "kvaser_interface/kvaser_interface.hpp"
 
-using AS::CAN::KvaserCanUtils;
-using AS::CAN::KvaserChannel;
+using kvaser_interface::KvaserCanUtils;
+using kvaser_interface::KvaserChannel;
 
 int main(int argc, char ** argv)
 {

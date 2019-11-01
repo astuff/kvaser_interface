@@ -43,20 +43,17 @@ int main(int argc, char ** argv)
   rclcpp::executors::SingleThreadedExecutor exec;
   rclcpp::NodeOptions options;
 
-  auto reader_node = std::make_shared<AS::CAN::KvaserReaderNode>(options);
-  auto writer_node = std::make_shared<AS::CAN::KvaserWriterNode>(options);
+  auto reader_node = std::make_shared<kvaser_interface::KvaserReaderNode>(options);
+  auto writer_node = std::make_shared<kvaser_interface::KvaserWriterNode>(options);
 
   exec.add_node(reader_node->get_node_base_interface());
   exec.add_node(writer_node->get_node_base_interface());
 
-  auto reader_configure_state =
-    reader_node->trigger_transition(
-    rclcpp_lifecycle::Transition(Transition::TRANSITION_CONFIGURE, "configure"));
+  auto reader_configure_state = reader_node->configure();
 
   if (reader_configure_state.id() == State::PRIMARY_STATE_INACTIVE) {
     auto reader_activate_state =
-      reader_node->trigger_transition(
-      rclcpp_lifecycle::Transition(Transition::TRANSITION_ACTIVATE, "activate"));
+      reader_node->activate();
 
     if (reader_activate_state.id() == State::PRIMARY_STATE_ACTIVE) {
       reader_started = true;
@@ -64,13 +61,11 @@ int main(int argc, char ** argv)
   }
 
   auto writer_configure_state =
-    writer_node->trigger_transition(
-    rclcpp_lifecycle::Transition(Transition::TRANSITION_CONFIGURE, "configure"));
+    writer_node->configure();
 
   if (writer_configure_state.id() == State::PRIMARY_STATE_INACTIVE) {
     auto writer_activate_state =
-      writer_node->trigger_transition(
-      rclcpp_lifecycle::Transition(Transition::TRANSITION_ACTIVATE, "activate"));
+      writer_node->activate();
 
     if (writer_activate_state.id() == State::PRIMARY_STATE_ACTIVE) {
       writer_started = true;
