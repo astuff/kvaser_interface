@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Build in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon build"
+            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon build --packages-up-to $CIRCLE_PROJECT_REPONAME"
       - run:
           name: Run Tests in Docker
           command: |
