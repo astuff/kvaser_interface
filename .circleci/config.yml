@@ -26,7 +26,6 @@ jobs:
           name: Add Dependencies
           command: |
             git clone https://github.com/jwhitleyastuff/ros_canopen -b dashing-devel
-            git clone https://github.com/ros/diagnostics -b dashing
       - run:
           name: Clone and Run AS Docker Image
           command: |
