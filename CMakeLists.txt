@@ -27,10 +27,6 @@ add_library(
   ${LIB_NAME} SHARED
   src/kvaser_interface.cpp
 )
-target_compile_definitions(
-  ${LIB_NAME}
-  PRIVATE "COMPOSITION_BUILDING_DLL"
-)
 target_link_libraries(${LIB_NAME}
   canlib
 )
@@ -47,9 +43,17 @@ ament_target_dependencies(
   "rclcpp_lifecycle"
   "can_msgs"
 )
+target_compile_definitions(
+  kvaser_reader_node
+  PRIVATE "COMPOSITION_BUILDING_DLL"
+)
 target_link_libraries(
   kvaser_reader_node
   ${LIB_NAME}
+)
+rclcpp_components_register_nodes(
+  kvaser_reader_node
+  "kvaser_interface::KvaserReaderNode"
 )
 
 # kvaser_writer ROS Node
@@ -65,16 +69,14 @@ ament_target_dependencies(
   "can_msgs"
   "lifecycle_msgs"
 )
+target_compile_definitions(
+  kvaser_writer_node
+  PRIVATE "COMPOSITION_BUILDING_DLL"
+)
 target_link_libraries(
   kvaser_writer_node
   ${LIB_NAME}
 )
-
-rclcpp_components_register_nodes(
-  kvaser_reader_node
-  "kvaser_interface::KvaserReaderNode"
-)
-
 rclcpp_components_register_nodes(
   kvaser_writer_node
   "kvaser_interface::KvaserWriterNode"
@@ -181,8 +183,6 @@ if(BUILD_TESTING)
 #    ${catkin_LIBRARIES})
 endif()
 
-ament_package()
-
 install(
   TARGETS ${LIB_NAME}
   EXPORT export_${LIB_NAME}
@@ -224,3 +224,5 @@ install(
   DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}/
 )
+
+ament_package()
