@@ -19,6 +19,50 @@ using namespace AS::CAN;
 KvaserCan *KvaserReadCbProxy::kvCanObj = nullptr;
 std::shared_ptr<CanHandle> KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
 
+bool AS::CAN::operator==(const MsgFlags& lhs, const MsgFlags& rhs)
+{
+  return (lhs.rtr == rhs.rtr &&
+    lhs.std_id == rhs.std_id &&
+    lhs.ext_id == rhs.ext_id &&
+    lhs.wakeup_mode == rhs.wakeup_mode &&
+    lhs.nerr_active == rhs.nerr_active &&
+    lhs.error_frame == rhs.error_frame &&
+    lhs.tx_ack == rhs.tx_ack &&
+    lhs.tx_rq == rhs.tx_rq &&
+    lhs.msg_delayed == rhs.msg_delayed &&
+    lhs.single_shot == rhs.single_shot &&
+    lhs.tx_nack == rhs.tx_nack &&
+    lhs.arb_lost == rhs.arb_lost &&
+    lhs.fd_msg == rhs.fd_msg &&
+    lhs.fd_bitrate_switch == rhs.fd_bitrate_switch &&
+    lhs.fd_sndr_err_pass_md == rhs.fd_sndr_err_pass_md);
+}
+
+bool AS::CAN::operator==(const MsgErrFlags& lhs, const MsgErrFlags& rhs)
+{
+  return (lhs.has_err == rhs.has_err &&
+    lhs.hw_overrun_err == rhs.hw_overrun_err &&
+    lhs.sw_overrun_err == rhs.sw_overrun_err &&
+    lhs.stuff_err == rhs.stuff_err &&
+    lhs.form_err == rhs.form_err &&
+    lhs.crc_err == rhs.crc_err &&
+    lhs.bit0_err == rhs.bit0_err &&
+    lhs.bit1_err == rhs.bit1_err &&
+    lhs.any_overrun_err == rhs.any_overrun_err &&
+    lhs.any_bit_err == rhs.any_bit_err &&
+    lhs.any_rx_err == rhs.any_rx_err);
+}
+
+bool AS::CAN::operator==(const CanMsg& lhs, const CanMsg& rhs)
+{
+  return (lhs.id == rhs.id &&
+    lhs.dlc == rhs.dlc &&
+    lhs.flags == rhs.flags &&
+    lhs.error_flags == rhs.error_flags &&
+    lhs.data == rhs.data &&
+    lhs.timestamp == rhs.timestamp);
+}
+
 KvaserCan::KvaserCan() :
   handle(new CanHandle)
 {
@@ -265,6 +309,7 @@ ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::share
 
 void KvaserReadCbProxy::proxyCallback(canNotifyData *data)
 {
+  (void) data;
   kvCanObj->readFunc();
 }
 
