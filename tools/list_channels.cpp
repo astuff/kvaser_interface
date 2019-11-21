@@ -1,9 +1,9 @@
 /*
-* Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
-*
-* This file is part of the Kvaser ROS driver which is released under the MIT license.
-* See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
-*/
+ * Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
+ *
+ * This file is part of the Kvaser ROS driver which is released under the MIT license.
+ * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
+ */
 
 #include "kvaser_interface/kvaser_interface.h"
 
@@ -13,7 +13,7 @@
 using AS::CAN::KvaserCanUtils;
 using AS::CAN::KvaserChannel;
 
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
   auto cards = KvaserCanUtils::getCards();
 
@@ -21,25 +21,25 @@ int main(int argc, char ** argv)
   {
     std::cout << std::endl;
 
-    for (const auto & card : cards)
+    for (const auto& card : cards)
     {
       std::cout << "Card " << (&card - &cards[0]) << ":" << std::endl;
       std::cout << "  S/N: " << card->serial_no << std::endl;
       std::cout << "  UPC: " << card->upc_no << std::endl;
       std::cout << "  Name: " << card->dev_name << std::endl;
       std::cout << "  Firmware rev: v";
-        std::cout << card->firmware_rev_maj << ".";
-        std::cout << card->firmware_rev_min << ".";
-        std::cout << card->firmware_rev_bld << std::endl;
+      std::cout << card->firmware_rev_maj << ".";
+      std::cout << card->firmware_rev_min << ".";
+      std::cout << card->firmware_rev_bld << std::endl;
       std::cout << "  Driver: " << card->driver_name << " v";
-        std::cout << card->driver_ver_maj << ".";
-        std::cout << card->driver_ver_min << ".";
-        std::cout << card->driver_ver_bld << std::endl;
+      std::cout << card->driver_ver_maj << ".";
+      std::cout << card->driver_ver_min << ".";
+      std::cout << card->driver_ver_bld << std::endl;
       std::cout << std::endl;
 
       auto channels = KvaserCanUtils::getChannelsOnCard(card->serial_no);
 
-      for (const auto & channel : channels)
+      for (const auto& channel : channels)
       {
         std::cout << "  Channel " << channel->channel_no_on_card << ":" << std::endl;
         std::cout << "    Index: " << channel->channel_idx << std::endl;

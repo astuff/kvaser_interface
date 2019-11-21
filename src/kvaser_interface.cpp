@@ -1,9 +1,9 @@
 /*
-* Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
-*
-* This file is part of the Kvaser ROS 1.0 driver which is released under the MIT license.
-* See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
-*/
+ * Unpublished Copyright (c) 2009-2019 AutonomouStuff, LLC, All Rights Reserved.
+ *
+ * This file is part of the Kvaser ROS 1.0 driver which is released under the MIT license.
+ * See file LICENSE included with this software or go to https://opensource.org/licenses/MIT for full license details.
+ */
 
 #include <kvaser_interface/kvaser_interface.h>
 
@@ -16,11 +16,10 @@
 
 using namespace AS::CAN;
 
-KvaserCan *KvaserReadCbProxy::kvCanObj = nullptr;
+KvaserCan* KvaserReadCbProxy::kvCanObj = nullptr;
 std::shared_ptr<CanHandle> KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
 
-KvaserCan::KvaserCan() :
-  handle(new CanHandle)
+KvaserCan::KvaserCan() : handle(new CanHandle)
 {
   *handle = -1;
   canInitializeLibrary();
@@ -32,10 +31,8 @@ KvaserCan::~KvaserCan()
     canClose(*handle);
 }
 
-ReturnStatuses KvaserCan::open(const uint64_t &hardware_id,
-                               const uint32_t &circuit_id,
-                               const uint32_t &bitrate,
-                               const bool &echo_on)
+ReturnStatuses KvaserCan::open(const uint64_t& hardware_id, const uint32_t& circuit_id, const uint32_t& bitrate,
+                               const bool& echo_on)
 {
   auto channels = KvaserCanUtils::getChannels();
   uint32_t channel_index = 0;
@@ -44,10 +41,9 @@ ReturnStatuses KvaserCan::open(const uint64_t &hardware_id,
   if (channels.size() < 1)
     return ReturnStatuses::NO_CHANNELS_FOUND;
 
-  for (const auto &channel : channels)
+  for (const auto& channel : channels)
   {
-    if (hardware_id == channel->serial_no &&
-        circuit_id == channel->channel_no_on_card)
+    if (hardware_id == channel->serial_no && circuit_id == channel->channel_no_on_card)
     {
       channel_index = channel->channel_idx;
       channel_found = true;
@@ -61,9 +57,7 @@ ReturnStatuses KvaserCan::open(const uint64_t &hardware_id,
     return ReturnStatuses::BAD_PARAM;
 }
 
-ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
-                               const uint32_t &bitrate,
-                               const bool &echo_on)
+ReturnStatuses KvaserCan::open(const uint32_t& channel_index, const uint32_t& bitrate, const bool& echo_on)
 {
   if (!on_bus)
   {
@@ -84,11 +78,20 @@ ReturnStatuses KvaserCan::open(const uint32_t &channel_index,
 
     switch (bitrate)
     {
-      case 125000: freq = canBITRATE_125K; break;
-      case 250000: freq = canBITRATE_250K; break;
-      case 500000: freq = canBITRATE_500K; break;
-      case 1000000: freq = canBITRATE_1M; break;
-      default: return  ReturnStatuses::BAD_PARAM;
+      case 125000:
+        freq = canBITRATE_125K;
+        break;
+      case 250000:
+        freq = canBITRATE_250K;
+        break;
+      case 500000:
+        freq = canBITRATE_500K;
+        break;
+      case 1000000:
+        freq = canBITRATE_1M;
+        break;
+      default:
+        return ReturnStatuses::BAD_PARAM;
     }
 
     if (canSetBusParams(*handle, freq, 0, 0, 0, 0, 0) < 0)
@@ -140,7 +143,7 @@ ReturnStatuses KvaserCan::close()
     return ReturnStatuses::OK;
 }
 
-ReturnStatuses KvaserCan::read(CanMsg *msg)
+ReturnStatuses KvaserCan::read(CanMsg* msg)
 {
   if (*handle < 0)
   {
@@ -216,7 +219,7 @@ ReturnStatuses KvaserCan::registerReadCallback(std::function<void(void)> callabl
   }
 }
 
-ReturnStatuses KvaserCan::write(CanMsg &&msg)
+ReturnStatuses KvaserCan::write(CanMsg&& msg)
 {
   if (*handle < 0)
     return ReturnStatuses::CHANNEL_CLOSED;
@@ -235,7 +238,7 @@ ReturnStatuses KvaserCan::write(CanMsg &&msg)
   return (ret == canOK) ? ReturnStatuses::OK : ReturnStatuses::WRITE_FAILED;
 }
 
-ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::shared_ptr<CanHandle> &hdl)
+ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan* canObj, const std::shared_ptr<CanHandle>& hdl)
 {
   handle = std::shared_ptr<CanHandle>(hdl);
 
@@ -245,11 +248,7 @@ ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::share
   {
     kvCanObj = canObj;
 
-    auto stat = canSetNotify(
-      *(hdl),
-      &KvaserReadCbProxy::proxyCallback,
-      canNOTIFY_RX,
-      reinterpret_cast<char*>(0));
+    auto stat = canSetNotify(*(hdl), &KvaserReadCbProxy::proxyCallback, canNOTIFY_RX, reinterpret_cast<char*>(0));
 
     if (stat == canOK)
     {
@@ -263,12 +262,12 @@ ReturnStatuses KvaserReadCbProxy::registerCb(KvaserCan *canObj, const std::share
   }
 }
 
-void KvaserReadCbProxy::proxyCallback(canNotifyData *data)
+void KvaserReadCbProxy::proxyCallback(canNotifyData* data)
 {
   kvCanObj->readFunc();
 }
 
-ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t &canlibStat)
+ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t& canlibStat)
 {
   switch (canlibStat)
   {
@@ -283,7 +282,7 @@ ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t &canlibSta
   }
 }
 
-size_t KvaserCanUtils::dlcToSize(const uint8_t &dlc)
+size_t KvaserCanUtils::dlcToSize(const uint8_t& dlc)
 {
   if (dlc < 9)
   {
@@ -320,7 +319,7 @@ size_t KvaserCanUtils::dlcToSize(const uint8_t &dlc)
   }
 }
 
-uint8_t KvaserCanUtils::sizeToDlc(const size_t &size)
+uint8_t KvaserCanUtils::sizeToDlc(const size_t& size)
 {
   if (size < 9)
   {
@@ -357,7 +356,7 @@ uint8_t KvaserCanUtils::sizeToDlc(const size_t &size)
   }
 }
 
-void KvaserCanUtils::getChannelCount(int32_t *numChan)
+void KvaserCanUtils::getChannelCount(int32_t* numChan)
 {
   auto stat = canGetNumberOfChannels(numChan);
 
@@ -371,11 +370,11 @@ std::vector<std::shared_ptr<KvaserCard>> KvaserCanUtils::getCards()
 
   std::vector<std::shared_ptr<KvaserCard>> cards;
 
-  for (const auto &channel : channels)
+  for (const auto& channel : channels)
   {
     bool found = false;
 
-    for (const auto &card : cards)
+    for (const auto& card : cards)
     {
       if (card->serial_no == channel->serial_no)
         found = true;
@@ -509,13 +508,13 @@ std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannels()
   return channels;
 }
 
-std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannelsOnCard(const uint64_t &serialNo)
+std::vector<std::shared_ptr<KvaserChannel>> KvaserCanUtils::getChannelsOnCard(const uint64_t& serialNo)
 {
   std::vector<std::shared_ptr<KvaserChannel>> channelsOnCard;
 
   auto channels = getChannels();
 
-  for (const auto &channel : channels)
+  for (const auto& channel : channels)
   {
     if (channel->serial_no == serialNo)
       channelsOnCard.emplace_back(std::move(channel));
@@ -548,7 +547,7 @@ std::string KvaserCanUtils::returnStatusDesc(const ReturnStatuses& ret)
   return status_string;
 }
 
-void KvaserCanUtils::setMsgFromFlags(CanMsg *msg, const uint32_t &flags)
+void KvaserCanUtils::setMsgFromFlags(CanMsg* msg, const uint32_t& flags)
 {
   // Regular CAN message flags
   msg->flags.rtr = ((flags & canMSG_RTR) > 0);
@@ -583,33 +582,33 @@ void KvaserCanUtils::setMsgFromFlags(CanMsg *msg, const uint32_t &flags)
   msg->error_flags.any_rx_err = ((flags & canMSGERR_BUSERR) > 0);
 }
 
-void KvaserCanUtils::setFlagsFromMsg(const CanMsg &msg, uint32_t *flags)
+void KvaserCanUtils::setFlagsFromMsg(const CanMsg& msg, uint32_t* flags)
 {
   // Regular CAN message flags
-  msg.flags.rtr ? *flags |= canMSG_RTR : *flags &= ~canMSG_RTR;
-  msg.flags.std_id ? *flags |= canMSG_STD : *flags &= ~canMSG_STD;
-  msg.flags.ext_id ? *flags |= canMSG_EXT : *flags &= ~canMSG_EXT;
-  msg.flags.wakeup_mode ? *flags |= canMSG_WAKEUP : *flags &= ~canMSG_WAKEUP;
-  msg.flags.nerr_active ? *flags |= canMSG_NERR : *flags &= ~canMSG_NERR;
-  msg.flags.error_frame ? *flags |= canMSG_ERROR_FRAME : *flags &= ~canMSG_ERROR_FRAME;
-  msg.flags.tx_ack ? *flags |= canMSG_TXACK : *flags &= ~canMSG_TXACK;
-  msg.flags.tx_rq ? *flags |= canMSG_TXRQ : *flags &= ~canMSG_TXRQ;
-  msg.flags.msg_delayed ? *flags |= canMSG_DELAY_MSG : *flags &= ~canMSG_DELAY_MSG;
-  msg.flags.single_shot ? *flags |= canMSG_SINGLE_SHOT : *flags &= ~canMSG_SINGLE_SHOT;
-  msg.flags.tx_nack ? *flags |= canMSG_TXNACK : *flags &= ~canMSG_TXNACK;
-  msg.flags.arb_lost ? *flags |= canMSG_ABL : *flags &= ~canMSG_ABL;
+  msg.flags.rtr ? * flags |= canMSG_RTR : * flags &= ~canMSG_RTR;
+  msg.flags.std_id ? * flags |= canMSG_STD : * flags &= ~canMSG_STD;
+  msg.flags.ext_id ? * flags |= canMSG_EXT : * flags &= ~canMSG_EXT;
+  msg.flags.wakeup_mode ? * flags |= canMSG_WAKEUP : * flags &= ~canMSG_WAKEUP;
+  msg.flags.nerr_active ? * flags |= canMSG_NERR : * flags &= ~canMSG_NERR;
+  msg.flags.error_frame ? * flags |= canMSG_ERROR_FRAME : * flags &= ~canMSG_ERROR_FRAME;
+  msg.flags.tx_ack ? * flags |= canMSG_TXACK : * flags &= ~canMSG_TXACK;
+  msg.flags.tx_rq ? * flags |= canMSG_TXRQ : * flags &= ~canMSG_TXRQ;
+  msg.flags.msg_delayed ? * flags |= canMSG_DELAY_MSG : * flags &= ~canMSG_DELAY_MSG;
+  msg.flags.single_shot ? * flags |= canMSG_SINGLE_SHOT : * flags &= ~canMSG_SINGLE_SHOT;
+  msg.flags.tx_nack ? * flags |= canMSG_TXNACK : * flags &= ~canMSG_TXNACK;
+  msg.flags.arb_lost ? * flags |= canMSG_ABL : * flags &= ~canMSG_ABL;
 
   // CAN FD *flags
-  msg.flags.fd_msg ? *flags |= canFDMSG_FDF : *flags &= ~canFDMSG_FDF;
-  msg.flags.fd_bitrate_switch ? *flags |= canFDMSG_BRS : *flags &= ~canFDMSG_BRS;
-  msg.flags.fd_sndr_err_pass_md ? *flags |= canFDMSG_ESI : *flags &= ~canFDMSG_ESI;
+  msg.flags.fd_msg ? * flags |= canFDMSG_FDF : * flags &= ~canFDMSG_FDF;
+  msg.flags.fd_bitrate_switch ? * flags |= canFDMSG_BRS : * flags &= ~canFDMSG_BRS;
+  msg.flags.fd_sndr_err_pass_md ? * flags |= canFDMSG_ESI : * flags &= ~canFDMSG_ESI;
 
   // Error *flags
-  msg.error_flags.hw_overrun_err ? *flags |= canMSGERR_HW_OVERRUN : *flags &= ~canMSGERR_HW_OVERRUN;
-  msg.error_flags.sw_overrun_err ? *flags |= canMSGERR_SW_OVERRUN : *flags &= ~canMSGERR_SW_OVERRUN;
-  msg.error_flags.stuff_err ? *flags |= canMSGERR_STUFF : *flags &= ~canMSGERR_STUFF;
-  msg.error_flags.form_err ? *flags |= canMSGERR_FORM : *flags &= ~canMSGERR_FORM;
-  msg.error_flags.crc_err ? *flags |= canMSGERR_CRC : *flags &= ~canMSGERR_CRC;
-  msg.error_flags.bit0_err ? *flags |= canMSGERR_BIT0 : *flags &= ~canMSGERR_BIT0;
-  msg.error_flags.bit1_err ? *flags |= canMSGERR_BIT1 : *flags &= ~canMSGERR_BIT1;
+  msg.error_flags.hw_overrun_err ? * flags |= canMSGERR_HW_OVERRUN : * flags &= ~canMSGERR_HW_OVERRUN;
+  msg.error_flags.sw_overrun_err ? * flags |= canMSGERR_SW_OVERRUN : * flags &= ~canMSGERR_SW_OVERRUN;
+  msg.error_flags.stuff_err ? * flags |= canMSGERR_STUFF : * flags &= ~canMSGERR_STUFF;
+  msg.error_flags.form_err ? * flags |= canMSGERR_FORM : * flags &= ~canMSGERR_FORM;
+  msg.error_flags.crc_err ? * flags |= canMSGERR_CRC : * flags &= ~canMSGERR_CRC;
+  msg.error_flags.bit0_err ? * flags |= canMSGERR_BIT0 : * flags &= ~canMSGERR_BIT0;
+  msg.error_flags.bit1_err ? * flags |= canMSGERR_BIT1 : * flags &= ~canMSGERR_BIT1;
 }
