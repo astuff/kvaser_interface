@@ -37,7 +37,8 @@ enum class ReturnStatuses
   READ_FAILED = -6,
   WRITE_FAILED = -7,
   CLOSE_FAILED = -8,
-  DLC_PAYLOAD_MISMATCH = -9
+  DLC_PAYLOAD_MISMATCH = -9,
+  CALLBACK_REGISTRATION_FAILED = -10
 };
 
 enum class HardwareType
@@ -265,17 +266,7 @@ private:
   bool on_bus;
 };
 
-class KvaserReadCbProxy
-{
-public:
-  static ReturnStatuses registerCb(KvaserCan* canObj, const std::shared_ptr<CanHandle>& hdl);
-
-private:
-  static void proxyCallback(canNotifyData* data);
-
-  static KvaserCan* kvCanObj;
-  static std::shared_ptr<CanHandle> handle;
-};
+void proxyCallback(canNotifyData* data);
 
 class KvaserCanUtils
 {
