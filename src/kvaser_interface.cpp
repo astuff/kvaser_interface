@@ -32,8 +32,10 @@
 namespace kvaser_interface
 {
 
-KvaserCan * KvaserReadCbProxy::kvCanObj = nullptr;
-std::shared_ptr<CanHandle> KvaserReadCbProxy::handle = std::shared_ptr<CanHandle>(nullptr);
+void proxyCallback(canNotifyData * data)
+{
+  static_cast<KvaserCan *>(data->tag)->readFunc();
+}
 
 KvaserCan::KvaserCan()
 : handle(new CanHandle, &KvaserCan::closeHandle)
@@ -234,13 +236,14 @@ ReturnStatuses KvaserCan::registerReadCallback(std::function<void(void)> callabl
     return ReturnStatuses::CHANNEL_CLOSED;
   } else {
     readFunc = callable;
-    auto ret = KvaserReadCbProxy::registerCb(this, handle);
+    auto stat = canSetNotify(*(handle), &proxyCallback, canNOTIFY_RX, static_cast<void *>(this));
 
-    if (ret != ReturnStatuses::OK) {
+    if (stat != canOK) {
       readFunc = nullptr;
+      return ReturnStatuses::CALLBACK_REGISTRATION_FAILED;
+    } else {
+      return ReturnStatuses::OK;
     }
-
-    return ret;
   }
 }
 
@@ -263,37 +266,6 @@ ReturnStatuses KvaserCan::write(CanMsg && msg)
   canStatus ret = canWrite(*handle, msg.id, &msg.data[0], msg.dlc, flags);
 
   return (ret == canOK) ? ReturnStatuses::OK : ReturnStatuses::WRITE_FAILED;
-}
-
-ReturnStatuses KvaserReadCbProxy::registerCb(
-  KvaserCan * canObj, const std::shared_ptr<CanHandle> & hdl)
-{
-  handle = std::shared_ptr<CanHandle>(hdl);
-
-  if (!canObj->isOpen()) {
-    return ReturnStatuses::CHANNEL_CLOSED;
-  } else {
-    kvCanObj = canObj;
-
-    auto stat = canSetNotify(
-      *(hdl),
-      &KvaserReadCbProxy::proxyCallback,
-      canNOTIFY_RX,
-      reinterpret_cast<char *>(0));
-
-    if (stat == canOK) {
-      return ReturnStatuses::OK;
-    } else {
-      kvCanObj = nullptr;
-      return ReturnStatuses::BAD_PARAM;
-    }
-  }
-}
-
-void KvaserReadCbProxy::proxyCallback(canNotifyData * data)
-{
-  (void)data;
-  kvCanObj->readFunc();
 }
 
 ReturnStatuses KvaserCanUtils::canlibStatToReturnStatus(const int32_t & canlibStat)
@@ -564,6 +536,10 @@ std::string KvaserCanUtils::returnStatusDesc(const ReturnStatuses & ret)
     status_string = "A write operation failed on the CAN interface.";
   } else if (ret == ReturnStatuses::CLOSE_FAILED) {
     status_string = "Closing the CAN interface failed.";
+  } else if (ret == ReturnStatuses::DLC_PAYLOAD_MISMATCH) {
+    status_string = "The DLC did not match the size of the message payload.";
+  } else if (ret == ReturnStatuses::CALLBACK_REGISTRATION_FAILED) {
+    status_string = "Registering a callback for message read failed.";
   }
 
   return status_string;
