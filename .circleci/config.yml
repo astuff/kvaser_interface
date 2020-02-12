@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Install Linuxcan on Host
           command: |
-            sudo apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux
+            sudo apt-add-repository -y ppa:astuff/kvaser-linux
             sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
             sudo apt-get install -y linux-headers-`uname -r` kvaser-drivers-dkms
             sudo depmod
@@ -25,7 +25,7 @@ jobs:
       - run:
           name: Install Linuxcan in Docker
           command: |
-            docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux && apt update -qq"
+            docker exec test /bin/bash -c "apt-add-repository -y ppa:astuff/kvaser-linux && apt update -qq"
             docker exec test /bin/bash -c "apt install -y kvaser-canlib-dev"
       - run:
           name: Set Up ROS in Docker
@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Install Linuxcan on Host
           command: |
-            sudo apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux
+            sudo apt-add-repository -y ppa:astuff/kvaser-linux
             sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
             sudo apt-get install -y linux-headers-`uname -r` kvaser-drivers-dkms
             sudo depmod
@@ -71,7 +71,7 @@ jobs:
       - run:
           name: Install Linuxcan in Docker
           command: |
-            docker exec test /bin/bash -c "apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux && apt update -qq"
+            docker exec test /bin/bash -c "apt-add-repository -y ppa:astuff/kvaser-linux && apt update -qq"
             docker exec test /bin/bash -c "apt install -y kvaser-canlib-dev"
       - run:
           name: Set Up ROS in Docker
@@ -100,7 +100,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux
+            apt-add-repository -y ppa:astuff/kvaser-linux
             apt-get update -qq && apt-get install -y kvaser-canlib-dev dh-make python-bloom ruby
             gem install --no-rdoc --no-ri deb-s3
             source `find /opt/ros -name setup.bash | sort | head -1`
@@ -126,7 +126,7 @@ jobs:
       - run:
           name: Set Up Container
           command: |
-            apt-add-repository -y ppa:jwhitleyastuff/kvaser-linux
+            apt-add-repository -y ppa:astuff/kvaser-linux
             apt-get update -qq && apt-get install -y kvaser-canlib-dev dh-make python-bloom ruby
             gem install --no-rdoc --no-ri deb-s3
             source `find /opt/ros -name setup.bash | sort | head -1`
