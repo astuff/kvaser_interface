@@ -11,7 +11,7 @@ The following are required prerequisites:
 * The Kvaser CANLIB API (https://www.kvaser.com/downloads/)
     * Can be [downloaded directly](https://www.kvaser.com/kvaser-downloads) or installed through PPA:
 
-        `sudo apt-add-repository ppa:astuff/kvaser-linuxcan`
+        `sudo apt-add-repository ppa:astuff/kvaser-linux`
 
         `sudo apt update && sudo apt install -y kvaser-canlib-dev`
     * You can optionally install the Kvaser drivers from the PPA with the following command:
