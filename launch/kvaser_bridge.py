@@ -34,8 +34,8 @@ def generate_launch_description():
     return LaunchDescription([
         launch_ros.actions.Node(
             package='kvaser_interface',
-            node_executable='kvaser_can_bridge',
+            executable='kvaser_can_bridge',
             output='screen',
-            node_namespace='',
+            namespace='',
             parameters=[params_file]),
     ])
