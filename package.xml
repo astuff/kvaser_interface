@@ -11,7 +11,7 @@
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
