@@ -126,6 +126,7 @@ void KvaserReaderNode::read()
         msg.flags.tx_nack))
       {
         auto ros_msg = KvaserRosUtils::to_ros_msg(std::move(msg));
+        ros_msg.header.stamp = this->now();
         frames_pub_->publish(std::move(ros_msg));
       }
     } else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED) {
