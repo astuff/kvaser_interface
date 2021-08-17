@@ -30,20 +30,21 @@ commands:
       - run:
           name: Install Linuxcan in Docker
           command: |
-            docker exec test /bin/bash -c "apt-add-repository -y ppa:astuff/kvaser-linux && apt update -qq"
-            docker exec test /bin/bash -c "apt install -y kvaser-canlib-dev"
+            docker exec test /bin/bash -c "apt-add-repository -y ppa:astuff/kvaser-linux && apt-get update"
+            docker exec test /bin/bash -c "apt-get install -y kvaser-canlib-dev"
       - run:
           name: Set Up ROS in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
+            docker exec test /bin/bash -c "source /opt/ros/*/setup.bash && rosdep update"
+            docker exec test /bin/bash -c "source /opt/ros/*/setup.bash && rosdep install --from-paths src --ignore-src -y"
       - run:
           name: Build in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon build --packages-up-to $CIRCLE_PROJECT_REPONAME"
+            docker exec test /bin/bash -c "source /opt/ros/*/setup.bash && colcon build --packages-up-to $CIRCLE_PROJECT_REPONAME"
       - run:
           name: Run Tests in Docker
           command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon test --packages-select kvaser_interface && colcon test-result"
+            docker exec test /bin/bash -c "source /opt/ros/*/setup.bash && colcon test --packages-select kvaser_interface && colcon test-result"
       - run:
           name: Shut Down Container
           command: |
@@ -54,90 +55,46 @@ jobs:
     machine:
       image: ubuntu-1604:201903-01
     steps:
-      - checkout
-      - run:
-          name: Install Linuxcan on Host
-          command: |
-            sudo apt-add-repository -y ppa:astuff/kvaser-linux
-            sudo apt-get clean && sudo apt-get update -qq && sudo apt-get install dpkg # Fix dpkg bug
-            sudo apt-get install -y linux-headers-`uname -r` kvaser-drivers-dkms
-            sudo depmod
-            cd /usr/src/kvaser-drivers-*
-            sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
-            sudo make virtualcan
-            sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
-            sudo virtualcan.sh start
-      - run:
-          name: Move Source
-          command: |
-            mkdir $CIRCLE_PROJECT_REPONAME
-            mv `find -maxdepth 1 -not -name . -not -name $CIRCLE_PROJECT_REPONAME` $CIRCLE_PROJECT_REPONAME/
-      - run:
-          name: Clone and Run AS Docker Image
-          command: |
-            docker pull autonomoustuff/docker-builds:dashing-ros-base
-            cd ..
-            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 --device=/dev/kvvirtualcan2 --device=/dev/kvvirtualcan3 --device=/dev/kvvirtualcan4 --device=/dev/kvvirtualcan5 -v `pwd`:/ros_ws -w /ros_ws autonomoustuff/docker-builds:dashing-ros-base sh -c "sleep infinity"
-      - run:
-          name: Install Linuxcan in Docker
-          command: |
-            docker exec test /bin/bash -c "apt-add-repository -y ppa:astuff/kvaser-linux && apt update -qq"
-            docker exec test /bin/bash -c "apt install -y kvaser-canlib-dev"
-      - run:
-          name: Set Up ROS in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && rosdep install --from-paths src --ignore-src -y"
-      - run:
-          name: Build in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon build --packages-up-to $CIRCLE_PROJECT_REPONAME"
-      - run:
-          name: Run Tests in Docker
-          command: |
-            docker exec test /bin/bash -c "source \`find /opt/ros -maxdepth 2 -name setup.bash | sort | head -1\` && colcon test --packages-select kvaser_interface && colcon test-result"
-      - run:
-          name: Shut Down Container
-          command: |
-            docker kill $(docker ps -l -q)
+      - ros_build
     working_directory: ~/src
 
-  dashing_release:
-    docker:
-      - image: autonomoustuff/docker-builds:dashing-ros-base
-    steps:
-      - checkout
-      - run:
-          name: Set Up Container
-          command: |
-            apt-add-repository -y ppa:astuff/kvaser-linux
-            apt-get update -qq && apt-get install -y kvaser-canlib-dev dh-make python-bloom ruby
-            gem install --no-rdoc --no-ri deb-s3
-            source `find /opt/ros -name setup.bash | sort | head -1`
-            rosdep install --from-paths . --ignore-src -y
-      - run:
-          name: Build
-          command: |
-            bloom-generate rosdebian --os-name ubuntu --os-version bionic --ros-distro dashing
-            sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
-            fakeroot debian/rules binary
-      - run:
-          name: Upload
-          command: |
-            cd ..
-            deb-s3 upload -b autonomoustuff-repo -c bionic --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
-    working_directory: ~/src
+  # dashing_release:
+  #   docker:
+  #     - image: autonomoustuff/docker-builds:dashing-ros-base
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Set Up Container
+  #         command: |
+  #           apt-add-repository -y ppa:astuff/kvaser-linux
+  #           apt-get update -qq && apt-get install -y kvaser-canlib-dev dh-make python-bloom ruby
+  #           gem install --no-rdoc --no-ri deb-s3
+  #           source `find /opt/ros -name setup.bash | sort | head -1`
+  #           rosdep install --from-paths . --ignore-src -y
+  #     - run:
+  #         name: Build
+  #         command: |
+  #           bloom-generate rosdebian --os-name ubuntu --os-version bionic --ros-distro dashing
+  #           sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
+  #           fakeroot debian/rules binary
+  #     - run:
+  #         name: Upload
+  #         command: |
+  #           cd ..
+  #           deb-s3 upload -b autonomoustuff-repo -c bionic --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
+  #   working_directory: ~/src
 
 workflows:
   version: 2
   ros_build:
     jobs:
       - dashing
-  ros_release:
-    jobs:
-      - dashing_release:
-          context: ubuntu-pkg-build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^[0-9]*.[0-9]*.[0-9]*$/
+  # ros_release:
+  #   jobs:
+  #     - dashing_release:
+  #         context: ubuntu-pkg-build
+  #         filters:
+  #           branches:
+  #             ignore: /.*/
+  #           tags:
+  #             only: /^[0-9]*.[0-9]*.[0-9]*$/
