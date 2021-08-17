@@ -125,10 +125,13 @@ int main(int argc, char ** argv)
   // Parse options
   cxxopts::Options options("canmonitor", "A simple tool for reading data from a CAN channel.");
 
-  options.add_options()("i, index", "Channel index",
-    cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))("b, bitrate",
+  options.add_options()(
+    "i, index", "Channel index",
+    cxxopts::value<unsigned int>()->implicit_value("0")->default_value("0"))(
+    "b, bitrate",
     "Bitrate",
-    cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))("h, help",
+    cxxopts::value<unsigned int>()->implicit_value("500000")->default_value("500000"))(
+    "h, help",
     "Print help",
     cxxopts::value<bool>()->implicit_value("true")->default_value("false"));
 

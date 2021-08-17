@@ -58,7 +58,8 @@ LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
   {
     RCLCPP_DEBUG(this->get_logger(), "Reader successfully configured.");
   } else {
-    RCLCPP_ERROR(this->get_logger(), "Error opening CAN reader: %d - %s",
+    RCLCPP_ERROR(
+      this->get_logger(), "Error opening CAN reader: %d - %s",
       static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     return LNI::CallbackReturn::FAILURE;
   }
@@ -132,7 +133,8 @@ void KvaserReaderNode::read()
     } else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED) {
       break;
     } else {
-      RCLCPP_WARN(this->get_logger(), "Error reading CAN message: %d - %s",
+      RCLCPP_WARN(
+        this->get_logger(), "Error reading CAN message: %d - %s",
         static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret));
     }
   }
