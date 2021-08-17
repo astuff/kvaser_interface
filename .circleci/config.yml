@@ -49,8 +49,6 @@ commands:
           command: |
             docker kill $(docker ps -l -q)
 
-
-version: 2
 jobs:
   dashing:
     machine:
