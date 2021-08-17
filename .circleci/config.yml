@@ -57,43 +57,8 @@ jobs:
       - ros_build
     working_directory: ~/src
 
-  # foxy_release:
-  #   docker:
-  #     - image: autonomoustuff/docker-builds:foxy-ros-base
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Set Up Container
-  #         command: |
-  #           apt-add-repository -y ppa:astuff/kvaser-linux
-  #           apt-get update -qq && apt-get install -y kvaser-canlib-dev dh-make python-bloom ruby
-  #           gem install --no-rdoc --no-ri deb-s3
-  #           source `find /opt/ros -name setup.bash | sort | head -1`
-  #           rosdep install --from-paths . --ignore-src -y
-  #     - run:
-  #         name: Build
-  #         command: |
-  #           bloom-generate rosdebian --os-name ubuntu --os-version bionic --ros-distro foxy
-  #           sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
-  #           fakeroot debian/rules binary
-  #     - run:
-  #         name: Upload
-  #         command: |
-  #           cd ..
-  #           deb-s3 upload -b autonomoustuff-repo -c bionic --preserve-versions $(ls *.deb) --access-key-id=$S3_ACCESS_KEY_ID --secret-access-key=$S3_SECRET_ACCESS_KEY
-  #   working_directory: ~/src
-
 workflows:
   version: 2
   ros_build:
     jobs:
       - foxy
-  # ros_release:
-  #   jobs:
-  #     - foxy_release:
-  #         context: ubuntu-pkg-build
-  #         filters:
-  #           branches:
-  #             ignore: /.*/
-  #           tags:
-  #             only: /^[0-9]*.[0-9]*.[0-9]*$/
