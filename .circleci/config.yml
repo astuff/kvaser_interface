@@ -24,9 +24,9 @@ commands:
       - run:
           name: Clone and Run AS Docker Image
           command: |
-            docker pull autonomoustuff/docker-builds:dashing-ros-base
+            docker pull autonomoustuff/docker-builds:foxy-ros-base
             cd ..
-            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 --device=/dev/kvvirtualcan2 --device=/dev/kvvirtualcan3 --device=/dev/kvvirtualcan4 --device=/dev/kvvirtualcan5 -v `pwd`:/ros_ws -w /ros_ws autonomoustuff/docker-builds:dashing-ros-base sh -c "sleep infinity"
+            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 --device=/dev/kvvirtualcan2 --device=/dev/kvvirtualcan3 --device=/dev/kvvirtualcan4 --device=/dev/kvvirtualcan5 -v `pwd`:/ros_ws -w /ros_ws autonomoustuff/docker-builds:foxy-ros-base sh -c "sleep infinity"
       - run:
           name: Install Linuxcan in Docker
           command: |
@@ -51,16 +51,16 @@ commands:
             docker kill $(docker ps -l -q)
 
 jobs:
-  dashing:
+  foxy:
     machine:
       image: ubuntu-1604:201903-01
     steps:
       - ros_build
     working_directory: ~/src
 
-  # dashing_release:
+  # foxy_release:
   #   docker:
-  #     - image: autonomoustuff/docker-builds:dashing-ros-base
+  #     - image: autonomoustuff/docker-builds:foxy-ros-base
   #   steps:
   #     - checkout
   #     - run:
@@ -74,7 +74,7 @@ jobs:
   #     - run:
   #         name: Build
   #         command: |
-  #           bloom-generate rosdebian --os-name ubuntu --os-version bionic --ros-distro dashing
+  #           bloom-generate rosdebian --os-name ubuntu --os-version bionic --ros-distro foxy
   #           sed -i '/dh_shlibdeps -l.*/ s/$/ --dpkg-shlibdeps-params=--ignore-missing-info/' debian/rules
   #           fakeroot debian/rules binary
   #     - run:
@@ -88,10 +88,10 @@ workflows:
   version: 2
   ros_build:
     jobs:
-      - dashing
+      - foxy
   # ros_release:
   #   jobs:
-  #     - dashing_release:
+  #     - foxy_release:
   #         context: ubuntu-pkg-build
   #         filters:
   #           branches:
