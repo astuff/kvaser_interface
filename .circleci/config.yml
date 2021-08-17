@@ -35,7 +35,6 @@ commands:
       - run:
           name: Set Up ROS in Docker
           command: |
-            docker exec test /bin/bash -c "source /opt/ros/*/setup.bash && rosdep update"
             docker exec test /bin/bash -c "source /opt/ros/*/setup.bash && rosdep install --from-paths src --ignore-src -y"
       - run:
           name: Build in Docker
