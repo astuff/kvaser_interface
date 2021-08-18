@@ -59,7 +59,8 @@ LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
   {
     RCLCPP_DEBUG(this->get_logger(), "Writer successfully configured.");
   } else {
-    RCLCPP_ERROR(this->get_logger(), "Error opening CAN writer: %d - %s",
+    RCLCPP_ERROR(
+      this->get_logger(), "Error opening CAN writer: %d - %s",
       static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     return LNI::CallbackReturn::FAILURE;
   }
