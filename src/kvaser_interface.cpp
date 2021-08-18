@@ -13,6 +13,8 @@
 #include <sstream>
 #include <algorithm>
 #include <iomanip>
+#include <utility>
+#include <memory>
 
 using namespace AS::CAN;
 

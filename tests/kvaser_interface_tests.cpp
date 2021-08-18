@@ -8,6 +8,7 @@
 #include <kvaser_interface/kvaser_interface.h>
 #include <canstat.h>
 #include <gtest/gtest.h>
+#include <utility>
 
 using AS::CAN::CanMsg;
 using AS::CAN::KvaserCan;
