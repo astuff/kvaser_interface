@@ -65,7 +65,6 @@ LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
   }
 
   frames_pub_ = this->create_publisher<can_msgs::msg::Frame>("can_tx", 500);
-  can_reader_.registerReadCallback(std::bind(&KvaserReaderNode::read, this));
 
   return LNI::CallbackReturn::SUCCESS;
 }
@@ -74,6 +73,7 @@ LNI::CallbackReturn KvaserReaderNode::on_activate(const lc::State & state)
 {
   (void)state;
   frames_pub_->on_activate();
+  can_reader_.registerReadCallback(std::bind(&KvaserReaderNode::read, this));
   RCLCPP_DEBUG(this->get_logger(), "Reader activated.");
   return LNI::CallbackReturn::SUCCESS;
 }
