@@ -60,8 +60,7 @@ int main(int argc, char ** argv)
     }
   }
 
-  auto writer_configure_state =
-    writer_node->configure();
+  auto writer_configure_state = writer_node->configure();
 
   if (writer_configure_state.id() == State::PRIMARY_STATE_INACTIVE) {
     auto writer_activate_state =

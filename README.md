@@ -1,6 +1,6 @@
 # Kvaser ROS Interface API
 
-[![CircleCI](https://circleci.com/gh/astuff/kvaser_interface/tree/dashing-devel.svg?style=svg)](https://circleci.com/gh/astuff/kvaser_interface/tree/dashing-devel)
+[![CircleCI](https://circleci.com/gh/astuff/kvaser_interface/tree/ros2_master.svg?style=svg)](https://circleci.com/gh/astuff/kvaser_interface/tree/ros2_master)
 
 This package was developed as a standardized way to access Kvaser CAN devices from ROS 2. It can either be used as a development API
 by including the appropriate header <kvaser_interface/kvaser_reader_node.hpp> or <kvaser_interface/kvaser_writer_node.hpp> and linking
@@ -11,13 +11,13 @@ The following are required prerequisites:
 * The Kvaser CANLIB API (https://www.kvaser.com/downloads/)
     * Can be [downloaded directly](https://www.kvaser.com/kvaser-downloads) or installed through PPA:
 
-        `sudo apt-add-repository ppa:jwhitleyastuff/kvaser-linuxcan`
+        `sudo apt-add-repository ppa:astuff/kvaser-linuxcan`
 
         `sudo apt update && sudo apt install -y kvaser-canlib-dev`
     * You can optionally install the Kvaser drivers from the PPA with the following command:
 
         `sudo apt install -y kvaser-drivers-dkms`
-* `can_msgs` from [`ros_canopen`](https://github.com/JWhitleyAStuff/ros_canopen/tree/dashing-devel) (not yet available on the Build Farm)
+* `can_msgs` from [`ros_canopen`](https://github.com/ros-industrial/ros_canopen)
 
 ## TOPICS
 
