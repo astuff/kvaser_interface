@@ -4,7 +4,7 @@
   <arg name="circuit_id" default="0" />
   <arg name="bit_rate" default="500000" />
 
-  <node pkg="kvaser_interface" exec="kvaser_can_bridge" namespace="kvaser_can_bridge" output="screen">
+  <node pkg="kvaser_interface" exec="kvaser_can_bridge" output="screen">
     <param name="hardware_id" value="$(var hardware_id)" />
     <param name="circuit_id" value="$(var circuit_id)" />
     <param name="bit_rate" value="$(var bit_rate)" />
