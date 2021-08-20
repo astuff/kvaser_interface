@@ -11,8 +11,7 @@ Changelog for package kvaser_interface
 * Updating PPA address in README.
 * CI: Updating PPA address.
 * Merge pull request `#51 <https://github.com/astuff/kvaser_interface/issues/51>`_ from astuff/fix/static-callback-issues
-  Fix static function callback woes
-* Fixing a bug related to using a static function to register the user-defined read callback function.
+  Fixing a bug related to using a static function to register the user-defined read callback function.
 * CI: Removing docker_layer_caching.
 * Merge pull request `#47 <https://github.com/astuff/kvaser_interface/issues/47>`_ from astuff/maint/auto-format
   Automatic Formatting of Code
