@@ -2,8 +2,8 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+4.1.1 (2021-08-20)
+------------------
 * Update ROS1 CI (`#62 <https://github.com/astuff/kvaser_interface/issues/62>`_)
   * Update CI to build for melodic and noetic, remove release automation
   * Add missing depends to satisfy roslint
