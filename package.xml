@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>kvaser_interface</name>
-  <version>0.0.1</version>
+  <version>2004.1.1</version>
   <description>Kvaser CAN interface for ROS2 device drivers.</description>
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
   <license>MIT</license>
