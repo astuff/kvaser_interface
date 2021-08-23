@@ -2,7 +2,7 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2004.1.1 (2021-08-20)
+2004.1.1 (2021-08-23)
 ---------------------
 * Move can_reader\_ callback to node activation function (`#66 <https://github.com/astuff/kvaser_interface/issues/66>`_)
 * Update ROS2 launch file (`#64 <https://github.com/astuff/kvaser_interface/issues/64>`_)
