@@ -2,6 +2,24 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+4.1.1 (2021-08-23)
+------------------
+* Update ROS1 CI (`#62 <https://github.com/astuff/kvaser_interface/issues/62>`_)
+  * Update CI to build for melodic and noetic, remove release automation
+  * Add missing depends to satisfy roslint
+* Update README.md (`#55 <https://github.com/astuff/kvaser_interface/issues/55>`_)
+* Updating PPA address in README.
+* CI: Updating PPA address.
+* Merge pull request `#51 <https://github.com/astuff/kvaser_interface/issues/51>`_ from astuff/fix/static-callback-issues
+  Fixing a bug related to using a static function to register the user-defined read callback function.
+* CI: Removing docker_layer_caching.
+* Merge pull request `#47 <https://github.com/astuff/kvaser_interface/issues/47>`_ from astuff/maint/auto-format
+  Automatic Formatting of Code
+* Updating PPA instructions in README with new PPA.
+* Fixing difference between roslint and clang-format.
+* Auto-formatting code with clang-format.
+* Contributors: Daisuke Nishimatsu, Joshua Whitley, icolwell-as
+
 4.1.0 (2019-09-10)
 ------------------
 * Merge pull request `#45 <https://github.com/astuff/kvaser_interface/issues/45>`_ from astuff/fix/slow_response
