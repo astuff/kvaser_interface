@@ -2,6 +2,36 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2004.1.1 (2021-08-23)
+---------------------
+* Move can_reader\_ callback to node activation function (`#66 <https://github.com/astuff/kvaser_interface/issues/66>`_)
+* Update ROS2 launch file (`#64 <https://github.com/astuff/kvaser_interface/issues/64>`_)
+* Update ROS2 CI (`#61 <https://github.com/astuff/kvaser_interface/issues/61>`_)
+* Fix/rewrite cmake (`#57 <https://github.com/astuff/kvaser_interface/issues/57>`_)
+* Add timestamp into reader msg (`#56 <https://github.com/astuff/kvaser_interface/issues/56>`_)
+* Merge pull request `#52 <https://github.com/astuff/kvaser_interface/issues/52>`_ from astuff/fix/ros2-static-callback-issues
+  Fixing bug related to using a static function to register callback.
+* CI: Only build required packages with colcon.
+* CI: No longer need to build diagnostic_updater.
+* Fixing some CMake errors.
+* Changing namespace.
+* CI: Only targeting kvaser_interface for tests to avoid failures in dependencies.
+* CI: Removing unused docker_layer_caching flag from CircleCI config.
+* Removing unused line in CMakeLists. Adding missing dependency to package.xml.
+* Updating README.
+* Using registerReadCallback instead of polling. Much faster.
+* Exporting components 'the right way.'
+* Removing cxxopts.hpp from linter tests.
+* Adding launch file for kvaser_can_bridge.
+* Fixing infinite loop bug and adding launch params.
+* Getting bridge to handle node transitions.
+* Uncrustified almost all files.
+* Adding required license headers.
+* CI: Changing to dashing-devel branch of ros_canopen.
+* Convert to ROS2
+* Updating PPA instructions in README with new PPA.
+* Contributors: Daisuke Nishimatsu, Joshua Whitley, icolwell-as
+
 4.1.0 (2019-09-10)
 ------------------
 * Merge pull request `#45 <https://github.com/astuff/kvaser_interface/issues/45>`_ from astuff/fix/slow_response
