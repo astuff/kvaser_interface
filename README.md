@@ -6,19 +6,26 @@ This package was developed as a standardized way to access Kvaser CAN devices fr
 by including the header <kvaser_interface/kvaser_interface.h> and linking against `libros_linuxcan.so` or the stand-alone node
 `kvaser_can_bridge` can communicate with a CAN device independently.
 
-The following are required prerequisites:
+## Installation
 
-* The Kvaser CANLIB API (https://www.kvaser.com/downloads/)
-    * Can be [downloaded directly](https://www.kvaser.com/kvaser-downloads) or installed through PPA:
+The `kvaser_interface` package depends on the Kvaser CANLIB API. 
+You can install the Kvaser CANLIB from source [directly from Kvaser](https://www.kvaser.com/downloads/), however the easiest way to install is using our ppa which distributes them as deb packages:
 
-        `sudo apt-add-repository ppa:astuff/kvaser-linux`
+```sh
+sudo apt-add-repository ppa:astuff/kvaser-linux
+sudo apt update
+sudo apt install kvaser-canlib-dev kvaser-drivers-dkms
+```
 
-        `sudo apt update && sudo apt install -y kvaser-canlib-dev`
-    * You can optionally install the Kvaser drivers from the PPA with the following command:
+Now that the dependencies are installed, we can install `kvaser_interface`:
 
-        `sudo apt install -y kvaser-drivers-dkms`
-    * For Linux kernel 4.13 or higher, version 5.21 or higher of CANLIB is required
-* `can_msgs`
+
+```sh
+sudo apt install apt-transport-https
+sudo sh -c 'echo "deb [trusted=yes] https://s3.amazonaws.com/autonomoustuff-repo/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/autonomoustuff-public.list'
+sudo apt update
+sudo apt install ros-$ROS_DISTRO-kvaser-interface
+```
 
 ## The `kvaser_can_bridge` Node
 
