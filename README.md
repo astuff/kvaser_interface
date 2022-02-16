@@ -17,6 +17,13 @@ sudo apt update
 sudo apt install kvaser-canlib-dev kvaser-drivers-dkms
 ```
 
+For kernel versions 5.13+ the Kvaser drivers are broken.  They require a header file which is no longer included in new kernels.
+This can be fixed by first running:
+
+```sh
+sudo touch /usr/src/linux-headers-`uname -r`/include/config/modversions.h
+```
+
 Now that the dependencies are installed, we can install `kvaser_interface`:
 
 
