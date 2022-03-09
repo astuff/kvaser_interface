@@ -307,7 +307,7 @@ public:
 
 private:
   std::shared_ptr<CanHandle> handle;
-  bool on_bus;
+  bool on_bus = false;
 };
 
 void proxyCallback(canNotifyData * data);
