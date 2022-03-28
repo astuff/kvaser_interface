@@ -24,7 +24,7 @@ commands:
           name: Clone and Run AS Docker Image
           command: |
             docker pull << parameters.docker_image >>
-            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 --device=/dev/kvvirtualcan2 --device=/dev/kvvirtualcan3 --device=/dev/kvvirtualcan4 --device=/dev/kvvirtualcan5 -v `pwd`:/ros_ws/src -w /ros_ws << parameters.docker_image >> sh -c "sleep infinity"
+            docker run -d --name test --device=/dev/kvvirtualcan0 --device=/dev/kvvirtualcan1 -v `pwd`:/ros_ws/src -w /ros_ws << parameters.docker_image >> sh -c "sleep infinity"
       - run:
           name: Install Linuxcan in Docker
           command: |
