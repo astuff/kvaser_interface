@@ -15,6 +15,7 @@ commands:
             sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
             sudo make virtualcan
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
+            sudo virtualcan.sh stop
             sudo virtualcan.sh start
       - run:
           name: Move Source
@@ -52,7 +53,7 @@ commands:
 jobs:
   foxy:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202111-02
     steps:
       - ros_build
     working_directory: ~/src
