@@ -52,7 +52,7 @@ commands:
 jobs:
   melodic:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202111-02
     steps:
       - ros_build:
           docker_image: autonomoustuff/docker-builds:melodic-ros-base
@@ -60,7 +60,7 @@ jobs:
 
   noetic:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202111-02
     steps:
       - ros_build:
           docker_image: autonomoustuff/docker-builds:noetic-ros-base
