@@ -19,6 +19,7 @@ commands:
             sudo sed -i 's/#define NR_VIRTUAL_DEV       1/#define NR_VIRTUAL_DEV       3/g' virtualcan/virtualcan.h
             sudo make virtualcan
             sudo install -m 644 virtualcan/kvvirtualcan.ko /lib/modules/`uname -r`/updates/dkms/
+            sudo virtualcan.sh stop
             sudo virtualcan.sh start
       - run:
           name: Clone and Run AS Docker Image
@@ -52,7 +53,7 @@ commands:
 jobs:
   melodic:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202111-02
     steps:
       - ros_build:
           docker_image: autonomoustuff/docker-builds:melodic-ros-base
@@ -60,7 +61,7 @@ jobs:
 
   noetic:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202111-02
     steps:
       - ros_build:
           docker_image: autonomoustuff/docker-builds:noetic-ros-base
