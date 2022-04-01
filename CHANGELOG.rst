@@ -2,6 +2,13 @@
 Changelog for package kvaser_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2004.1.2 (2022-03-31)
+---------------------
+* Update Ubuntu image used for CI (`#82 <https://github.com/astuff/kvaser_interface/issues/82>`_)
+* Fix: initialize boolean variable (`#77 <https://github.com/astuff/kvaser_interface/issues/77>`_)
+* Update README install instructions (`#71 <https://github.com/astuff/kvaser_interface/issues/71>`_)
+* Contributors: Tomoya Kimura, icolwell-as
+
 2004.1.1 (2021-08-23)
 ---------------------
 * Move can_reader\_ callback to node activation function (`#66 <https://github.com/astuff/kvaser_interface/issues/66>`_)
