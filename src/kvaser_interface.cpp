@@ -111,7 +111,14 @@ ReturnStatuses KvaserCan::open(const uint32_t& channel_index, const uint32_t& bi
     }
 
     // Set output control
-    canSetBusOutputControl(*handle, canDRIVER_NORMAL);
+    if (silent_mode)
+    {
+      canSetBusOutputControl(*handle, canDRIVER_SILENT);
+    }
+    else
+    {
+      canSetBusOutputControl(*handle, canDRIVER_NORMAL);
+    }
 
     if (canBusOn(*handle) < 0)
       return ReturnStatuses::INIT_FAILED;
@@ -593,4 +600,9 @@ void KvaserCanUtils::setFlagsFromMsg(const CanMsg& msg, uint32_t* flags)
   msg.error_flags.crc_err ? * flags |= canMSGERR_CRC : * flags &= ~canMSGERR_CRC;
   msg.error_flags.bit0_err ? * flags |= canMSGERR_BIT0 : * flags &= ~canMSGERR_BIT0;
   msg.error_flags.bit1_err ? * flags |= canMSGERR_BIT1 : * flags &= ~canMSGERR_BIT1;
+}
+
+void KvaserCan::set_silent_mode(bool _silent_mode)
+{
+  silent_mode = _silent_mode;
 }
