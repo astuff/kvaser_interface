@@ -262,7 +262,7 @@ public:
   std::function<void(void)> readFunc;
 
   // Set output mode to silent
-  void set_silent_mode(bool _silent_mode);
+  void setSilentMode(bool _silent_mode);
 
 private:
   std::shared_ptr<CanHandle> handle;
