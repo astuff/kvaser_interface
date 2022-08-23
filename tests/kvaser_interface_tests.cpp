@@ -232,7 +232,7 @@ TEST(KvaserCan, readWriteTests)
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
 
   // Receive standard CAN ID with std flag true and extended flag false
-  kv_can_reader.read(&rcvd_msg);
+  reader_stat = kv_can_reader.read(&rcvd_msg);
   ASSERT_EQ(reader_stat, ReturnStatuses::OK);
 
   // Check that sent and received messages are identical
@@ -247,7 +247,7 @@ TEST(KvaserCan, readWriteTests)
   ASSERT_EQ(writer_stat, ReturnStatuses::OK);
 
   // Receive extended CAN ID with std flag false and extended flag true
-  kv_can_reader.read(&rcvd_msg);
+  reader_stat = kv_can_reader.read(&rcvd_msg);
   ASSERT_EQ(reader_stat, ReturnStatuses::OK);
 
   // Check that sent and received messages are identical
