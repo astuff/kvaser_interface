@@ -43,7 +43,7 @@ KvaserWriterNode::KvaserWriterNode(rclcpp::NodeOptions options)
   bit_rate_ = this->declare_parameter("bit_rate", 500000);
   enable_echo_ = this->declare_parameter("enable_echo", false);
 
-  RCLCPP_INFO(this->get_logger(), "Got hardware ID: %d", hardware_id_);
+  RCLCPP_INFO(this->get_logger(), "Got hardware ID: %ld", hardware_id_);
   RCLCPP_INFO(this->get_logger(), "Got circuit ID: %d", circuit_id_);
   RCLCPP_INFO(this->get_logger(), "Got bit rate: %d", bit_rate_);
   RCLCPP_INFO(this->get_logger(), "Message echo is %s", enable_echo_ ? "enabled" : "disabled");
