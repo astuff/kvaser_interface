@@ -10,17 +10,24 @@
   <url type="repository">https://github.com/astuff/kvaser_interface</url>
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
+  <author email="sungchan.yeo@hlcompany.com">Sungchan Yeo</author>
+
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <build_depend>rosidl_default_generators</build_depend>
 
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>can_msgs</depend>
+  <depend>std_msgs</depend>
   <depend>lifecycle_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
     <build_type>ament_cmake</build_type>

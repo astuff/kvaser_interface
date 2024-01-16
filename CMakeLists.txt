@@ -12,6 +12,11 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/FrameFd.msg"
+  DEPENDENCIES std_msgs
+)
+
 set(LIB_NAME "ros_${PROJECT_NAME}")
 
 # kvaser_interface Library
