@@ -21,6 +21,7 @@
   <depend>rclcpp_lifecycle</depend>
   <depend>can_msgs</depend>
   <depend>std_msgs</depend>
+  <depend>can_fd_interface</depend>
   <depend>lifecycle_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>

@@ -26,12 +26,11 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <can_msgs/msg/frame.hpp>
 
-
+#include <can_fd_interface/msg/frame.hpp>
 #include <memory>
 #include <string>
 
 #include "kvaser_interface/kvaser_interface.hpp"
-#include "kvaser_interface/msg/frame_fd.hpp"
 
 namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
@@ -77,7 +76,7 @@ private:
   uint32_t bit_rate_;
   bool enable_echo_;
   std::shared_ptr<lc::LifecyclePublisher<can_msgs::msg::Frame>> frames_pub_;
-  std::shared_ptr<lc::LifecyclePublisher<kvaser_interface::msg::FrameFd>> frame_fd_pub;
+  std::shared_ptr<lc::LifecyclePublisher<can_fd_interface::msg::Frame>> fd_frames_pub_;
   KvaserCan can_reader_;
 
   uint8_t tseg1_ = 0;

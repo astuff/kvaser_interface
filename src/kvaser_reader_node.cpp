@@ -47,7 +47,7 @@ KvaserReaderNode::KvaserReaderNode(rclcpp::NodeOptions options)
   tseg2_ = this->declare_parameter("tseg2", 0);
   sjw_ = this->declare_parameter("sjw", 0);
   data_bit_rate_ = this->declare_parameter("data_bit_rate", 2000000);
-  is_canfd_ = this->declare_parameter("is_canfd", false);
+  is_canfd_ = this->declare_parameter("is_canfd", true);
 
   RCLCPP_INFO(this->get_logger(), "Got hardware ID: %ld", hardware_id_);
   RCLCPP_INFO(this->get_logger(), "Got circuit ID: %d", circuit_id_);
@@ -149,7 +149,7 @@ void KvaserReaderNode::read()
     } else if (msg.flags.fd_msg) {
         auto ros_msg = KvaserRosUtils::to_ros_msg(std::move(msg), true);
         ros_msg.header.stamp = this->now();
-        frame_fd_pub->publish(std::move(ros_msg));
+        fd_frames_pub_->publish(std::move(ros_msg));
     }
     else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED) {
       break;

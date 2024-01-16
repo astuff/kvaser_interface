@@ -151,79 +151,81 @@ ReturnStatuses KvaserCan::open(
 }
 
 
-ReturnStatuses KvaserCan::open(const int& hardware_id,
-                               const int& circuit_id,
-                               const int& bitrate,
-                               const int& fd_bitrate,
-                               unsigned int tseg1_brs,
-                               unsigned int tseg2_brs,
-                               unsigned int sjw_brs,
-                               const bool& echo_on) {
-  if (handle == NULL)
-  {
-    return ReturnStatuses::INIT_FAILED;
+ReturnStatuses KvaserCan::open(
+  const uint64_t& hardware_id,
+  const uint8_t& circuit_id,
+  const uint32_t& bitrate,
+  const uint32_t& fd_bitrate,
+  const uint8_t& tseg1_brs,
+  const uint8_t& tseg2_brs,
+  const uint8_t& sjw_brs,
+  const bool& echo_on
+  ) {
+
+  
+  auto channels = KvaserCanUtils::getChannels();
+  uint32_t channel_index = 0;
+  bool channel_found = false;
+
+  if (channels.size() < 1) {
+    return ReturnStatuses::NO_CHANNELS_FOUND;
+  }
+  for (const auto & channel : channels) {
+    if (
+      hardware_id == channel->serial_no &&
+      circuit_id == channel->channel_no_on_card)
+    {
+      channel_index = channel->channel_idx;
+      channel_found = true;
+      break;
+    }
   }
 
-  if (!on_bus)
+  if (channel_found) {
+    return open(channel_index, bitrate, fd_bitrate, tseg1_brs, tseg2_brs, sjw_brs, echo_on);
+  } else {
+    return ReturnStatuses::BAD_PARAM;
+  }
+}  
+
+  ReturnStatuses KvaserCan::open(
+  const uint32_t & channel_index,
+  const uint32_t & bitrate,
+  const uint32_t & bitrate_fd,
+  const uint8_t& tseg1_brs,
+  const uint8_t& tseg2_brs,
+  const uint8_t& sjw_brs,
+  const bool & echo_on)
   {
-    //canHandle *h = (canHandle *) handle;
-
-    int numChan;
-    if (canGetNumberOfChannels(&numChan) != canOK)
-    {
-      return ReturnStatuses::INIT_FAILED;
-    }
-
-    unsigned int serial[2];
-    unsigned int channel_number;
-    int channel = -1;
-
-    for (int idx = 0; idx < numChan; idx++)
-    {
-      if (canGetChannelData(idx, canCHANNELDATA_CARD_SERIAL_NO, &serial, sizeof(serial)) == canOK)
-      {
-        if (serial[0] == (unsigned int) hardware_id)
-        {
-          if (canGetChannelData(idx, canCHANNELDATA_CHAN_NO_ON_CARD, &channel_number, sizeof(channel_number)) == canOK)
-          {
-            if (channel_number == (unsigned int) circuit_id)
-            {
-              channel = idx;
-            }
-          }
-        }
+     if (!on_bus){
+      int32_t numChan = -1;
+      KvaserCanUtils::getChannelCount(&numChan);
+      if (numChan < 1) {
+        return ReturnStatuses::NO_CHANNELS_FOUND;
       }
-    }
 
-    if (channel == -1)
-    {
-      return ReturnStatuses::BAD_PARAM;
-    }
 
-    // Open channel
-    *handle = canOpenChannel(channel, canOPEN_CAN_FD | canOPEN_EXCLUSIVE);
-    if (*handle < 0)
-    {
+      // Open channel
+    *handle = canOpenChannel(channel_index, canOPEN_CAN_FD | canOPEN_EXCLUSIVE);
+    if (*handle < 0) {
       return ReturnStatuses::INIT_FAILED;
     }
 
     // Set bit rate and other parameters
-    long freq;
-    switch (bitrate)
-    {
+    uint64_t freq;
+
+    switch (bitrate) {
       case 500000: freq = canFD_BITRATE_500K_80P; break;
       case 1000000: freq = canFD_BITRATE_1M_80P; break;
       case 2000000: freq = canFD_BITRATE_2M_80P; break;
       case 4000000: freq = canFD_BITRATE_4M_80P; break;
       case 8000000: freq = canFD_BITRATE_8M_60P; break;
       default:
-      {
         return ReturnStatuses::BAD_PARAM;
-      }
     }
 
-    long freq_fd;
-    switch (fd_bitrate)
+    uint64_t freq_fd;
+    switch (bitrate_fd)
     {
       case 500000: freq_fd = canFD_BITRATE_500K_80P; break;
       case 1000000: freq_fd = canFD_BITRATE_1M_80P; break;
@@ -251,18 +253,23 @@ ReturnStatuses KvaserCan::open(const int& hardware_id,
     // send.  Turn it off here if desired.
     if (!echo_on)
     {
-      unsigned char off = 0;
+      uint8_t off = 0;
       canIoCtl(*handle, canIOCTL_SET_LOCAL_TXECHO, &off, 1);
     }
 
     // Set output control
     canSetBusOutputControl(*handle, canDRIVER_NORMAL);
-    canBusOn(*handle);
+
+    if (canBusOn(*handle) < 0) {
+        return ReturnStatuses::INIT_FAILED;
+      }
+
     on_bus = true;
   }
-
   return ReturnStatuses::OK;
 }
+
+
 bool KvaserCan::isOpen()
 {
   if (*handle < 0) {

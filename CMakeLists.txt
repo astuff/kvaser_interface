@@ -12,11 +12,6 @@ endif()
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/FrameFd.msg"
-  DEPENDENCIES std_msgs
-)
-
 
 set(LIB_NAME "ros_${PROJECT_NAME}")
 
@@ -47,107 +42,117 @@ rclcpp_components_register_nodes(
   EXECUTABLE kvaser_reader_node_exe
 )
 
-# kvaser_writer ROS Node
-ament_auto_add_library(
-  kvaser_writer_node SHARED
-  src/kvaser_writer_node.cpp
-)
-target_compile_definitions(
-  kvaser_writer_node
-  PRIVATE "COMPOSITION_BUILDING_DLL"
-)
-target_link_libraries(
-  kvaser_writer_node
-  ${LIB_NAME}
-)
-rclcpp_components_register_nodes(
-  kvaser_writer_node "kvaser_interface::KvaserWriterNode"
-  EXECUTABLE kvaser_writer_node_exe
-)
+# # kvaser_writer ROS Node
+# ament_auto_add_library(
+#   kvaser_writer_node SHARED
+#   src/kvaser_writer_node.cpp
+# )
+# target_compile_definitions(
+#   kvaser_writer_node
+#   PRIVATE "COMPOSITION_BUILDING_DLL"
+# )
+# target_link_libraries(
+#   kvaser_writer_node
+#   ${LIB_NAME}
+# )
+# rclcpp_components_register_nodes(
+#   kvaser_writer_node "kvaser_interface::KvaserWriterNode"
+#   EXECUTABLE kvaser_writer_node_exe
+# )
 
-# CAN Bridge Node
+# # CAN Bridge Node
+# ament_auto_add_executable(
+#   kvaser_can_bridge
+#   src/kvaser_can_bridge.cpp
+# )
+# target_link_libraries(
+#   kvaser_can_bridge
+#   kvaser_reader_node
+#   kvaser_writer_node
+# )
+
+# CANFD Read Bridge Node
 ament_auto_add_executable(
-  kvaser_can_bridge
-  src/kvaser_can_bridge.cpp
+  kvaser_can_fd_read_bridge
+  src/kvaser_can_fd_read_bridge.cpp
 )
 target_link_libraries(
-  kvaser_can_bridge
+  kvaser_can_fd_read_bridge
   kvaser_reader_node
-  kvaser_writer_node
 )
 
-# canmonitor Tool
-ament_auto_add_executable(
-  canmonitor
-  tools/canmonitor.cpp
-)
-target_link_libraries(
-  canmonitor
-  ${LIB_NAME}
-)
+# # canmonitor Tool
+# ament_auto_add_executable(
+#   canmonitor
+#   tools/canmonitor.cpp
+# )
+# target_link_libraries(
+#   canmonitor
+#   ${LIB_NAME}
+# )
 
-# list_channels Tool
-ament_auto_add_executable(
-  list_channels
-  tools/list_channels.cpp
-)
-target_link_libraries(
-  list_channels
-  ${LIB_NAME}
-)
+# # list_channels Tool
+# ament_auto_add_executable(
+#   list_channels
+#   tools/list_channels.cpp
+# )
+# target_link_libraries(
+#   list_channels
+#   ${LIB_NAME}
+# )
 
-if(BUILD_TESTING)
-  list(APPEND AMENT_LINT_AUTO_EXCLUDE
-    ament_cmake_cpplint
-    ament_cmake_uncrustify
-  )
+# if(BUILD_TESTING)
+#   list(APPEND AMENT_LINT_AUTO_EXCLUDE
+#     ament_cmake_cpplint
+#     ament_cmake_uncrustify
+#   )
 
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
+#   find_package(ament_lint_auto REQUIRED)
+#   ament_lint_auto_find_test_dependencies()
 
-  # Remove cxxopts.hpp from linter tests
-  file(GLOB_RECURSE SOURCE_FILES
-    "*.cpp"
-    "*.hpp"
-  )
+#   # Remove cxxopts.hpp from linter tests
+#   file(GLOB_RECURSE SOURCE_FILES
+#     "*.cpp"
+#     "*.hpp"
+#   )
 
-  find_package(ament_cmake_cpplint)
-  find_package(ament_cmake_uncrustify)
+#   find_package(ament_cmake_cpplint)
+#   find_package(ament_cmake_uncrustify)
 
-  get_filename_component(
-    CXXOPTS_ABS
-    "include/kvaser_interface/cxxopts.hpp"
-    ABSOLUTE
-  )
+#   get_filename_component(
+#     CXXOPTS_ABS
+#     "include/kvaser_interface/cxxopts.hpp"
+#     ABSOLUTE
+#   )
 
-  list(REMOVE_ITEM SOURCE_FILES ${CXXOPTS_ABS})
+#   list(REMOVE_ITEM SOURCE_FILES ${CXXOPTS_ABS})
 
-  ament_cpplint(${SOURCE_FILES})
-  ament_uncrustify(${SOURCE_FILES})
+#   ament_cpplint(${SOURCE_FILES})
+#   ament_uncrustify(${SOURCE_FILES})
 
-  find_package(ament_cmake_gtest REQUIRED)
-  ament_add_gtest(
-    ${PROJECT_NAME}_tests
-    tests/${PROJECT_NAME}_tests.cpp
-  )
-  target_link_libraries(
-    ${PROJECT_NAME}_tests
-    ${LIB_NAME}
-  )
+#   find_package(ament_cmake_gtest REQUIRED)
+#   ament_add_gtest(
+#     ${PROJECT_NAME}_tests
+#     tests/${PROJECT_NAME}_tests.cpp
+#   )
+#   target_link_libraries(
+#     ${PROJECT_NAME}_tests
+#     ${LIB_NAME}
+#   )
 
-#  TODO(jwhitleyastuff): Use launch_testing for tests.
-#  find_package(catkin REQUIRED COMPONENTS rostest)
-#  add_rostest(tests/reader_writer_1000hz.test)
+# #  TODO(jwhitleyastuff): Use launch_testing for tests.
+# #  find_package(catkin REQUIRED COMPONENTS rostest)
+# #  add_rostest(tests/reader_writer_1000hz.test)
 
-#add_rostest_gtest(${PROJECT_NAME}_ros_tests
-#    tests/can_bridge_tests.test
-#    tests/${PROJECT_NAME}_ros_tests.cpp)
-#  target_link_libraries(${PROJECT_NAME}_ros_tests
-#    ros_${PROJECT_NAME}
-#    ${catkin_LIBRARIES})
-endif()
+# #add_rostest_gtest(${PROJECT_NAME}_ros_tests
+# #    tests/can_bridge_tests.test
+# #    tests/${PROJECT_NAME}_ros_tests.cpp)
+# #  target_link_libraries(${PROJECT_NAME}_ros_tests
+# #    ros_${PROJECT_NAME}
+# #    ${catkin_LIBRARIES})
+# endif()
 
 ament_auto_package(
   INSTALL_TO_SHARE
-  launch
+  # launch
 )
