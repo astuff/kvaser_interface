@@ -30,6 +30,7 @@
 #include <string>
 
 #include "kvaser_interface/kvaser_interface.hpp"
+#include "kvaser_interface/msg/frame_fd.hpp"
 
 namespace lc = rclcpp_lifecycle;
 using LNI = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface;
@@ -73,6 +74,13 @@ private:
   std::shared_ptr<rclcpp::Subscription<can_msgs::msg::Frame>> frames_sub_;
   KvaserCan can_writer_;
   void frame_callback(const can_msgs::msg::Frame::SharedPtr msg);
+
+  uint8_t tseg1_ = 0;
+  uint8_t tseg2_ = 0;
+  uint8_t sjw_ = 0;
+  uint32_t data_bit_rate_ = 2000000;
+  bool is_canfd_ = true;
+
 };  // class KvaserWriterNode
 
 }  // namespace kvaser_interface

@@ -17,6 +17,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   DEPENDENCIES std_msgs
 )
 
+
 set(LIB_NAME "ros_${PROJECT_NAME}")
 
 # kvaser_interface Library

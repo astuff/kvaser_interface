@@ -29,10 +29,12 @@ sudo apt install ros-$ROS_DISTRO-kvaser-interface
 ## TOPICS
 
 *can_tx* [can_msgs::msg::Frame]
+*can_tx* [can_msgs::FrameFd]
 
 This topic is published by the kvaser_reader_node. It expects to have other nodes subscribe to it to receive data which are *sent by the CAN device*.
 
 *can_rx* [can_msgs::msg::Frame]
+*can_rx* [can_msgs::FrameFd]
 
 This topic is subscribed to by the kvaser_writer_node. It expects to have data published to it which are intended to be *received by the CAN device*.
 
@@ -56,6 +58,27 @@ This is the communication rate to be used on the CAN channel in bits per second 
 
 If this parameter is set to *true* and both the `kvaser_reader_node` and `kvaser_writer_node` are connected to the same
 *hardware_id* and *circuit_id*, then messages sent by the `kvaser_writer_node` will be echoed to the `kvaser_reader_node` (default: false).
+
+*canfd*
+
+This is the canfd flag (0 : not canfd, 1 : canfd).
+
+*canfd_tseg1*
+
+Time segment 1, that is, the number of quanta from (but not including) the Sync Segment to the sampling point (default: 15).
+
+*canfd_tseg2*
+
+Time segment 2, that is, the number of quanta from the sampling point to the end of the bit (default: 4).
+
+*canfd_sjw*
+
+The Synchronization Jump Width (default: 4).
+
+*canfd_data_rate*
+
+The canfd data rate (defalut : 2000000)
+
 
 ## NODES
 

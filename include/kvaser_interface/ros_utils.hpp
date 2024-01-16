@@ -28,6 +28,7 @@
 #include <memory>
 
 #include "kvaser_interface/kvaser_interface.hpp"
+#include "kvaser_interface/msg/frame_fd.hpp"
 
 namespace kvaser_interface
 {
@@ -57,6 +58,25 @@ public:
 
     return ros_msg;
   }
+
+
+  static kvaser_interface::msg::FrameFd to_ros_msg(const CanMsg & can_msg, bool canfd)
+  {
+    kvaser_interface::msg::FrameFd ros_msg;
+    ros_msg.id = can_msg.id;
+    ros_msg.dlc = can_msg.dlc;
+    ros_msg.is_extended = can_msg.flags.ext_id;
+    ros_msg.is_error = can_msg.flags.error_frame;
+    ros_msg.is_rtr = can_msg.flags.rtr;
+
+    size_t copy_size = std::min(can_msg.data.size(), ros_msg.data.size());
+    for (size_t i = 0; i < copy_size; ++i) {
+        ros_msg.data[i] = can_msg.data[i];
+    }
+
+    return ros_msg;
+  }
+
 
   /// \brief Converts a can_msgs::msg::Frame to a CanMsg.
   /// \param[in] ros_msg The can_msgs::msg::Frame to convert.
