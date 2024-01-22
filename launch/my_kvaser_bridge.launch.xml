@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="hardware_id" default="12345" />
+  <arg name="circuit_id" default="0" />
+  <arg name="bit_rate" default="500000" />
+  <arg name="tseg1_" default="15" />
+  <arg name="tseg2_" default="4" />
+  <arg name="sjw_" default="4" />
+  <arg name="data_bit_rate_" default="2000000" />
+  <arg name="is_canfd_" default="true" />
+
+  <node pkg="kvaser_interface" exec="kvaser_can_fd_read_bridge" output="screen">
+    <param name="hardware_id" value="$(var hardware_id)" />
+    <param name="circuit_id" value="$(var circuit_id)" />
+    <param name="bit_rate" value="$(var bit_rate)" />
+    <param name="tseg1_" value="$(var tseg1_)" />
+    <param name="tseg2_" value="$(var tseg2_)" />
+    <param name="sjw_" value="$(var sjw_)" />
+    <param name="data_bit_rate_" value="$(var data_bit_rate_)" />
+    <param name="is_canfd_" value="$(var is_canfd_)" />
+    
+  </node>
+</launch>

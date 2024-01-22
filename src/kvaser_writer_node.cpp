@@ -43,19 +43,38 @@ KvaserWriterNode::KvaserWriterNode(rclcpp::NodeOptions options)
   bit_rate_ = this->declare_parameter("bit_rate", 500000);
   enable_echo_ = this->declare_parameter("enable_echo", false);
 
-  RCLCPP_INFO(this->get_logger(), "Got hardware ID: %d", hardware_id_);
+  // CAN FD
+  tseg1_ = this->declare_parameter("tseg1", 0);
+  tseg2_ = this->declare_parameter("tseg2", 0);
+  sjw_ = this->declare_parameter("sjw", 0);
+  data_bit_rate_ = this->declare_parameter("data_bit_rate", 2000000);
+  is_canfd_ = this->declare_parameter("is_canfd", false);
+
+  RCLCPP_INFO(this->get_logger(), "Got hardware ID: %ld", hardware_id_);
   RCLCPP_INFO(this->get_logger(), "Got circuit ID: %d", circuit_id_);
   RCLCPP_INFO(this->get_logger(), "Got bit rate: %d", bit_rate_);
   RCLCPP_INFO(this->get_logger(), "Message echo is %s", enable_echo_ ? "enabled" : "disabled");
+
+  RCLCPP_INFO(this->get_logger(), "CAN FD is %s", is_canfd_ ? "enabled" : "disabled");
+  if (is_canfd_){
+    RCLCPP_INFO(this->get_logger(), "Got tseg1 : %d", tseg1_);
+    RCLCPP_INFO(this->get_logger(), "Got tseg2 : %d", tseg2_);
+    RCLCPP_INFO(this->get_logger(), "Got sjw : %d", sjw_);
+  }
+
 }
 
 LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
 {
   (void)state;
   ReturnStatuses ret;
+  if (is_canfd_)
+      ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, data_bit_rate_, tseg1_, tseg2_, sjw_, enable_echo_);
+  else
+      ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_);
 
-  if ((ret = can_writer_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) ==
-    ReturnStatuses::OK)
+
+  if (ret == ReturnStatuses::OK)
   {
     RCLCPP_DEBUG(this->get_logger(), "Writer successfully configured.");
   } else {
@@ -65,8 +84,15 @@ LNI::CallbackReturn KvaserWriterNode::on_configure(const lc::State & state)
     return LNI::CallbackReturn::FAILURE;
   }
 
-  frames_sub_ = this->create_subscription<can_msgs::msg::Frame>(
-    "can_rx", 500, std::bind(&KvaserWriterNode::frame_callback, this, std::placeholders::_1));
+  if (is_canfd_){
+    fd_frames_pub = this->create_subscription<can_fd_interface::msg::Frame>("can_rx", 500, std::bind(&KvaserWriterNode::frame_callback, this, std::placeholders::_1));
+  }
+  else{
+      frames_sub_ = this->create_subscription<can_msgs::msg::Frame>("can_rx", 500, std::bind(&KvaserWriterNode::frame_callback, this, std::placeholders::_1));
+  }
+
+
+
 
   return LNI::CallbackReturn::SUCCESS;
 }

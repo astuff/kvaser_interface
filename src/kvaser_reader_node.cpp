@@ -42,19 +42,36 @@ KvaserReaderNode::KvaserReaderNode(rclcpp::NodeOptions options)
   bit_rate_ = this->declare_parameter("bit_rate", 500000);
   enable_echo_ = this->declare_parameter("enable_echo", false);
 
-  RCLCPP_INFO(this->get_logger(), "Got hardware ID: %d", hardware_id_);
+  // CAN FD
+  tseg1_ = this->declare_parameter("tseg1", 0);
+  tseg2_ = this->declare_parameter("tseg2", 0);
+  sjw_ = this->declare_parameter("sjw", 0);
+  data_bit_rate_ = this->declare_parameter("data_bit_rate", 2000000);
+  is_canfd_ = this->declare_parameter("is_canfd", true);
+
+  RCLCPP_INFO(this->get_logger(), "Got hardware ID: %ld", hardware_id_);
   RCLCPP_INFO(this->get_logger(), "Got circuit ID: %d", circuit_id_);
   RCLCPP_INFO(this->get_logger(), "Got bit rate: %d", bit_rate_);
   RCLCPP_INFO(this->get_logger(), "Message echo is %s", enable_echo_ ? "enabled" : "disabled");
+
+  RCLCPP_INFO(this->get_logger(), "CAN FD is %s", is_canfd_ ? "enabled" : "disabled");
+  if (is_canfd_){
+    RCLCPP_INFO(this->get_logger(), "Got tseg1 : %d", tseg1_);
+    RCLCPP_INFO(this->get_logger(), "Got tseg2 : %d", tseg2_);
+    RCLCPP_INFO(this->get_logger(), "Got sjw : %d", sjw_);
+  }
 }
 
 LNI::CallbackReturn KvaserReaderNode::on_configure(const lc::State & state)
 {
   (void)state;
   ReturnStatuses ret;
+  if (is_canfd_)
+      ret = can_reader_.open(hardware_id_, circuit_id_, bit_rate_, data_bit_rate_, tseg1_, tseg2_, sjw_, enable_echo_);
+  else
+      ret = can_reader_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_);
 
-  if ((ret = can_reader_.open(hardware_id_, circuit_id_, bit_rate_, enable_echo_)) ==
-    ReturnStatuses::OK)
+  if (ret ==  ReturnStatuses::OK)
   {
     RCLCPP_DEBUG(this->get_logger(), "Reader successfully configured.");
   } else {
@@ -104,7 +121,6 @@ LNI::CallbackReturn KvaserReaderNode::on_shutdown(const lc::State & state)
 void KvaserReaderNode::read()
 {
   ReturnStatuses ret;
-
   while (true) {
     if (!can_reader_.isOpen()) {
       RCLCPP_ERROR(this->get_logger(), "Tried to read CAN message but reader was closed.");
@@ -130,12 +146,18 @@ void KvaserReaderNode::read()
         ros_msg.header.stamp = this->now();
         frames_pub_->publish(std::move(ros_msg));
       }
-    } else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED) {
+    } else if (msg.flags.fd_msg) {
+        auto ros_msg = KvaserRosUtils::to_ros_msg(std::move(msg), true);
+        ros_msg.header.stamp = this->now();
+        fd_frames_pub_->publish(std::move(ros_msg));
+    }
+    else if (ret == ReturnStatuses::NO_MESSAGES_RECEIVED) {
       break;
+
     } else {
       RCLCPP_WARN(
         this->get_logger(), "Error reading CAN message: %d - %s",
-        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret));
+        static_cast<int>(ret), KvaserCanUtils::returnStatusDesc(ret).c_str());
     }
   }
 }

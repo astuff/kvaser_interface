@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>kvaser_interface</name>
-  <version>2004.1.2</version>
+  <version>2004.1.3</version>
   <description>Kvaser CAN interface for ROS2 device drivers.</description>
   <maintainer email="software@autonomoustuff.com">AutonomouStuff Software Development Team</maintainer>
   <license>MIT</license>
@@ -10,17 +10,25 @@
   <url type="repository">https://github.com/astuff/kvaser_interface</url>
   <author email="jwhitley@autonomoustuff.com">Joshua Whitley</author>
   <author email="dstanek@autonomoustuff.com">Daniel Stanek</author>
+  <author email="sungchan.yeo@hlcompany.com">Sungchan Yeo</author>
+
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <build_depend>rosidl_default_generators</build_depend>
 
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>can_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>can_fd_interface</depend>
   <depend>lifecycle_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
     <build_type>ament_cmake</build_type>

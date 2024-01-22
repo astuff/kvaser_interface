@@ -150,6 +150,126 @@ ReturnStatuses KvaserCan::open(
   return ReturnStatuses::OK;
 }
 
+
+ReturnStatuses KvaserCan::open(
+  const uint64_t& hardware_id,
+  const uint8_t& circuit_id,
+  const uint32_t& bitrate,
+  const uint32_t& fd_bitrate,
+  const uint8_t& tseg1_brs,
+  const uint8_t& tseg2_brs,
+  const uint8_t& sjw_brs,
+  const bool& echo_on
+  ) {
+
+  
+  auto channels = KvaserCanUtils::getChannels();
+  uint32_t channel_index = 0;
+  bool channel_found = false;
+
+  if (channels.size() < 1) {
+    return ReturnStatuses::NO_CHANNELS_FOUND;
+  }
+  for (const auto & channel : channels) {
+    if (
+      hardware_id == channel->serial_no &&
+      circuit_id == channel->channel_no_on_card)
+    {
+      channel_index = channel->channel_idx;
+      channel_found = true;
+      break;
+    }
+  }
+
+  if (channel_found) {
+    return open(channel_index, bitrate, fd_bitrate, tseg1_brs, tseg2_brs, sjw_brs, echo_on);
+  } else {
+    return ReturnStatuses::BAD_PARAM;
+  }
+}  
+
+  ReturnStatuses KvaserCan::open(
+  const uint32_t & channel_index,
+  const uint32_t & bitrate,
+  const uint32_t & bitrate_fd,
+  const uint8_t& tseg1_brs,
+  const uint8_t& tseg2_brs,
+  const uint8_t& sjw_brs,
+  const bool & echo_on)
+  {
+     if (!on_bus){
+      int32_t numChan = -1;
+      KvaserCanUtils::getChannelCount(&numChan);
+      if (numChan < 1) {
+        return ReturnStatuses::NO_CHANNELS_FOUND;
+      }
+
+
+      // Open channel
+    *handle = canOpenChannel(channel_index, canOPEN_CAN_FD | canOPEN_EXCLUSIVE);
+    if (*handle < 0) {
+      return ReturnStatuses::INIT_FAILED;
+    }
+
+    // Set bit rate and other parameters
+    uint64_t freq;
+
+    switch (bitrate) {
+      case 500000: freq = canFD_BITRATE_500K_80P; break;
+      case 1000000: freq = canFD_BITRATE_1M_80P; break;
+      case 2000000: freq = canFD_BITRATE_2M_80P; break;
+      case 4000000: freq = canFD_BITRATE_4M_80P; break;
+      case 8000000: freq = canFD_BITRATE_8M_60P; break;
+      default:
+        return ReturnStatuses::BAD_PARAM;
+    }
+
+    uint64_t freq_fd;
+    switch (bitrate_fd)
+    {
+      case 500000: freq_fd = canFD_BITRATE_500K_80P; break;
+      case 1000000: freq_fd = canFD_BITRATE_1M_80P; break;
+      case 2000000: freq_fd = canFD_BITRATE_2M_80P; break;
+      case 4000000: freq_fd = canFD_BITRATE_4M_80P; break;
+      case 8000000: freq_fd = canFD_BITRATE_8M_60P; break;
+      default:
+      {
+        return ReturnStatuses::BAD_PARAM;
+      }
+    }
+
+    if (canSetBusParams(*handle, freq, 0, 0, 0, 0, 0) < 0){
+      return ReturnStatuses::BAD_PARAM;
+    }
+
+    //canSetBusParamsFd (const CanHandle hnd, long freq_brs, unsigned int tseg1_brs, unsigned int tseg2_brs, unsigned int sjw_brs);
+    if (canSetBusParamsFd(*handle, freq_fd, tseg1_brs, tseg2_brs, sjw_brs) < 0)
+    {
+      return ReturnStatuses::BAD_PARAM;
+    }
+
+    // Linuxcan defaults to echo on, so if you've opened the same can channel
+    // from multiple interfaces they will receive the messages that each other
+    // send.  Turn it off here if desired.
+    if (!echo_on)
+    {
+      uint8_t off = 0;
+      canIoCtl(*handle, canIOCTL_SET_LOCAL_TXECHO, &off, 1);
+    }
+
+    // Set output control
+    canSetBusOutputControl(*handle, canDRIVER_NORMAL);
+
+    if (canBusOn(*handle) < 0) {
+        return ReturnStatuses::INIT_FAILED;
+      }
+
+    on_bus = true;
+  }
+  return ReturnStatuses::OK;
+}
+
+
 bool KvaserCan::isOpen()
 {
   if (*handle < 0) {
@@ -195,10 +315,14 @@ ReturnStatuses KvaserCan::read(CanMsg * msg)
   int64_t id_proxy = 0;
   uint32_t flags = 0;
   char data[64];
+  unsigned int size;
 
-  canStatus ret = canRead(*handle, &id_proxy, data, &msg->dlc, &flags, &msg->timestamp);
+
+  canStatus ret = canRead(*handle, &id_proxy, data, &size, &flags, &msg->timestamp);
 
   msg->id = static_cast<uint32_t>(id_proxy);
+  msg->dlc = KvaserCanUtils::sizeToDlc(size);
+
 
   // Only process payload if dlc != 0
   if (msg->dlc != 0) {
@@ -311,6 +435,12 @@ size_t KvaserCanUtils::dlcToSize(const uint8_t & dlc)
         break;
       case 15:
         return 64;
+        break;
+      case 16:
+        return 16;
+        break;
+      case 32:
+        return 32;
         break;
       default:
         return 0;

@@ -289,6 +289,26 @@ public:
     const uint32_t & bitrate,
     const bool & echo_on = true);
 
+  ReturnStatuses open(
+    const uint64_t& hardware_id,
+    const uint8_t& circuit_id,
+    const uint32_t& bitrate,
+    const uint32_t& fd_bitrate,
+    const uint8_t&  tseg1_brs,
+    const uint8_t&  tseg2_brs,
+    const uint8_t&  sjw_brs,
+    const bool& echo_on = true);
+
+  ReturnStatuses open(
+  const uint32_t & channel_index,
+  const uint32_t & bitrate,
+  const uint32_t & bitrate_fd,
+  const uint8_t& tseg1_brs,
+  const uint8_t& tseg2_brs,
+  const uint8_t& sjw_brs,
+  const bool & echo_on);
+  
+
   // Close the can link
   ReturnStatuses close();
 

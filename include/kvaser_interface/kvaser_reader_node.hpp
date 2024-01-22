@@ -26,6 +26,7 @@
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <can_msgs/msg/frame.hpp>
 
+#include <can_fd_interface/msg/frame.hpp>
 #include <memory>
 #include <string>
 
@@ -75,7 +76,14 @@ private:
   uint32_t bit_rate_;
   bool enable_echo_;
   std::shared_ptr<lc::LifecyclePublisher<can_msgs::msg::Frame>> frames_pub_;
+  std::shared_ptr<lc::LifecyclePublisher<can_fd_interface::msg::Frame>> fd_frames_pub_;
   KvaserCan can_reader_;
+
+  uint8_t tseg1_ = 0;
+  uint8_t tseg2_ = 0;
+  uint8_t sjw_ = 0;
+  uint32_t data_bit_rate_ = 2000000;
+  bool is_canfd_ = true;
 };  // class KvaserReaderNode
 
 }  // namespace kvaser_interface
